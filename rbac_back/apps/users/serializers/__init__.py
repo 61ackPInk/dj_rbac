@@ -8,9 +8,11 @@
 from .register import UserRegisterSerializer
 from .login import UserLoginSerializer
 from .user import UserInfoSerializer
+from .refresh_token import RefreshTokenSerializer
 
 __all__ = [
     "UserRegisterSerializer",
     "UserLoginSerializer",
     "UserInfoSerializer",
+    "RefreshTokenSerializer",
 ]

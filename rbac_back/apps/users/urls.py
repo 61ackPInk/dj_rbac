@@ -11,6 +11,7 @@ from apps.users.views import (
     UserRegisterAPIView,
     UserLoginAPIView,
     CurrentUserAPIView,
+    RefreshTokenAPIView,
 )
 
 # 接口
@@ -32,5 +33,11 @@ urlpatterns = [
         "me/",
         CurrentUserAPIView.as_view(),
         name="current-user",
+    ),
+    # 刷新Token
+    path(
+        "refresh/",
+        RefreshTokenAPIView.as_view(),
+        name="refresh-token",
     )
 ]
