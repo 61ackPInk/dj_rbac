@@ -1,0 +1,6 @@
+Django==5.2
+djangorestframework==3.18.0
+django-db-connection-pool[mysql]==1.2.6
+PyMySQL==1.2.0
+loguru==0.7.3
+PyJWT==2.10.1
