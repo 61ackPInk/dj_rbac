@@ -24,6 +24,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
             "email",
             "is_active",
             "create_time",
+            "last_login",
         ]
 
         # 这些字段只能读取，不能通过序列化器修改

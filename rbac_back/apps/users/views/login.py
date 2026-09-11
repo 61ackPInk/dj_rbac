@@ -15,7 +15,7 @@ from common.utils.jwt import (
     create_access_token,
     create_refresh_token,
 )
-
+from django.utils import timezone
 
 class UserLoginAPIView(GenericAPIView):
     """用户登录接口"""
@@ -47,10 +47,13 @@ class UserLoginAPIView(GenericAPIView):
         # 登录序列化器验证成功后，
         # 会把查询到的用户对象放入 validated_data
         user = serializer.validated_data["user"]
+        # 用户名和密码验证成功后，记录本次登录时间
+        user.last_login = timezone.now()
+        # 更新 last_login 字段
+        user.save(update_fields=["last_login"])
 
         # 创建短期访问令牌
         access_token = create_access_token(user)
-
         # 创建长期刷新令牌
         refresh_token = create_refresh_token(user)
 
@@ -69,6 +72,7 @@ class UserLoginAPIView(GenericAPIView):
                 "id": user.id,
                 "username": user.username,
                 "email": user.email,
+                "last_login": user.last_login,
             },
         })
 

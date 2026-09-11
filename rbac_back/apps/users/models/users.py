@@ -17,6 +17,8 @@ class Users(models.Model):
     is_active = models.BooleanField(default=True, verbose_name='是否启用')
     create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间')
+    # 新增字段
+    last_login = models.DateTimeField(blank=True, null=True, verbose_name="最后登录时间")
 
     class Meta:
         db_table = 'sys_users'
