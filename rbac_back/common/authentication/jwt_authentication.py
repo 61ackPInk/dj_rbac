@@ -104,3 +104,12 @@ class JWTAuthentication(BaseAuthentication):
         # 第一个值会成为 request.user
         # 第二个值会成为 request.auth
         return user, token
+
+    def authenticate_header(self, request):
+        """
+        告诉 DRF 当前认证方式是 Bearer。
+
+        存在这个方法时，未登录通常返回 401；
+        如果没有，DRF 可能返回 403。
+        """
+        return self.keyword

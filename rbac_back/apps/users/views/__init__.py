@@ -7,8 +7,10 @@
 """
 from .register import UserRegisterAPIView
 from .login import UserLoginAPIView
+from .current_user import CurrentUserAPIView
 
 __all__ = [
     "UserRegisterAPIView",
-    "UserLoginAPIView"
+    "UserLoginAPIView",
+    "CurrentUserAPIView",
 ]

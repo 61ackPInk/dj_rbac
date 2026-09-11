@@ -7,8 +7,10 @@
 """
 from .register import UserRegisterSerializer
 from .login import UserLoginSerializer
+from .user import UserInfoSerializer
 
 __all__ = [
     "UserRegisterSerializer",
-    "UserLoginSerializer"
+    "UserLoginSerializer",
+    "UserInfoSerializer",
 ]
