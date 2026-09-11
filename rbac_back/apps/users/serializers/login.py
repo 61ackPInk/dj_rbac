@@ -26,6 +26,20 @@ class UserLoginSerializer(serializers.Serializer):
         trim_whitespace=False,
     )
 
+    def validate_username(self, value):
+        if any(character.isspace() for character in value):
+            raise serializers.ValidationError(
+                "用户名不能包含空格"
+            )
+        return value
+
+    def validate_password(self, value):
+        if any(character.isspace() for character in value):
+            raise serializers.ValidationError(
+                "密码不能包含空格"
+            )
+        return value
+
     def validate(self, attrs):
         """
         检查用户名、密码和账号状态。
