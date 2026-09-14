@@ -6,6 +6,10 @@
 @Desc : 
 """
 
-from .users import Users
+from .users import User
+from .roles import Role
 
-__all__ = ['Users']
+__all__ = [
+    'User',
+    'Role',
+]

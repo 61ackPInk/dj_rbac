@@ -13,7 +13,7 @@ from rest_framework.authentication import (
 )
 from rest_framework.exceptions import AuthenticationFailed
 
-from apps.users.models import Users
+from apps.users.models import User
 
 
 class JWTAuthentication(BaseAuthentication):
@@ -92,11 +92,11 @@ class JWTAuthentication(BaseAuthentication):
 
         try:
             # 查询用户，同时确保账号处于启用状态
-            user = Users.objects.get(
+            user = User.objects.get(
                 id=user_id,
                 is_active=True,
             )
-        except Users.DoesNotExist:
+        except User.DoesNotExist:
             raise AuthenticationFailed(
                 "用户不存在或已被禁用"
             )

@@ -1,20 +1,20 @@
 """
 -*- coding: utf-8 -*-
-@File  : user.py
+@File  : users.py
 @Author: 61ackPink
 @Time : 2026/9/11 16:20
 @Desc : 用户信息序列化器
 """
 from rest_framework import serializers
 
-from apps.users.models import Users
+from apps.users.models import User
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
     """当前用户信息序列化器"""
 
     class Meta:
-        model = Users
+        model = User
 
         # 只返回允许前端查看的字段
         # 密码绝对不能放在这里奥!!!!

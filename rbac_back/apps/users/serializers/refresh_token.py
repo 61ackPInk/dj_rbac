@@ -9,7 +9,7 @@ import jwt
 from django.conf import settings
 from rest_framework import serializers
 
-from apps.users.models import Users
+from apps.users.models import User
 
 
 class RefreshTokenSerializer(serializers.Serializer):
@@ -60,11 +60,11 @@ class RefreshTokenSerializer(serializers.Serializer):
 
         try:
             # 刷新 Token 时再次检查用户是否存在、是否启用
-            user = Users.objects.get(
+            user = User.objects.get(
                 id=user_id,
                 is_active=True,
             )
-        except Users.DoesNotExist:
+        except User.DoesNotExist:
             raise serializers.ValidationError({
                 "refresh_token": "用户不存在或已被禁用"
             })

@@ -8,7 +8,7 @@
 
 from rest_framework import serializers
 
-from apps.users.models import Users
+from apps.users.models import User
 
 
 class UserLoginSerializer(serializers.Serializer):
@@ -54,8 +54,8 @@ class UserLoginSerializer(serializers.Serializer):
 
         try:
             # 根据用户名查询用户
-            user = Users.objects.get(username=username)
-        except Users.DoesNotExist:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
             # 不告诉前端具体是用户名不存在还是密码错误，
             # 避免别人通过接口猜测系统中有哪些账号
             raise serializers.ValidationError(

@@ -9,7 +9,7 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password, check_password
 
-class Users(models.Model):
+class User(models.Model):
     """用户表"""
     username = models.CharField(max_length=50, unique=True, db_index=True, verbose_name='用户名')
     password = models.CharField(max_length=128, verbose_name='密码')

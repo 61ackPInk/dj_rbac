@@ -11,7 +11,7 @@ from django.contrib.auth.password_validation import (
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
-from apps.users.models import Users
+from apps.users.models import User
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -41,7 +41,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = Users
+        model = User
         fields = [
             "username",
             "email",
@@ -59,7 +59,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
                 "用户名不能包含空格"
             )
 
-        if Users.objects.filter(username=value).exists():
+        if User.objects.filter(username=value).exists():
             raise serializers.ValidationError(
                 "用户名已经存在"
             )
@@ -111,7 +111,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         validated_data.pop("password_confirm")
         raw_password = validated_data.pop("password")
 
-        user = Users(**validated_data)
+        user = User(**validated_data)
         user.set_password(raw_password)
         user.save()
 
