@@ -15,6 +15,8 @@ class User(models.Model):
     password = models.CharField(max_length=128, verbose_name='密码')
     email = models.EmailField(blank=True, null=True, verbose_name='邮箱')
     is_active = models.BooleanField(default=True, verbose_name='是否启用')
+    is_root = models.BooleanField(default=False, db_index=True, verbose_name="是否为根管理员",
+                                  help_text="根管理员可以管理系统角色和权限")
     create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间')
     # 新增字段
