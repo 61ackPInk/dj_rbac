@@ -12,6 +12,7 @@ from apps.users.views import (
     UserLoginAPIView,
     CurrentUserAPIView,
     RefreshTokenAPIView,
+    RoleDetailAPIView,
     RoleListCreateAPIView,
 )
 
@@ -46,9 +47,16 @@ urlpatterns = [
     # 角色管理
     # --------------------
 
+    # POST：创建  GET：角色列表查询
     path(
         "roles/",
         RoleListCreateAPIView.as_view(),
         name="role-list-create",
+    ),
+    # GET：查询单个, PUT、PATCH、DELETE
+    path(
+        "roles/<int:role_id>/",
+        RoleDetailAPIView.as_view(),
+        name="role-detail",
     ),
 ]
