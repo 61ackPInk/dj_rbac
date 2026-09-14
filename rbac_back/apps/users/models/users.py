@@ -3,7 +3,7 @@
 @File  : users.py
 @Author: 61ackPink
 @Time : 2026/9/10 16:59
-@Desc : 
+@Desc : 用户模型
 """
 
 from django.db import models
@@ -17,6 +17,22 @@ class User(models.Model):
     is_active = models.BooleanField(default=True, verbose_name='是否启用')
     is_root = models.BooleanField(default=False, db_index=True, verbose_name="是否为根管理员",
                                   help_text="根管理员可以管理系统角色和权限")
+    roles = models.ManyToManyField(
+        "users.Role",
+
+        # 指定使用我们自己创建的中间表，
+        # Django 就不会额外生成默认关联表
+        through="users.UserRole",
+
+        # 明确中间表中哪两个字段表示用户和角色
+        through_fields=("user", "role"),
+
+        # 可以通过 role.users 查询拥有该角色的用户
+        related_name="users",
+
+        blank=True,
+        verbose_name="角色",
+    )
     create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间')
     # 新增字段
