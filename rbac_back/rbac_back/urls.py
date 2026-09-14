@@ -8,7 +8,7 @@ urlpatterns = [
     ),
     # 用户模块API
     path(
-        'api/auth/',
+        'api/',
         include('apps.users.urls')
     )
 ]

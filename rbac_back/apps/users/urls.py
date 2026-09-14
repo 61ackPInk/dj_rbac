@@ -12,32 +12,43 @@ from apps.users.views import (
     UserLoginAPIView,
     CurrentUserAPIView,
     RefreshTokenAPIView,
+    RoleListCreateAPIView,
 )
 
 # 接口
 urlpatterns = [
     # 用户注册
     path(
-        "register/",
+        "auth/register/",
         UserRegisterAPIView.as_view(),
         name="user-register",
     ),
     # 用户登录
     path(
-        "login/",
+        "auth/login/",
         UserLoginAPIView.as_view(),
         name="user-login",
     ),
     # 用户信息
     path(
-        "me/",
+        "auth/me/",
         CurrentUserAPIView.as_view(),
         name="current-user",
     ),
     # 刷新Token
     path(
-        "refresh/",
+        "auth/refresh/",
         RefreshTokenAPIView.as_view(),
         name="refresh-token",
-    )
+    ),
+
+    # --------------------
+    # 角色管理
+    # --------------------
+
+    path(
+        "roles/",
+        RoleListCreateAPIView.as_view(),
+        name="role-list-create",
+    ),
 ]

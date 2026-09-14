@@ -9,10 +9,12 @@ from .register import UserRegisterAPIView
 from .login import UserLoginAPIView
 from .current_user import CurrentUserAPIView
 from .refresh_token import RefreshTokenAPIView
+from .role import RoleListCreateAPIView
 
 __all__ = [
     "UserRegisterAPIView",
     "UserLoginAPIView",
     "CurrentUserAPIView",
     "RefreshTokenAPIView",
+    "RoleListCreateAPIView",
 ]
