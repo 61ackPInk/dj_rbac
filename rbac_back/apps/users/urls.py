@@ -10,6 +10,8 @@ from django.urls import path
 from apps.users.views import (
     UserRegisterAPIView,
     UserLoginAPIView,
+    CurrentUserAPIView,
+    RefreshTokenAPIView,
 )
 
 # 接口
@@ -25,5 +27,17 @@ urlpatterns = [
         "login/",
         UserLoginAPIView.as_view(),
         name="user-login",
+    ),
+    # 用户信息
+    path(
+        "me/",
+        CurrentUserAPIView.as_view(),
+        name="current-user",
+    ),
+    # 刷新Token
+    path(
+        "refresh/",
+        RefreshTokenAPIView.as_view(),
+        name="refresh-token",
     )
 ]

@@ -107,6 +107,14 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": (
         "common.custom.json_render.Renderer",
     ),
+    # 所有接口默认使用自定义 JWT 身份认证
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "common.authentication.jwt_authentication.JWTAuthentication",
+    ),
+    # 所有接口默认要求用户已经登录
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
 }
 
 # JWT 配置

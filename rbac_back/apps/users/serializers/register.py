@@ -5,26 +5,43 @@
 @Time : 2026/9/11 14:30
 @Desc : 用户注册序列化器
 """
-from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.password_validation import (
+    validate_password as django_validate_password,
+)
+from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
-from apps.users.models import Users
+from apps.users.models import User
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     """用户注册序列化器"""
+
+    username = serializers.CharField(
+        min_length=4,
+        max_length=20,
+        trim_whitespace=False,
+        error_messages={
+            "blank": "用户名不能为空",
+            "min_length": "用户名不能少于4个字符",
+            "max_length": "用户名不能超过20个字符",
+        },
+    )
+
     password = serializers.CharField(
         write_only=True,
+        max_length=128,
         trim_whitespace=False,
-        validators=[validate_password],
     )
+
     password_confirm = serializers.CharField(
         write_only=True,
+        max_length=128,
         trim_whitespace=False,
     )
 
     class Meta:
-        model = Users
+        model = User
         fields = [
             "username",
             "email",
@@ -33,14 +50,50 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         ]
 
     def validate_username(self, value):
-        """检查用户名"""
+        """验证用户名"""
 
-        username = value.strip()
+        # isspace() 不仅能检查普通空格，
+        # 还可以检查制表符、换行符等空白字符
+        if any(character.isspace() for character in value):
+            raise serializers.ValidationError(
+                "用户名不能包含空格"
+            )
 
-        if Users.objects.filter(username=username).exists():
-            raise serializers.ValidationError("用户名已经存在")
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError(
+                "用户名已经存在"
+            )
 
-        return username
+        return value
+
+    def validate_password(self, value):
+        """验证密码"""
+
+        if any(character.isspace() for character in value):
+            raise serializers.ValidationError(
+                "密码不能包含空格"
+            )
+
+        try:
+            # 使用 settings.py 中配置的 Django 密码验证规则
+            django_validate_password(value)
+        except DjangoValidationError as error:
+            # 把 Django 的错误转换为 DRF 能返回的错误
+            raise serializers.ValidationError(
+                list(error.messages)
+            )
+
+        return value
+
+    def validate_password_confirm(self, value):
+        """验证确认密码中的空格"""
+
+        if any(character.isspace() for character in value):
+            raise serializers.ValidationError(
+                "确认密码不能包含空格"
+            )
+
+        return value
 
     def validate(self, attrs):
         """检查两次密码是否一致"""
@@ -53,12 +106,12 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        """创建用户"""
+        """创建用户并加密密码"""
 
         validated_data.pop("password_confirm")
         raw_password = validated_data.pop("password")
 
-        user = Users(**validated_data)
+        user = User(**validated_data)
         user.set_password(raw_password)
         user.save()
 

@@ -9,7 +9,7 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password, check_password
 
-class Users(models.Model):
+class User(models.Model):
     """用户表"""
     username = models.CharField(max_length=50, unique=True, db_index=True, verbose_name='用户名')
     password = models.CharField(max_length=128, verbose_name='密码')
@@ -17,6 +17,8 @@ class Users(models.Model):
     is_active = models.BooleanField(default=True, verbose_name='是否启用')
     create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间')
+    # 新增字段
+    last_login = models.DateTimeField(blank=True, null=True, verbose_name="最后登录时间")
 
     class Meta:
         db_table = 'sys_users'
