@@ -3,7 +3,7 @@
 @File  : roles.py
 @Author: 61ackPink
 @Time : 2026/9/14 16:57
-@Desc : 角色序列化器
+@Desc : 角色管理
 """
 from rest_framework import serializers
 

@@ -3,7 +3,7 @@
 @File  : user_roles.py
 @Author: 61ackPink
 @Time : 2026/9/15 14:47
-@Desc : 角色分配序列化器
+@Desc : 用户角色分配
 """
 from rest_framework import serializers
 

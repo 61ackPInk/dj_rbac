@@ -7,16 +7,22 @@
 """
 from .register import UserRegisterSerializer
 from .login import UserLoginSerializer
-from .users import UserInfoSerializer
-from .roles import RoleSerializer
 from .refresh_token import RefreshTokenSerializer
+
+from .users import (
+    UserInfoSerializer,
+    UserAdminUpdateSerializer
+)
+from .roles import RoleSerializer
+
 from .user_roles import UserRoleAssignSerializer
 
 __all__ = [
     "UserRegisterSerializer",
     "UserLoginSerializer",
-    "UserInfoSerializer",
-    "RoleSerializer",
     "RefreshTokenSerializer",
+    "UserInfoSerializer",
+    "UserAdminUpdateSerializer",
+    "RoleSerializer",
     "UserRoleAssignSerializer"
 ]

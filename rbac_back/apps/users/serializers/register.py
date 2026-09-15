@@ -3,7 +3,7 @@
 @File  : register.py
 @Author: 61ackPink
 @Time : 2026/9/11 14:30
-@Desc : 用户注册序列化器
+@Desc : 注册
 """
 from django.contrib.auth.password_validation import (
     validate_password as django_validate_password,

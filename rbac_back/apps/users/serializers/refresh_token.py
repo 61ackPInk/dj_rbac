@@ -3,7 +3,7 @@
 @File  : refresh_token.py
 @Author: 61ackPink
 @Time : 2026/9/11 16:41
-@Desc : 刷新 Token 序列化器
+@Desc : 刷新令牌
 """
 import jwt
 from django.conf import settings

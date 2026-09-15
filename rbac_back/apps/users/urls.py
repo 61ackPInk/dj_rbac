@@ -18,6 +18,7 @@ from apps.users.views import (
     # 用户
     UserListAPIView,
     UserRoleAssignAPIView,
+    UserDetailAPIView,
 )
 
 # 接口
@@ -68,16 +69,22 @@ urlpatterns = [
     # 用户相关
     # --------------------
 
-    # 获取用户列表
+    # 用户列表
     path(
         "users/",
         UserListAPIView.as_view(),
         name="user-list",
     ),
-    # 给用户分配角色
+    # 用户角色分配
     path(
         "users/<int:user_id>/role/",
         UserRoleAssignAPIView.as_view(),
         name="user-role-assign",
+    ),
+    # 用户详情、状态修改
+    path(
+        "users/<int:user_id>/",
+        UserDetailAPIView.as_view(),
+        name="user-detail",
     ),
 ]

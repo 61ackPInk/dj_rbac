@@ -3,7 +3,7 @@
 @File  : users.py
 @Author: 61ackPink
 @Time : 2026/9/11 16:20
-@Desc : 用户信息序列化器
+@Desc : 用户信息和状态
 """
 from rest_framework import serializers
 
@@ -57,3 +57,102 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
         # 当前序列化器只用于返回用户信息
         read_only_fields = fields
+
+
+class UserAdminUpdateSerializer(serializers.ModelSerializer):
+    """根管理员修改用户基本信息"""
+
+    username = serializers.CharField(
+        required=False,
+        min_length=4,
+        max_length=20,
+        trim_whitespace=False,
+        error_messages={
+            "blank": "用户名不能为空",
+            "min_length": "用户名不能少于4个字符",
+            "max_length": "用户名不能超过20个字符",
+        },
+    )
+
+    email = serializers.EmailField(
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        error_messages={
+            "invalid": "邮箱格式不正确",
+        },
+    )
+
+    is_active = serializers.BooleanField(
+        required=False,
+        error_messages={
+            "invalid": "用户状态必须是布尔值",
+        },
+    )
+
+    class Meta:
+        model = User
+
+        # 只允许管理员修改以下三个字段
+        fields = [
+            "username",
+            "email",
+            "is_active",
+        ]
+
+    def validate_username(self, value):
+        """验证用户名"""
+
+        if any(character.isspace() for character in value):
+            raise serializers.ValidationError(
+                "用户名不能包含空格"
+            )
+
+        # 修改用户时，排除当前用户自身。
+        # 否则保留原用户名也会被判断为重复。
+        queryset = User.objects.filter(
+            username=value
+        )
+
+        if self.instance:
+            queryset = queryset.exclude(
+                id=self.instance.id
+            )
+
+        if queryset.exists():
+            raise serializers.ValidationError(
+                "用户名已经存在"
+            )
+
+        return value
+
+    def validate_email(self, value):
+        """
+        统一空邮箱的保存形式。
+
+        前端传入空字符串时，将其转换为 None，
+        数据库最终保存为 NULL。
+        """
+
+        if value == "":
+            return None
+
+        return value
+
+    def validate(self, attrs):
+        """执行涉及当前用户对象的验证"""
+
+        user = self.instance
+        is_active = attrs.get("is_active")
+
+        # 不允许通过普通用户管理接口禁用根管理员
+        if (
+            user
+            and user.is_root
+            and is_active is False
+        ):
+            raise serializers.ValidationError({
+                "is_active": "不能禁用根管理员账号"
+            })
+
+        return attrs

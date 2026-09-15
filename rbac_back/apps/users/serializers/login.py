@@ -3,7 +3,7 @@
 @File  : login.py
 @Author: 61ackPink
 @Time : 2026/9/11 15:17
-@Desc : 用户登录序列化器
+@Desc : 登录
 """
 
 from rest_framework import serializers
