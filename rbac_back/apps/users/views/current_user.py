@@ -9,27 +9,54 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from apps.users.serializers import UserInfoSerializer
+from apps.users.serializers import (
+    UserInfoSerializer,
+    UserProfileUpdateSerializer,
+)
 
 
 class CurrentUserAPIView(GenericAPIView):
-    """获取当前登录用户信息"""
+    """获取和修改当前登录用户信息"""
 
     serializer_class = UserInfoSerializer
-
-    # 明确要求当前接口必须登录
-    # 即使 settings.py 已经全局配置，这里写出来也更直观
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
+    def get_serializer_class(self):
         """
-        JWTAuthentication 验证成功后，会自动设置：
-
-        request.user：当前用户对象
-        request.auth：当前请求携带的 Token
+        GET：返回用户完整信息
+        PATCH：验证允许修改的个人资料
         """
 
-        # 将当前用户对象转换成可以返回的字典数据
-        serializer = self.get_serializer(request.user)
+        if self.request.method == "PATCH":
+            return UserProfileUpdateSerializer
+
+        return UserInfoSerializer
+
+    def get(self, request, *args, **kwargs):
+        """获取当前登录用户信息"""
+
+        serializer = self.get_serializer(
+            request.user
+        )
 
         return Response(serializer.data)
+
+    def patch(self, request, *args, **kwargs):
+        """修改当前用户的用户名或邮箱"""
+
+        serializer = self.get_serializer(
+            request.user,
+            data=request.data,
+
+            # 允许只提交需要修改的字段
+            partial=True,
+        )
+
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+
+        # 修改成功后使用只读序列化器
+        # 返回完整的用户信息
+        response_serializer = UserInfoSerializer(user)
+
+        return Response(response_serializer.data)

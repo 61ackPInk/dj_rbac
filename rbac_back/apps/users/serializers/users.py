@@ -156,3 +156,71 @@ class UserAdminUpdateSerializer(serializers.ModelSerializer):
             })
 
         return attrs
+
+
+class UserProfileUpdateSerializer(serializers.ModelSerializer):
+    """当前用户修改自己的基本资料"""
+
+    username = serializers.CharField(
+        required=False,
+        min_length=4,
+        max_length=20,
+        trim_whitespace=False,
+        error_messages={
+            "blank": "用户名不能为空",
+            "min_length": "用户名不能少于4个字符",
+            "max_length": "用户名不能超过20个字符",
+        },
+    )
+
+    email = serializers.EmailField(
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        error_messages={
+            "invalid": "邮箱格式不正确",
+        },
+    )
+
+    class Meta:
+        model = User
+
+        # 普通用户只能修改用户名和邮箱
+        fields = [
+            "username",
+            "email",
+        ]
+
+    def validate_username(self, value):
+        """验证用户名"""
+
+        # 用户名中不能出现空格、制表符或换行符
+        if any(character.isspace() for character in value):
+            raise serializers.ValidationError(
+                "用户名不能包含空格"
+            )
+
+        # 检查用户名是否已经被其他用户使用
+        queryset = User.objects.filter(
+            username=value
+        )
+
+        if self.instance:
+            queryset = queryset.exclude(
+                id=self.instance.id
+            )
+
+        if queryset.exists():
+            raise serializers.ValidationError(
+                "用户名已经存在"
+            )
+
+        return value
+
+    def validate_email(self, value):
+        """统一空邮箱的保存形式"""
+
+        if value == "":
+            return None
+
+        return value

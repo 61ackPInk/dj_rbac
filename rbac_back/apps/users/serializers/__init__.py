@@ -11,7 +11,8 @@ from .refresh_token import RefreshTokenSerializer
 
 from .users import (
     UserInfoSerializer,
-    UserAdminUpdateSerializer
+    UserAdminUpdateSerializer,
+    UserProfileUpdateSerializer
 )
 from .roles import RoleSerializer
 
@@ -23,6 +24,7 @@ __all__ = [
     "RefreshTokenSerializer",
     "UserInfoSerializer",
     "UserAdminUpdateSerializer",
+    "UserProfileUpdateSerializer",
     "RoleSerializer",
     "UserRoleAssignSerializer"
 ]
