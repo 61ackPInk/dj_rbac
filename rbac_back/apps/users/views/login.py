@@ -10,7 +10,10 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from apps.users.serializers import UserLoginSerializer
+from apps.users.serializers import (
+    UserInfoSerializer,
+    UserLoginSerializer,
+)
 from common.utils.jwt import (
     create_access_token,
     create_refresh_token,
@@ -63,17 +66,15 @@ class UserLoginAPIView(GenericAPIView):
             * 60
         )
 
+        # 统一通过用户信息序列化器生成返回数据
+        user_data = UserInfoSerializer(user).data
+
         return Response({
             "access_token": access_token,
             "refresh_token": refresh_token,
             "token_type": "Bearer",
             "expires_in": access_expires,
-            "user": {
-                "id": user.id,
-                "username": user.username,
-                "email": user.email,
-                "last_login": user.last_login,
-            },
+            "user": user_data
         })
 
 """

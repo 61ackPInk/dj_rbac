@@ -8,10 +8,8 @@
 
 from .users import User
 from .roles import Role
-from .user_roles import UserRole
 
 __all__ = [
     'User',
     'Role',
-    'UserRole',
 ]
