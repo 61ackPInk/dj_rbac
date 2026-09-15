@@ -101,6 +101,14 @@ class JWTAuthentication(BaseAuthentication):
                 "用户不存在或已被禁用"
             )
 
+        # 检查 Token 版本
+        token_version = payload.get("token_version")
+
+        if token_version != user.token_version:
+            raise AuthenticationFailed(
+                "登录凭证已失效，请重新登录"
+            )
+
         # 第一个值会成为 request.user
         # 第二个值会成为 request.auth
         return user, token

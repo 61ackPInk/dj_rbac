@@ -69,6 +69,14 @@ class RefreshTokenSerializer(serializers.Serializer):
                 "refresh_token": "用户不存在或已被禁用"
             })
 
+        # 防止使用旧版本 refresh_token 获取新令牌
+        token_version = payload.get("token_version")
+
+        if token_version != user.token_version:
+            raise serializers.ValidationError({
+                "refresh_token": "刷新凭证已失效，请重新登录"
+            })
+
         # 把用户对象交给视图，用于生成新的 access_token
         attrs["user"] = user
 

@@ -40,6 +40,9 @@ def create_token(user, token_type, lifetime):
         # 区分 access_token 和 refresh_token
         "token_type": token_type,
 
+        # 记录签发 Token 时的用户 Token 版本
+        "token_version": user.token_version,
+
         # Token 签发时间
         "iat": now,
 

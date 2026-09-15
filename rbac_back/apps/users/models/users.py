@@ -38,6 +38,12 @@ class User(models.Model):
     # 新增字段
     last_login = models.DateTimeField(blank=True, null=True, verbose_name="最后登录时间")
 
+    token_version = models.PositiveIntegerField(
+        default=1,
+        verbose_name="Token版本",
+        help_text="版本变化后，之前签发的Token立即失效",
+    )
+
     class Meta:
         db_table = 'sys_users'
         verbose_name = '系统用户'
