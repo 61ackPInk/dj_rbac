@@ -117,20 +117,19 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
         return user
 
-"""
-前端提交 JSON
-    ↓
-UserRegisterAPIView.post()
-    ↓
-UserRegisterSerializer 验证数据
-    ↓
-检查用户名是否重复
-    ↓
-检查两次密码是否一致
-    ↓
-使用 set_password() 加密密码
-    ↓
-保存到 sys_users
-    ↓
-返回用户 ID、用户名和邮箱
-"""
+
+# 前端提交 JSON
+#     ↓
+# UserRegisterAPIView.post()
+#     ↓
+# UserRegisterSerializer 验证数据
+#     ↓
+# 检查用户名是否重复
+#     ↓
+# 检查两次密码是否一致
+#     ↓
+# 使用 set_password() 加密密码
+#     ↓
+# 保存到 sys_users
+#     ↓
+# 返回用户 ID、用户名和邮箱

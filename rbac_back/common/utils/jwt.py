@@ -91,15 +91,13 @@ def create_refresh_token(user):
         lifetime=lifetime,
     )
 
-"""
-Token 内容示例
-生成的 Token 解码后类似 must：
-{
-  "user_id": nth Stylized为bly，  kahe。  We need fix weird final? I accidentally glitch. Need continue coherent. 
-  "username":fin "admin",
-  "token_type": "access",
-  "iat": 1789092000,
-  "exp": 1789093800,
-  "jti": "一个随机的唯一编号"
-}
-"""
+
+# Token 内容示例
+# {
+#   "user_id": nth Stylized为bly，  kahe。  We need fix weird final? I accidentally glitch. Need continue coherent.
+#   "username":fin "admin",
+#   "token_type": "access",
+#   "iat": 1789092000,
+#   "exp": 1789093800,
+#   "jti": "一个随机的唯一编号"
+# }

@@ -56,3 +56,21 @@ Traceback (most recent call last):
   File "D:\61\language\conda\envs\django_pro\lib\site-packages\django\db\migrations\graph.py", line 60, in raise_error
     raise NodeNotFoundError(self.error_message, self.key, origin=self.origin)
 django.db.migrations.exceptions.NodeNotFoundError: Migration users.0003_role dependencies reference nonexistent parent node ('users', '0002_users_last_login')
+[2026-09-14 18:31:03.513] [CRITICAL] [common.utils.log.log:handle_exception:186] [PID:34772 TID:27956] 程序发生未捕获异常: UnicodeEncodeError: 'gbk' codec can't encode character '\xe5' in position 44073: illegal multibyte sequence
+Traceback (most recent call last):
+> File "D:\61\Git\dj_rbac\rbac_back\manage.py", line 22, in <module>
+    main()
+  File "D:\61\Git\dj_rbac\rbac_back\manage.py", line 18, in main
+    execute_from_command_line(sys.argv)
+  File "D:\61\language\conda\envs\django_pro\lib\site-packages\django\core\management\__init__.py", line 442, in execute_from_command_line
+    utility.execute()
+  File "D:\61\language\conda\envs\django_pro\lib\site-packages\django\core\management\__init__.py", line 436, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+  File "D:\61\language\conda\envs\django_pro\lib\site-packages\django\core\management\base.py", line 416, in run_from_argv
+    self.execute(*args, **cmd_options)
+  File "D:\61\language\conda\envs\django_pro\lib\site-packages\django\core\management\base.py", line 460, in execute
+    output = self.handle(*args, **options)
+  File "D:\61\language\conda\envs\django_pro\lib\site-packages\django\core\management\commands\shell.py", line 247, in handle
+    exec(options["command"], {**globals(), **self.get_namespace(**options)})
+  File "<string>", line 1, in <module>
+UnicodeEncodeError: 'gbk' codec can't encode character '\xe5' in position 44073: illegal multibyte sequence

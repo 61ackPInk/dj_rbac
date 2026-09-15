@@ -16,7 +16,7 @@ class UserLoginSerializer(serializers.Serializer):
 
     # 登录时前端需要提交用户名
     username = serializers.CharField(
-        max_length=50,
+        max_length=20,
         trim_whitespace=True,
     )
     # write_only=True 表示密码只用于接收请求
@@ -81,14 +81,12 @@ class UserLoginSerializer(serializers.Serializer):
 
         return attrs
 
-"""
-接收用户名和密码
-    ↓
-查询用户是否存在
-    ↓
-调用 check_password() 验证密码
-    ↓
-检查账号是否启用
-    ↓
-把 user 对象交给登录视图
-"""
+# 接收用户名和密码
+#     ↓
+# 查询用户是否存在
+#     ↓
+# 调用 check_password() 验证密码
+#     ↓
+# 检查账号是否启用
+#     ↓
+# 把 user 对象交给登录视图

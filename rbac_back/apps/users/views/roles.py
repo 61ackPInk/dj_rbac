@@ -1,6 +1,6 @@
 """
 -*- coding: utf-8 -*-
-@File  : role.py
+@File  : roles.py
 @Author: 61ackPink
 @Time : 2026/9/14 17:37
 @Desc : 角色视图
@@ -115,7 +115,7 @@ class RoleDetailAPIView(GenericAPIView):
             id=role_id,
         )
 
-    def get(self, request, role_id):
+    def get(self, request, *args, **kwargs):
         """获取角色详情"""
 
         role = self.get_object()
@@ -124,7 +124,7 @@ class RoleDetailAPIView(GenericAPIView):
 
         return Response(serializer.data)
 
-    def put(self, request, role_id):
+    def put(self, request, *args, **kwargs):
         """完整修改角色"""
 
         role = self.get_object()
@@ -141,7 +141,7 @@ class RoleDetailAPIView(GenericAPIView):
             self.get_serializer(role).data
         )
 
-    def patch(self, request, role_id):
+    def patch(self, request, *args, **kwargs):
         """局部修改角色"""
 
         role = self.get_object()
@@ -159,7 +159,7 @@ class RoleDetailAPIView(GenericAPIView):
             self.get_serializer(role).data
         )
 
-    def delete(self, request, role_id):
+    def delete(self, request, *args, **kwargs):
         """停用角色"""
 
         role = self.get_object()
