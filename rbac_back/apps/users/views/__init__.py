@@ -14,6 +14,7 @@ from .roles import (
     RoleDetailAPIView
 )
 from .user_roles import UserRoleAssignAPIView
+from .users import UserListAPIView
 
 __all__ = [
     "UserRegisterAPIView",
@@ -23,4 +24,5 @@ __all__ = [
     "RoleListCreateAPIView",
     "RoleDetailAPIView",
     "UserRoleAssignAPIView",
+    "UserListAPIView",
 ]
