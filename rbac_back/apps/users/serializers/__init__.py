@@ -18,6 +18,11 @@ from .roles import RoleSerializer
 
 from .user_roles import UserRoleAssignSerializer
 
+from .passwords import (
+    UserPasswordChangeSerializer,
+    UserPasswordResetSerializer,
+)
+
 __all__ = [
     "UserRegisterSerializer",
     "UserLoginSerializer",
@@ -26,5 +31,7 @@ __all__ = [
     "UserAdminUpdateSerializer",
     "UserProfileUpdateSerializer",
     "RoleSerializer",
-    "UserRoleAssignSerializer"
+    "UserRoleAssignSerializer",
+    "UserPasswordChangeSerializer",
+    "UserPasswordResetSerializer",
 ]

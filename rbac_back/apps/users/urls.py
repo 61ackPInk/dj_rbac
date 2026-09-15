@@ -8,17 +8,20 @@
 from django.urls import path
 
 from apps.users.views import (
+    # 用户
     UserRegisterAPIView,
     UserLoginAPIView,
     CurrentUserAPIView,
     RefreshTokenAPIView,
+    UserPasswordChangeAPIView,
     # 角色
     RoleDetailAPIView,
     RoleListCreateAPIView,
-    # 用户
+    # 管理员操作用户
     UserListAPIView,
     UserRoleAssignAPIView,
     UserDetailAPIView,
+    UserPasswordResetAPIView,
 )
 
 # 接口
@@ -47,6 +50,12 @@ urlpatterns = [
         RefreshTokenAPIView.as_view(),
         name="refresh-token",
     ),
+    # 修改密码
+    path(
+        "auth/password/",
+        UserPasswordChangeAPIView.as_view(),
+        name="user-password-change",
+    ),
 
     # --------------------
     # 角色管理
@@ -66,7 +75,7 @@ urlpatterns = [
     ),
 
     # --------------------
-    # 用户相关
+    # 管理员操作用户
     # --------------------
 
     # 用户列表
@@ -87,4 +96,11 @@ urlpatterns = [
         UserDetailAPIView.as_view(),
         name="user-detail",
     ),
+    # 根管理员重置指定用户密码
+    path(
+        "users/<int:user_id>/password/",
+        UserPasswordResetAPIView.as_view(),
+        name="user-password-reset",
+    ),
+
 ]

@@ -19,6 +19,11 @@ from .users import (
     UserDetailAPIView,
 )
 
+from .passwords import (
+    UserPasswordChangeAPIView,
+    UserPasswordResetAPIView,
+)
+
 __all__ = [
     "UserRegisterAPIView",
     "UserLoginAPIView",
@@ -28,5 +33,7 @@ __all__ = [
     "RoleDetailAPIView",
     "UserRoleAssignAPIView",
     "UserListAPIView",
-    "UserDetailAPIView"
+    "UserDetailAPIView",
+    "UserPasswordChangeAPIView",
+    "UserPasswordResetAPIView",
 ]
