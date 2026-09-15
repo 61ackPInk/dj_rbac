@@ -10,6 +10,7 @@ from .login import UserLoginSerializer
 from .users import UserInfoSerializer
 from .roles import RoleSerializer
 from .refresh_token import RefreshTokenSerializer
+from .user_roles import UserRoleAssignSerializer
 
 __all__ = [
     "UserRegisterSerializer",
@@ -17,4 +18,5 @@ __all__ = [
     "UserInfoSerializer",
     "RoleSerializer",
     "RefreshTokenSerializer",
+    "UserRoleAssignSerializer"
 ]
