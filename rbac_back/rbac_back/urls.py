@@ -10,6 +10,11 @@ urlpatterns = [
     path(
         'api/',
         include('apps.users.urls')
-    )
+    ),
+    # 页面管理模块API
+    path(
+        "api/pages/",
+        include("apps.pages.urls"),
+    ),
 ]
 

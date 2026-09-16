@@ -3,7 +3,7 @@
 @File  : urls.py
 @Author: 61ackPink
 @Time : 2026/9/10 16:58
-@Desc : 用户功能API
+@Desc : 用户、角色路由
 """
 from django.urls import path
 
