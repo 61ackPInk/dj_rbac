@@ -9,6 +9,7 @@ from .pages import (
     PageParentInfoSerializer,
     PageRoleInfoSerializer,
     PageSerializer,
+    VisiblePageSerializer,
 )
 
 
@@ -16,4 +17,5 @@ __all__ = [
     "PageParentInfoSerializer",
     "PageRoleInfoSerializer",
     "PageSerializer",
+    "VisiblePageSerializer",
 ]

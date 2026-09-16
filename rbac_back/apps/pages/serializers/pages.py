@@ -248,3 +248,24 @@ class PageSerializer(serializers.ModelSerializer):
         return attrs
 
 
+class VisiblePageSerializer(serializers.ModelSerializer):
+    """普通用户可见页面信息"""
+
+    class Meta:
+        model = Page
+
+        # 只返回前端导航需要的信息，
+        # 不暴露页面分配给了哪些角色
+        fields = [
+            "id",
+            "name",
+            "code",
+            "path",
+            "component",
+            "icon",
+            "parent_id",
+            "sort_order",
+        ]
+
+        read_only_fields = fields
+

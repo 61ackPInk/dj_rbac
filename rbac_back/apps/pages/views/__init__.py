@@ -8,10 +8,12 @@
 from .pages import (
     PageDetailAPIView,
     PageListCreateAPIView,
+    VisiblePageListAPIView,
 )
 
 
 __all__ = [
     "PageDetailAPIView",
     "PageListCreateAPIView",
+    "VisiblePageListAPIView",
 ]

@@ -14,6 +14,13 @@ from apps.pages.models import Page
 from apps.pages.serializers import PageSerializer
 from common.permissions import IsRootUser
 
+from rest_framework.permissions import IsAuthenticated
+
+from apps.pages.serializers import (
+    PageSerializer,
+    VisiblePageSerializer,
+)
+
 
 class PageListCreateAPIView(GenericAPIView):
     """根管理员查询和创建页面"""
@@ -147,3 +154,53 @@ class PageDetailAPIView(GenericAPIView):
             "is_active": page.is_active,
             "message": "页面已停用",
         })
+
+
+class VisiblePageListAPIView(GenericAPIView):
+    """获取当前用户可以查看的页面"""
+
+    serializer_class = VisiblePageSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """根据当前用户身份过滤页面"""
+
+        user = self.request.user
+
+        # 只查询已启用页面
+        pages = Page.objects.filter(
+            is_active=True
+        )
+
+        # 根管理员不受普通角色分配限制
+        if user.is_root:
+            return pages
+
+        # 没有角色时必须返回空列表。
+        #
+        # 不能直接使用 visible_roles=None 查询，
+        # 否则可能查到没有分配任何角色的页面。
+        if user.role_id is None:
+            return pages.none()
+
+        # 角色停用后，该角色用户不能再查看分配的页面
+        if not user.role.is_active:
+            return pages.none()
+
+        # 只查询明确分配给当前角色的页面
+        return pages.filter(
+            visible_roles__id=user.role_id
+        ).distinct()
+
+    def get(self, request, *args, **kwargs):
+        """返回当前用户可见页面列表"""
+
+        pages = self.get_queryset()
+
+        serializer = self.get_serializer(
+            pages,
+            many=True,
+        )
+
+        return Response(serializer.data)
+

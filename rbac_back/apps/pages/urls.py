@@ -10,8 +10,8 @@ from django.urls import path
 from apps.pages.views import (
     PageDetailAPIView,
     PageListCreateAPIView,
+    VisiblePageListAPIView,
 )
-
 
 urlpatterns = [
     # 页面列表和创建
@@ -26,5 +26,12 @@ urlpatterns = [
         "<int:page_id>/",
         PageDetailAPIView.as_view(),
         name="page-detail",
+    ),
+
+    # 当前用户可见页面
+    path(
+        "visible/",
+        VisiblePageListAPIView.as_view(),
+        name="page-visible-list",
     ),
 ]
