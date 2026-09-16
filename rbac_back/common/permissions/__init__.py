@@ -6,8 +6,10 @@
 @Desc : 
 """
 from .users import IsRootUser
+from .pages import CanAccessPage
 
 
 __all__ = [
     "IsRootUser",
+    "CanAccessPage"
 ]
