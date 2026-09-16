@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     # 自己创建的应用
     'apps.example',
     'apps.users',
+    'apps.pages',
 ]
 
 # 中间件
