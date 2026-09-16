@@ -11,6 +11,7 @@ from apps.users.views import (
     # 用户
     UserRegisterAPIView,
     UserLoginAPIView,
+    UserLogoutAPIView,
     CurrentUserAPIView,
     RefreshTokenAPIView,
     UserPasswordChangeAPIView,
@@ -37,6 +38,12 @@ urlpatterns = [
         "auth/login/",
         UserLoginAPIView.as_view(),
         name="user-login",
+    ),
+    # 退出登录
+    path(
+        "auth/logout/",
+        UserLogoutAPIView.as_view(),
+        name="user-logout",
     ),
     # 用户信息
     path(

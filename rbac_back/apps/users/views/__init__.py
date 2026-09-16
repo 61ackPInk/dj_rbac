@@ -7,6 +7,7 @@
 """
 from .register import UserRegisterAPIView
 from .login import UserLoginAPIView
+from .logout import UserLogoutAPIView
 from .current_user import CurrentUserAPIView
 from .refresh_token import RefreshTokenAPIView
 from .roles import (
@@ -27,6 +28,7 @@ from .passwords import (
 __all__ = [
     "UserRegisterAPIView",
     "UserLoginAPIView",
+    "UserLogoutAPIView",
     "CurrentUserAPIView",
     "RefreshTokenAPIView",
     "RoleListCreateAPIView",
