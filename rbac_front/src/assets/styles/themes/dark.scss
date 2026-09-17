@@ -1,0 +1,25 @@
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --app-primary: #409eff;
+  --app-primary-hover: #66b1ff;
+
+  --app-success: #67c23a;
+  --app-warning: #e6a23c;
+  --app-danger: #f56c6c;
+  --app-info: #909399;
+
+  --app-bg-page: #101014;
+  --app-bg-surface: #1d1e1f;
+  --app-bg-muted: #262727;
+
+  --app-text-primary: #e5eaf3;
+  --app-text-secondary: #cfd3dc;
+  --app-text-muted: #a3a6ad;
+  --app-text-on-primary: #ffffff;
+
+  --app-border-color: #4c4d4f;
+  --app-border-light: #363637;
+
+  --app-shadow-card: 0 4px 16px rgb(0 0 0 / 25%);
+}

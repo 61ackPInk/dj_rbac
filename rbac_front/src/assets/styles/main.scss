@@ -1,5 +1,7 @@
-// 全局样式
-// 让元素的宽高包含内边距和边框，方便控制布局
+// 公共主题只在全局入口加载一次。
+// 每个页面直接使用 var(--app-xxx)，无需重复导入。
+@use './themes/index.scss';
+
 *,
 *::before,
 *::after {
@@ -15,8 +17,8 @@ body,
 
 body {
   font-family: 'Microsoft YaHei', Arial, sans-serif;
-  color: #303133;
-  background-color: #f5f7fa;
+  color: var(--app-text-primary);
+  background-color: var(--app-bg-page);
 }
 
 a {

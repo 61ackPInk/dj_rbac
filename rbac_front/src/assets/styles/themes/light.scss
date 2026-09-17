@@ -1,0 +1,27 @@
+// 没有设置主题时，也默认使用浅色
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --app-primary: #409eff;
+  --app-primary-hover: #337ecc;
+
+  --app-success: #67c23a;
+  --app-warning: #e6a23c;
+  --app-danger: #f56c6c;
+  --app-info: #909399;
+
+  --app-bg-page: #f5f7fa;
+  --app-bg-surface: #ffffff;
+  --app-bg-muted: #f0f2f5;
+
+  --app-text-primary: #303133;
+  --app-text-secondary: #606266;
+  --app-text-muted: #909399;
+  --app-text-on-primary: #ffffff;
+
+  --app-border-color: #dcdfe6;
+  --app-border-light: #e4e7ed;
+
+  --app-shadow-card: 0 4px 16px rgb(0 0 0 / 6%);
+}

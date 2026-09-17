@@ -3,19 +3,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+
+  // 页面布局各自编写，颜色、间距使用公共变量
+  padding: var(--app-space-lg);
+  background-color: var(--app-bg-page);
 }
 
 .login-card {
   width: 100%;
   max-width: 400px;
+  background-color: var(--app-bg-surface);
+  border-radius: var(--app-radius-lg);
+  box-shadow: var(--app-shadow-card);
 }
 
 .login-title {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--app-space-sm);
+  color: var(--app-text-primary);
   font-size: 20px;
 }
 
