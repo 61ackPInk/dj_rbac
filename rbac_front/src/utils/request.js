@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { getAccessToken } from '@/utils/token'
 
 const request = axios.create({
   // 接口文件只写 /auth/login/，最终请求路径为 /api/auth/login/
@@ -6,6 +7,25 @@ const request = axios.create({
 
   // 请求超过 15 秒仍未完成，按超时处理
   timeout: 15000,
+})
+
+// 每次调用接口都会执行，不需要在每个接口里手动填写 Token
+request.interceptors.request.use((config) => {
+  const token = getAccessToken()
+
+  // 登录、注册、刷新接口不需要旧 access_token。
+  // 防止失效 Token 导致这些接口在认证阶段就被拒绝。
+  const publicUrls = [
+    '/auth/login/',
+    '/auth/register/',
+    '/auth/refresh/',
+  ]
+
+  if (token && !publicUrls.includes(config.url)) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+
+  return config
 })
 
 // 统一处理后端返回的数据
