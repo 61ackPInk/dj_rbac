@@ -1,16 +1,25 @@
-# Python缓存文件
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
+# ===== 操作系统文件 =====
+.DS_Store
+Thumbs.db
+Desktop.ini
 
-# Django
+# ===== 编辑器个人配置 =====
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+*~
+
+# ===== 通用日志 =====
 *.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-media/
 
-# 虚拟环境
-venv/
-env/
+# ===== 临时文件 =====
+*.tmp
+*.temp
