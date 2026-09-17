@@ -1,16 +1,49 @@
-# Python caches
+# ===== Python 缓存 =====
 __pycache__/
 *.pyc
 *.pyo
 
-# Runtime logs
-logs/
-*.log
+# ===== 虚拟环境 =====
+.venv/
+venv/
+env/
+ENV/
 
-# Local IDE settings
-.idea/
-
-# Local environment configuration
+# ===== 环境变量与本地配置 =====
 .env
 .env.*
 !.env.example
+
+local_settings.py
+
+# ===== 运行日志 =====
+logs/
+
+# ===== SQLite 本地数据库 =====
+db.sqlite3
+db.sqlite3-journal
+db.sqlite3-wal
+db.sqlite3-shm
+
+# ===== 上传文件与收集后的静态文件 =====
+/media/
+/staticfiles/
+
+# ===== 测试与覆盖率缓存 =====
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.tox/
+.nox/
+.hypothesis/
+
+# ===== Python 工具缓存 =====
+.mypy_cache/
+.ruff_cache/
+
+# ===== Python 构建产物 =====
+build/
+dist/
+*.egg-info/
