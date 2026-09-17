@@ -1,0 +1,25 @@
+// 全局样式
+// 让元素的宽高包含内边距和边框，方便控制布局
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'Microsoft YaHei', Arial, sans-serif;
+  color: #303133;
+  background-color: #f5f7fa;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
