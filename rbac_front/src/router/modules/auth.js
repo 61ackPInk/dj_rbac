@@ -3,7 +3,7 @@ export default [
   {
     path: '/login',
     name: 'login',
-    component: () => import('@/views/auth/login/index.vue'),
+    component: () => import('@/views/auth/login/login.vue'),
     meta: {
       title: '登录',
       requiresAuth: false,

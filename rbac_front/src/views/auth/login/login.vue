@@ -1,5 +1,5 @@
 <!-- 外部 JS 使用普通 script，不能添加 setup -->
-<script src="./index.js"></script>
+<script src="./login.js"></script>
 
 <template>
     <main class="login-page">
@@ -32,4 +32,4 @@
 </template>
 
 <!-- scoped 保证样式仅作用于当前页面 -->
-<style scoped lang="scss" src="./index.scss"></style>
+<style scoped lang="scss" src="./login.scss"></style>
