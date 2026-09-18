@@ -6,22 +6,21 @@ import { createPinia } from 'pinia'
 import ElementPlus from 'element-plus'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 
-// 引入组件库、图标和项目全局样式
+// 先加载组件库样式
 import 'element-plus/dist/index.css'
+import 'element-plus/theme-chalk/dark/css-vars.css'
+
+// 加载图标
 import 'bootstrap-icons/font/bootstrap-icons.css'
+
+// 最后加载项目样式，覆盖默认主题变量
 import './assets/styles/main.scss'
 
+
+import { initTheme } from '@/utils/theme'
 import App from './App.vue'
 import router from './router'
 
-import 'element-plus/dist/index.css'
-import 'element-plus/theme-chalk/dark/css-vars.css'
-import 'bootstrap-icons/font/bootstrap-icons.css'
-
-// 项目样式放最后，覆盖组件库默认变量
-import './assets/styles/main.scss'
-
-import { initTheme } from '@/utils/theme'
 
 // 应用挂载前恢复用户选择的主题
 initTheme()
