@@ -1,0 +1,396 @@
+.login-page {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100dvh;
+  color: var(--app-text-primary);
+  background: var(--app-bg-page);
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+
+  h1,
+  h2,
+  p {
+    margin: 0;
+  }
+
+  button,
+  input {
+    font: inherit;
+  }
+}
+
+/* 左侧几何动画：保留原 HTML 的位置与尺寸 */
+.left-panel {
+  width: 50%;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--app-bg-muted);
+}
+
+.decoration {
+  position: absolute;
+  border: 1px solid var(--app-decoration-border);
+  background: var(--app-decoration-bg);
+}
+
+.circle {
+  border-radius: 50%;
+}
+
+.square {
+  border-radius: var(--app-radius-sm);
+}
+
+.line {
+  height: 1px;
+  border: none;
+  background: var(--app-decoration-line);
+}
+
+.shape-1 {
+  width: 220px;
+  height: 220px;
+  top: 12%;
+  left: 18%;
+  animation: rotate 14s linear infinite;
+}
+
+.shape-2 {
+  width: 140px;
+  height: 140px;
+  bottom: 18%;
+  right: 22%;
+  animation: rotate 18s linear infinite reverse;
+}
+
+.shape-3 {
+  width: 80px;
+  height: 80px;
+  top: 55%;
+  left: 55%;
+  animation: float-y 7s ease-in-out infinite;
+}
+
+.shape-4 {
+  width: 40px;
+  height: 40px;
+  top: 30%;
+  right: 30%;
+  animation: float-x 9s ease-in-out infinite;
+}
+
+.shape-5 {
+  width: 100px;
+  height: 100px;
+  bottom: 30%;
+  left: 30%;
+  animation: rotate 22s linear infinite;
+}
+
+.dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: 40%;
+  left: 40%;
+  border-radius: 50%;
+  background: var(--app-text-secondary);
+  animation: pulse 3s ease-in-out infinite;
+}
+
+.line-1,
+.line-2 {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.line-1 {
+  width: 260px;
+  top: 48%;
+  animation: line-scale 6s ease-in-out infinite;
+}
+
+.line-2 {
+  width: 160px;
+  top: 62%;
+  animation: line-scale 7s ease-in-out infinite reverse;
+}
+
+.left-text {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 40px;
+
+  h1 {
+    font-size: 28px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+
+  p {
+    font-size: 14px;
+    color: var(--app-text-secondary);
+    letter-spacing: 1px;
+  }
+}
+
+/* 右侧登录区 */
+.right-panel {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: var(--app-bg-page);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 360px;
+  padding: 40px 32px;
+  border-radius: var(--app-radius-card);
+  background: var(--app-bg-surface);
+  box-shadow: var(--app-shadow-card);
+
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: var(--app-space-sm);
+  }
+
+  .login-subtitle {
+    font-size: 14px;
+    color: var(--app-text-muted);
+    margin-bottom: 36px;
+  }
+}
+
+.form-group {
+  margin-bottom: var(--app-space-lg);
+
+  label {
+    display: block;
+    font-size: 14px;
+    color: var(--app-text-secondary);
+    margin-bottom: 10px;
+  }
+}
+
+.input-line input {
+  width: 100%;
+  padding: 12px 0;
+  border: none;
+  border-bottom: 1px solid var(--app-border-color);
+  border-radius: 0;
+  font-size: 15px;
+  color: var(--app-text-primary);
+  background: transparent;
+  outline: none;
+  transition: border-color 0.2s ease;
+
+  &:focus {
+    border-bottom-color: var(--app-primary);
+  }
+
+  &[aria-invalid='true'] {
+    border-bottom-color: var(--app-danger);
+  }
+
+  &::placeholder {
+    color: var(--app-text-placeholder);
+  }
+}
+
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--app-space-sm);
+  margin: 32px 0 28px;
+  font-size: 14px;
+  color: var(--app-text-secondary);
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: var(--app-space-sm);
+    cursor: pointer;
+  }
+
+  input {
+    accent-color: var(--app-primary);
+  }
+}
+
+.text-button {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--app-primary);
+    text-decoration: underline;
+  }
+}
+
+.btn-login {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: var(--app-radius-sm);
+  background: var(--app-primary);
+  color: var(--app-text-on-primary);
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  span {
+    position: relative;
+    display: inline-block;
+    transition: padding 0.5s ease;
+
+    &::after {
+      content: '»';
+      position: absolute;
+      top: 50%;
+      right: -15px;
+      transform: translateY(-50%);
+      opacity: 0;
+      transition: opacity 0.5s ease, right 0.5s ease;
+    }
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--app-primary-hover);
+
+    span {
+      padding-right: 15px;
+
+      &::after {
+        opacity: 1;
+        right: 0;
+      }
+    }
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+}
+
+.field-error,
+.submit-error {
+  color: var(--app-danger);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.login-card .field-error {
+  margin-top: var(--app-space-xs);
+}
+
+.login-card .submit-error {
+  margin-bottom: var(--app-space-md);
+}
+
+.login-card .notice {
+  margin-top: var(--app-space-md);
+  color: var(--app-text-secondary);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.divider-line {
+  height: 1px;
+  background: var(--app-border-light);
+  margin: 28px 0 20px;
+}
+
+.register-tip {
+  text-align: center;
+  font-size: 14px;
+  color: var(--app-text-secondary);
+
+  .text-button {
+    color: var(--app-primary);
+    font-weight: 500;
+  }
+}
+
+/* 为键盘操作提供清晰的焦点提示 */
+button:focus-visible,
+input[type='checkbox']:focus-visible {
+  outline: 2px solid var(--app-primary);
+  outline-offset: 4px;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-24px); }
+}
+
+@keyframes float-x {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(20px); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.4); }
+}
+
+@keyframes line-scale {
+  0%, 100% {
+    transform: translateX(-50%) scaleX(0.6);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateX(-50%) scaleX(1);
+    opacity: 0.8;
+  }
+}
+
+/* 手机端隐藏装饰区，不固定高度，避免小屏内容被截断 */
+@media (max-width: 768px) {
+  .left-panel {
+    display: none;
+  }
+
+  .right-panel {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .login-card {
+    padding: 32px 24px;
+  }
+}
+
+/* 尊重系统的减少动态效果设置 */
+@media (prefers-reduced-motion: reduce) {
+  .decoration,
+  .dot {
+    animation: none;
+  }
+
+  .btn-login,
+  .btn-login span,
+  .btn-login span::after {
+    transition: none;
+  }
+}

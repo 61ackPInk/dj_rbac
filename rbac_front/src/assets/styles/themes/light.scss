@@ -3,25 +3,64 @@
 :root[data-theme='light'] {
   color-scheme: light;
 
-  --app-primary: #409eff;
-  --app-primary-hover: #337ecc;
+  /* 黑白灰品牌配色 */
+  --app-primary: #111111;
+  --app-primary-hover: #333333;
+  --app-text-on-primary: #ffffff;
 
+  /* 状态颜色仍保留，便于展示成功、警告和错误 */
   --app-success: #67c23a;
   --app-warning: #e6a23c;
   --app-danger: #f56c6c;
   --app-info: #909399;
 
-  --app-bg-page: #f5f7fa;
+  --app-bg-page: #ffffff;
   --app-bg-surface: #ffffff;
-  --app-bg-muted: #f0f2f5;
+  --app-bg-muted: #f4f5f7;
 
-  --app-text-primary: #303133;
-  --app-text-secondary: #606266;
-  --app-text-muted: #909399;
-  --app-text-on-primary: #ffffff;
+  --app-text-primary: #111111;
+  --app-text-secondary: #555555;
+  --app-text-muted: #888888;
+  --app-text-placeholder: #bbbbbb;
 
-  --app-border-color: #dcdfe6;
-  --app-border-light: #e4e7ed;
+  --app-border-color: #dddddd;
+  --app-border-light: #eeeeee;
 
-  --app-shadow-card: 0 4px 16px rgb(0 0 0 / 6%);
+  --app-shadow-card: 0 8px 30px rgb(0 0 0 / 7%);
+
+  /* 几何装饰使用主题变量，深色主题可以提供对应值 */
+  --app-decoration-border: rgb(0 0 0 / 15%);
+  --app-decoration-bg: rgb(0 0 0 / 2%);
+  --app-decoration-line: rgb(0 0 0 / 20%);
 }
+// :root,
+// :root[data-theme='light'] {
+//   color-scheme: light;
+
+//   /* -------- 功能色（状态、按钮、提示） -------- */
+//   --app-primary: #409eff;        /* 主色：按钮、激活态、高亮、ElementPlus primary */
+//   --app-primary-hover: #337ecc;  /* 主色hover：主按钮悬浮、可点击高亮hover */
+//   --app-success: #67c23a;        /* 成功色：操作成功提示、成功状态图标 */
+//   --app-warning: #e6a23c;        /* 警告色：警告提示、注意状态 */
+//   --app-danger: #f56c6c;         /* 危险色：删除、错误提示、告警 */
+//   --app-info: #909399;           /* 信息色：普通提示、次要状态文字 */
+
+//   /* -------- 背景色（页面、卡片、面板） -------- */
+//   --app-bg-page: #f5f7fa;        /* 页面底层背景：整个网站页面最外层底色 */
+//   --app-bg-surface: #ffffff;     /* 表层背景：卡片、弹窗、表单、下拉菜单、内容容器 */
+//   --app-bg-muted: #f0f2f5;       /* 弱化背景：标签、输入框禁用、次要填充、表格隔行 */
+//   --app-bg-panel: #f4f5f7;       /* 装饰面板背景：登录页左侧大面板、侧边栏、分区装饰块 */
+
+//   /* -------- 文字颜色 -------- */
+//   --app-text-primary: #303133;   /* 主要文字：大标题、表单label、正文核心内容 */
+//   --app-text-secondary: #606266; /* 次要文字：副标题、描述文本、表单说明 */
+//   --app-text-muted: #909399;     /* 弱化文字：placeholder、占位提示、辅助说明、禁用文字 */
+//   --app-text-on-primary: #ffffff;/* 主色上文字：primary按钮内部文字、主色背景上的文字 */
+
+//   /* -------- 边框、分割线 -------- */
+//   --app-border-color: #dcdfe6;   /* 常规边框：输入框边框、卡片边框、分割线重度 */
+//   --app-border-light: #e4e7ed;   /* 浅色边框：分割线、模块间隔、轻量分割 */
+
+//   /* -------- 阴影 -------- */
+//   --app-shadow-card: 0 4px 16px rgb(0 0 0 / 6%); /* 卡片阴影：登录卡片、弹窗、悬浮浮层 */
+// }
