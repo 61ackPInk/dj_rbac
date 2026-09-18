@@ -2,5 +2,155 @@
 :root[data-theme='light'] {
   color-scheme: light;
 
-  // 从登录页面开始，逐步添加公共颜色
+  /* ==================== 页面与容器 ==================== */
+
+  // 整个网站的页面底色
+  --app-page-bg: #f5f5f7;
+
+  // 普通内容区域：侧栏、顶部导航、独立面板
+  --app-panel-bg: #ffffff;
+
+  // 次级区域：工具栏、分组区域、浅色内容块
+  --app-panel-muted-bg: #f0f0f2;
+
+
+  /* ==================== 文本 ==================== */
+
+  // 页面标题、卡片标题、弹窗标题
+  --app-text-title: #1f1f1f;
+
+  // 正文、表单标签、列表内容
+  --app-text-body: #333333;
+
+  // 描述、帮助说明、次要内容
+  --app-text-description: #737373;
+
+  // 辅助信息、占位文字
+  --app-text-muted: #8a8a8a;
+
+  // 禁用控件的文字
+  --app-text-disabled: #a3a3a3;
+
+  // 深色背景上的文字
+  --app-text-inverse: #ffffff;
+
+
+  /* ==================== 图标 ==================== */
+
+  // 普通操作图标
+  --app-icon-color: #737373;
+
+  // 强调或选中状态的图标
+  --app-icon-active-color: #1f1f1f;
+
+  // 禁用图标
+  --app-icon-disabled-color: #a3a3a3;
+
+
+  /* ==================== 链接 ==================== */
+
+  --app-link-color: #1f1f1f;
+  --app-link-hover-color: #555555;
+
+
+  /* ==================== 边框与分隔线 ==================== */
+
+  // 普通容器、控件边框
+  --app-border-color: #d4d4d4;
+
+  // 卡片边框、轻量分隔
+  --app-border-light-color: #e8e8e8;
+
+  // 内容之间的分隔线
+  --app-divider-color: #e0e0e0;
+
+
+  /* ==================== 卡片 ==================== */
+
+  // 数据卡片、登录卡片、信息卡片
+  --app-card-bg: #ffffff;
+  --app-card-border: #e8e8e8;
+
+
+  /* ==================== 输入控件 ==================== */
+
+  // 输入框、文本域、选择框等共用
+  --app-input-bg: #ffffff;
+  --app-input-text: #333333;
+  --app-input-placeholder: #8a8a8a;
+
+  --app-input-border: #d4d4d4;
+  --app-input-hover-border: #a3a3a3;
+  --app-input-focus-border: #1f1f1f;
+
+  --app-input-disabled-bg: #f0f0f2;
+  --app-input-disabled-text: #a3a3a3;
+
+
+  /* ==================== 主按钮 ==================== */
+
+  // 登录、保存、确认等主要操作
+  --app-button-primary-bg: #1f1f1f;
+  --app-button-primary-text: #ffffff;
+  --app-button-primary-hover-bg: #363636;
+  --app-button-primary-active-bg: #111111;
+
+
+  /* ==================== 次按钮 ==================== */
+
+  // 取消、返回、次要操作
+  --app-button-secondary-bg: #ffffff;
+  --app-button-secondary-text: #333333;
+  --app-button-secondary-border: #d4d4d4;
+  --app-button-secondary-hover-bg: #f5f5f7;
+  --app-button-secondary-active-bg: #ebebed;
+
+  // 所有按钮的禁用状态
+  --app-button-disabled-bg: #e5e5e5;
+  --app-button-disabled-text: #8a8a8a;
+
+
+  /* ==================== 列表与导航状态 ==================== */
+
+  // 菜单项、列表项、表格行的悬停背景
+  --app-item-hover-bg: #f5f5f7;
+
+  // 当前菜单、已选列表项的背景和文字
+  --app-item-selected-bg: #ebebed;
+  --app-item-selected-text: #1f1f1f;
+
+
+  /* ==================== 浮层与遮罩 ==================== */
+
+  // 下拉菜单、公共提示、弹窗
+  --app-overlay-bg: #ffffff;
+
+  // 弹窗背后的半透明遮罩
+  --app-mask-bg: rgb(0 0 0 / 40%);
+
+
+  /* ==================== 状态颜色 ==================== */
+
+  // 状态色是功能例外，不改变全站黑白灰主调
+  // 用于成功、警告、错误提示，不用于普通页面装饰
+  --app-status-success: #15803d;
+  --app-status-warning: #a16207;
+  --app-status-danger: #b91c1c;
+  --app-status-info: #525252;
+
+
+  /* ==================== 圆角 ==================== */
+
+  --app-radius-control: 10px; // 按钮、输入框、选择框
+  --app-radius-card: 14px;    // 卡片、内容面板
+  --app-radius-overlay: 14px; // 弹窗、下拉菜单、公共提示
+
+
+  /* ==================== 阴影 ==================== */
+
+  // 普通卡片：较轻
+  --app-shadow-card: 0 8px 30px rgb(0 0 0 / 7%);
+
+  // 浮层：稍明显，突出与底层内容的区别
+  --app-shadow-overlay: 0 12px 36px rgb(0 0 0 / 12%);
 }
