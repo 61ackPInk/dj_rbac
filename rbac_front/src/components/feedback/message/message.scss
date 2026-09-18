@@ -1,0 +1,129 @@
+.app-message-container {
+  position: fixed;
+  top: 32px;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+  padding: 0 var(--app-space-md);
+
+  // 空白区域不阻挡页面点击，提示框自身再恢复点击
+  pointer-events: none;
+}
+
+.app-message-list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-message-item {
+  --message-accent: var(--app-primary);
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: max-content;
+  max-width: min(480px, 100%);
+  min-width: min(280px, 100%);
+  padding: 14px 16px;
+
+  color: var(--app-text-primary);
+  background: var(--app-bg-surface);
+  border: 1px solid var(--app-border-light);
+  border-radius: var(--app-radius-lg);
+  box-shadow: var(--app-shadow-card);
+
+  pointer-events: auto;
+
+  &--success {
+    --message-accent: var(--app-success);
+  }
+
+  &--error {
+    --message-accent: var(--app-danger);
+  }
+
+  &--warning {
+    --message-accent: var(--app-warning);
+  }
+
+  &--info {
+    --message-accent: var(--app-primary);
+  }
+}
+
+.app-message-icon {
+  flex-shrink: 0;
+  font-size: 19px;
+  color: var(--message-accent);
+}
+
+.app-message-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.app-message-close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+
+  border: none;
+  border-radius: var(--app-radius-sm);
+  color: var(--app-text-muted);
+  background: transparent;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--app-text-primary);
+    background: var(--app-bg-muted);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--message-accent);
+    outline-offset: 2px;
+  }
+}
+
+/* 新提示进入、旧提示退出 */
+.app-message-enter-active,
+.app-message-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.app-message-enter-from,
+.app-message-leave-to {
+  opacity: 0;
+  transform: translateY(-12px);
+}
+
+/* 其他提示补位时平滑移动 */
+.app-message-move {
+  transition: transform 0.2s ease;
+}
+
+@media (max-width: 768px) {
+  .app-message-container {
+    top: 20px;
+  }
+}
+
+/* 用户选择减少动画时，不播放过渡 */
+@media (prefers-reduced-motion: reduce) {
+  .app-message-enter-active,
+  .app-message-leave-active,
+  .app-message-move {
+    transition: none;
+  }
+}

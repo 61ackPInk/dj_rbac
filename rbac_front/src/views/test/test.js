@@ -1,133 +1,53 @@
-import { defineComponent, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-
-const REMEMBERED_ACCOUNT_KEY = 'remembered_account'
+import { defineComponent } from 'vue'
+import { message } from '@/utils/message'
 
 export default defineComponent({
-  name: 'LoginView',
+  name: 'TestView',
 
   setup() {
-    const router = useRouter()
-    const auth = useAuthStore()
-
-    const savedAccount = localStorage.getItem(REMEMBERED_ACCOUNT_KEY) || ''
-
-    const form = reactive({
-      username: savedAccount,
-      password: '',
-    })
-
-    const errors = reactive({
-      username: '',
-      password: '',
-    })
-
-    const rememberAccount = ref(Boolean(savedAccount))
-    const loading = ref(false)
-    const submitError = ref('')
-    const notice = ref('')
-
-    // 不自动 trim：空白字符应提示错误，而不是悄悄修改用户输入
-    const validateForm = () => {
-      errors.username = ''
-      errors.password = ''
-
-      if (!form.username) {
-        errors.username = '请输入账号'
-      } else if (form.username.length > 20) {
-        errors.username = '账号最多 20 个字符'
-      } else if (/\s/.test(form.username)) {
-        errors.username = '账号不能包含空白字符'
-      }
-
-      if (!form.password) {
-        errors.password = '请输入密码'
-      } else if (/\s/.test(form.password)) {
-        errors.password = '密码不能包含空白字符'
-      }
-
-      return !errors.username && !errors.password
+    const showSuccess = () => {
+      message.success('操作成功，信息已保存')
     }
 
-    const handleLogin = async () => {
-      if (loading.value) return
-
-      submitError.value = ''
-      notice.value = ''
-
-      if (!validateForm()) return
-
-      loading.value = true
-
-      try {
-        // 沿用公共 Store，不在页面里重复保存 Token
-        await auth.login({
-          username: form.username,
-          password: form.password,
-        })
-      } catch (error) {
-        const backendErrors = error.validationErrors || {}
-
-        /*
-         * 逐个检查账号和密码字段。
-         * 后端字段错误显示在对应输入框下面，
-         * 而不是把所有错误混成一条提示。
-         */
-        for (const field of ['username', 'password']) {
-          const value = backendErrors[field]
-          const message = Array.isArray(value) ? value[0] : value
-
-          if (typeof message === 'string') {
-            errors[field] = message
-          }
-        }
-
-        // 用户名或密码错误通常位于 non_field_errors
-        const generalErrors = backendErrors.non_field_errors
-        const generalMessage = Array.isArray(generalErrors)
-          ? generalErrors[0]
-          : generalErrors
-
-        if (typeof generalMessage === 'string') {
-          submitError.value = generalMessage
-        } else if (!errors.username && !errors.password) {
-          submitError.value = error.userMessage || '登录失败，请稍后重试'
-        }
-
-        return
-      } finally {
-        loading.value = false
-      }
-
-      // 只保存账号；密码始终不写入浏览器存储
-      if (rememberAccount.value) {
-        localStorage.setItem(REMEMBERED_ACCOUNT_KEY, form.username)
-      } else {
-        localStorage.removeItem(REMEMBERED_ACCOUNT_KEY)
-      }
-
-      form.password = ''
-      await router.replace({ name: 'home' })
+    const showError = () => {
+      message.error('操作失败，请稍后重试')
     }
 
-    const showHelp = (type) => {
-      notice.value =
-        type === 'password'
-          ? '找回密码功能暂未开放，请联系管理员。'
-          : '注册页面暂未接入，请联系管理员创建账号。'
+    const showWarning = () => {
+      message.warning('请先填写完整信息')
     }
 
-    // 外部普通 script 的 setup 必须返回模板使用的变量和方法
+    const showInfo = () => {
+      message.info('这是一条普通提示')
+    }
+
+    const showLongText = () => {
+      message.info(
+        '这是一条较长的提示信息，用于检查文字换行、提示框最大宽度，以及手机屏幕上的显示效果。',
+        { duration: 5000 },
+      )
+    }
+
+    const showPersistent = () => {
+      // 不自动关闭，点击提示右侧关闭按钮即可关闭
+      message.info('这条提示不会自动关闭', {
+        duration: 0,
+      })
+    }
+
+    const closeAll = () => {
+      message.closeAll()
+    }
+
+    // 模板需要使用的方法都在这里返回
     return {
-      form,
-      errors,
-      rememberAccount,
-      loading,
-      submitError,
-      notice,
-      handleLogin,
-      showHelp,
+      showSuccess,
+      showError,
+      showWarning,
+      showInfo,
+      showLongText,
+      showPersistent,
+      closeAll,
     }
   },
 })
