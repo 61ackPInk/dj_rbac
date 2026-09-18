@@ -1,0 +1,52 @@
+.test-page {
+  min-height: 100vh;
+  padding: 80px var(--app-space-lg);
+  background: var(--app-bg-page);
+  color: var(--app-text-primary);
+}
+
+.test-card {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--app-space-lg);
+  background: var(--app-bg-surface);
+  border: 1px solid var(--app-border-light);
+  border-radius: var(--app-radius-lg);
+  box-shadow: var(--app-shadow-card);
+
+  h1 {
+    margin: 0 0 var(--app-space-md);
+    font-size: 24px;
+  }
+
+  p {
+    margin: 0 0 var(--app-space-lg);
+    color: var(--app-text-secondary);
+    line-height: 1.6;
+  }
+}
+
+.test-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--app-space-sm);
+
+  button {
+    padding: 10px 16px;
+    border: 1px solid var(--app-border-color);
+    border-radius: var(--app-radius-md);
+    background: var(--app-bg-surface);
+    color: var(--app-text-primary);
+    font: inherit;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--app-bg-muted);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--app-primary);
+      outline-offset: 2px;
+    }
+  }
+}

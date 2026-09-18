@@ -1,0 +1,25 @@
+// 公共主题只在全局入口加载一次。
+// 每个页面直接使用 var(--app-xxx)，无需重复导入。
+@use './themes/index.scss';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'Microsoft YaHei', Arial, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
