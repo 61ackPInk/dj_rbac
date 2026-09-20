@@ -4,9 +4,10 @@
   left: 0;
   right: 0;
   z-index: 10000;
-  padding: 0 var(--app-space-md);
 
-  // 空白区域不阻挡页面点击，提示框自身再恢复点击
+  padding: 0 16px;
+
+  // 容器空白区域不会挡住页面点击
   pointer-events: none;
 }
 
@@ -19,38 +20,45 @@
 }
 
 .app-message-item {
-  --message-accent: var(--app-primary);
+  // 默认使用普通信息的灰色
+  --message-accent: #525252;
 
   display: flex;
   align-items: center;
   gap: 12px;
+
   width: max-content;
-  max-width: min(480px, 100%);
   min-width: min(280px, 100%);
+  max-width: min(480px, 100%);
   padding: 14px 16px;
 
-  color: var(--app-text-primary);
-  background: var(--app-bg-surface);
-  border: 1px solid var(--app-border-light);
-  border-radius: var(--app-radius-lg);
-  box-shadow: var(--app-shadow-card);
+  color: #1f1f1f;
+  background-color: #ffffff;
+  border: 1px solid #e8e8ed;
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgb(0 0 0 / 12%);
 
+  // 提示框自身允许点击
   pointer-events: auto;
 
+  // 成功
   &--success {
-    --message-accent: var(--app-success);
+    --message-accent: #15803d;
   }
 
+  // 错误
   &--error {
-    --message-accent: var(--app-danger);
+    --message-accent: #b91c1c;
   }
 
+  // 警告
   &--warning {
-    --message-accent: var(--app-warning);
+    --message-accent: #a16207;
   }
 
+  // 普通信息
   &--info {
-    --message-accent: var(--app-primary);
+    --message-accent: #525252;
   }
 }
 
@@ -63,8 +71,12 @@
 .app-message-text {
   flex: 1;
   min-width: 0;
+
+  color: #333333;
   font-size: 14px;
   line-height: 1.6;
+
+  // 长文字、连续英文或网址允许自动换行
   overflow-wrap: anywhere;
 }
 
@@ -73,24 +85,32 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   width: 26px;
   height: 26px;
   padding: 0;
 
+  color: #8a8a8a;
+  background-color: transparent;
   border: none;
-  border-radius: var(--app-radius-sm);
-  color: var(--app-text-muted);
-  background: transparent;
+  border-radius: 4px;
+
   cursor: pointer;
 
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+
   &:hover {
-    color: var(--app-text-primary);
-    background: var(--app-bg-muted);
+    color: #1f1f1f;
+    background-color: #f0f0f2;
   }
 
+  // 不显示鼠标点击或 Tab 选中时的外框
+  &:focus,
   &:focus-visible {
-    outline: 2px solid var(--message-accent);
-    outline-offset: 2px;
+    outline: none;
+    box-shadow: none;
   }
 }
 
@@ -113,13 +133,20 @@
   transition: transform 0.2s ease;
 }
 
+/* 手机端距离顶部更近 */
 @media (max-width: 768px) {
   .app-message-container {
     top: 20px;
+    padding: 0 12px;
+  }
+
+  .app-message-item {
+    width: 100%;
+    min-width: 0;
   }
 }
 
-/* 用户选择减少动画时，不播放过渡 */
+/* 用户开启“减少动态效果”时取消动画 */
 @media (prefers-reduced-motion: reduce) {
   .app-message-enter-active,
   .app-message-leave-active,
