@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 
 import {
   loginApi,
+  logoutApi,
   getCurrentUserApi,
 } from '@/api/auth'
 
@@ -74,6 +75,17 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = null
   }
 
+  const logout = async () => {
+    /*
+    * 先请求后端，使该用户之前签发的
+    * access_token 和 refresh_token 全部失效。
+    */
+    await logoutApi()
+
+    // 后端退出成功后再清除浏览器中的登录状态
+    clearSession()
+  }
+
   const initializeAuth = async () => {
     // 已经初始化过，不再重复请求
     if (initialized.value) {
@@ -131,6 +143,7 @@ export const useAuthStore = defineStore('auth', () => {
     isLoggedIn,
 
     login,
+    logout,
     fetchCurrentUser,
     initializeAuth,
     clearSession,

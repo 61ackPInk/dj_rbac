@@ -33,3 +33,11 @@ export const getCurrentUserApi = () => {
     method: 'get',
   })
 }
+
+// 退出登录 
+export const logoutApi = () => {
+  return request({
+    url: '/auth/logout/',
+    method: 'post',
+  })
+}
