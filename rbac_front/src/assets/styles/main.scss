@@ -8,6 +8,16 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+
+  // 页面文字无法被选中
+  user-select: none;
+  /* 标准写法 */
+  -webkit-user-select: none;
+  /* Safari / 旧版 Chrome */
+  -moz-user-select: none;
+  /* 旧版 Firefox */
+  -ms-user-select: none;
+  /* 旧版 IE / Edge */
 }
 
 html,
