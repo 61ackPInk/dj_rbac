@@ -1,5 +1,8 @@
 import { defineComponent, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import {
+  useRoute,
+  useRouter,
+} from 'vue-router'
 
 import { useAuthStore } from '@/stores/auth'
 import { message } from '@/utils/message'
@@ -10,6 +13,7 @@ export default defineComponent({
   name: 'LoginView',
 
   setup() {
+    const route = useRoute()
     const router = useRouter()
     const authStore = useAuthStore()
 
@@ -130,10 +134,29 @@ export default defineComponent({
 
         message.success('登录成功')
 
-        // replace 防止浏览器返回按钮重新返回登录页
-        await router.replace({
-          name: 'home',
-        })
+        const redirect = route.query.redirect
+        /*
+        * redirect 必须是站内绝对路径，
+        * 防止将用户跳转到外部恶意网站。
+        */
+        if (
+          typeof redirect === 'string' &&
+          redirect.startsWith('/') &&
+          !redirect.startsWith('//')
+        ) {
+          // 返回用户登录前准备访问的页面
+          await router.replace(redirect)
+        } else {
+          // 没有原页面时进入首页
+          await router.replace({
+            name: 'home',
+          })
+        }
+
+        // // replace 防止浏览器返回按钮重新返回登录页
+        // await router.replace({
+        //   name: 'home',
+        // })
       } catch (error) {
         const backendMessage = findFirstError(
           error.validationErrors,
@@ -141,8 +164,8 @@ export default defineComponent({
 
         message.error(
           backendMessage ||
-            error.userMessage ||
-            '登录失败，请稍后重试',
+          error.userMessage ||
+          '登录失败，请稍后重试',
         )
       } finally {
         // 无论登录成功还是失败，都恢复按钮状态

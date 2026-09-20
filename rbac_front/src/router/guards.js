@@ -1,21 +1,59 @@
 import { useAuthStore } from '@/stores/auth'
 
-// 接收路由实例，集中注册整个项目的导航规则
+// 接收路由实例，集中注册全局导航规则
 export const setupRouterGuards = (router) => {
-  router.beforeEach((to) => {
-    // 在守卫执行时获取 Store，确保 Pinia 已经注册
-    const auth = useAuthStore()
+  router.beforeEach(async (to) => {
+    /*
+     * 在守卫执行时获取 Store。
+     * 此时 main.js 已经通过 app.use(createPinia()) 注册 Pinia。
+     */
+    const authStore = useAuthStore()
 
-    // 本地没有 Token 时，需要登录的页面跳转到登录页
-    // Token 是否有效、用户有没有权限，仍由后端校验
-    if (to.meta.requiresAuth && !auth.isLoggedIn) {
-      return { name: 'login' }
+    try {
+      /*
+       * 首次打开网页或刷新页面时：
+       * 如果本地存在 Token，就请求 /api/auth/me/
+       * 恢复当前用户信息。
+       */
+      await authStore.initializeAuth()
+    } catch (error) {
+      /*
+       * 401 已经由 Store 清除了失效 Token。
+       *
+       * 网络故障等其他错误不在守卫里弹提示，
+       * 避免每次路由切换重复出现提示。
+       * 后续具体接口仍会展示相应错误。
+       */
+      console.warn('初始化登录状态失败：', error)
+    }
+
+    // 需要登录的页面，没有完整登录状态时进入登录页
+    if (to.meta.requiresAuth && !authStore.isLoggedIn) {
+      return {
+        name: 'login',
+
+        /*
+         * 记录原来想访问的网址。
+         * 后续可以在登录成功后返回该页面。
+         */
+        query: {
+          redirect: to.fullPath,
+        },
+      }
+    }
+
+    // 已登录用户访问登录页时，直接回到首页
+    if (to.name === 'login' && authStore.isLoggedIn) {
+      return {
+        name: 'home',
+      }
     }
 
     return true
   })
 
   router.afterEach((to) => {
-    document.title = `${to.meta.title || '页面'} - RBAC`
+    document.title =
+      `${to.meta.title || '页面'} - RBAC`
   })
 }
