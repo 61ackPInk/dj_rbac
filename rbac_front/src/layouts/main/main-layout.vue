@@ -42,28 +42,41 @@ const username = computed(
 const activeTopMenu = computed(() => {
   if (route.path === '/') return homeMenu
 
-  let currentPage = navigationStore.pages.find(
+  const currentPage = navigationStore.pages.find(
     (page) => page.path === route.path,
   )
 
-  const visited = new Set()
-
-  // 沿 parent_id 一直向上找到根页面
-  while (currentPage?.parent_id != null) {
-    if (visited.has(currentPage.id)) return null
-    visited.add(currentPage.id)
-
-    currentPage = navigationStore.pages.find(
-      (page) => page.id === currentPage.parent_id,
-    )
-  }
-
-  if (!currentPage) return null
+  const topId = currentPage?.parent_id ?? currentPage?.id
 
   return navigationStore.topMenus.find(
-    (menu) => menu.id === currentPage.id,
+    (menu) => menu.id === topId,
   )
 })
+// const activeTopMenu = computed(() => {
+//   if (route.path === '/') return homeMenu
+
+//   let currentPage = navigationStore.pages.find(
+//     (page) => page.path === route.path,
+//   )
+
+//   const visited = new Set()
+
+//   // 沿 parent_id 一直向上找到根页面
+//   while (currentPage?.parent_id != null) {
+//     if (visited.has(currentPage.id)) return null
+//     visited.add(currentPage.id)
+
+//     currentPage = navigationStore.pages.find(
+//       (page) => page.id === currentPage.parent_id,
+//     )
+//   }
+
+//   if (!currentPage) return null
+
+//   return navigationStore.topMenus.find(
+//     (menu) => menu.id === currentPage.id,
+//   )
+// })
 
 // 左侧只显示当前顶部菜单下的页面
 const sideMenus = computed(() => {
@@ -118,14 +131,14 @@ onMounted(async () => {
           </RouterLink>
         </nav>
         <!-- 电脑端侧边导航 -->
-        <!-- <nav aria-label="侧边导航">
+        <nav aria-label="侧边导航">
           <RouterLink v-for="menu in sideMenus" :key="menu.id" :to="menu.path" class="side-menu-item"
             :class="{ active: route.path === menu.path }" @click="closeMobileMenu">
             <i v-if="menu.icon" :class="menu.icon" aria-hidden="true"></i>
             <span>{{ menu.name }}</span>
           </RouterLink>
-        </nav> -->
-        <nav aria-label="侧边导航">
+        </nav>
+        <!-- <nav aria-label="侧边导航">
           <div v-for="menu in sideMenus" :key="menu.id" class="side-menu-group">
             <RouterLink :to="menu.path" class="side-menu-item" :class="{
               active:
@@ -145,7 +158,7 @@ onMounted(async () => {
               </RouterLink>
             </div>
           </div>
-        </nav>
+        </nav> -->
       </aside>
 
       <main class="layout-content">
