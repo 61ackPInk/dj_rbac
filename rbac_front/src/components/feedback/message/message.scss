@@ -43,22 +43,22 @@
 
   // 成功
   &--success {
-    --message-accent: #15803d;
+    --message-accent: #4caf50;
   }
 
   // 错误
   &--error {
-    --message-accent: #b91c1c;
+    --message-accent: #ff0000;
   }
 
   // 警告
   &--warning {
-    --message-accent: #a16207;
+    --message-accent: #f9a825;
   }
 
   // 普通信息
   &--info {
-    --message-accent: #525252;
+    --message-accent: #03a9f4;
   }
 }
 
