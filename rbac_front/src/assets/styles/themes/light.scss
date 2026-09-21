@@ -1,39 +1,94 @@
 :root,
-:root[data-theme='light'] {
+:root[data-theme="light"] {
   color-scheme: light;
 
-  /* ==================== 背景 ==================== */
-  --app-page-bg-primary: #ffffff;   // 主要
-  --app-page-bg-minor: #f5f5f7;     // 次要
+  /* ==================== 网站主色 ==================== */
+  --app-color-primary: #30AFFF;
+  --app-color-sky: #92EEFF;
+  --app-color-lime: #D8FFC5;
+  --app-color-mint: #C4F7CA;
 
-  /* ==================== 文字 ==================== */
-  --app-text-title: #000;           // 标题
-  --app-text-minor: #333333;        // 正文、表单
-  --app-text-description: #737373;  // 描述、说明、图标
-  --app-text-placeholder: #8a8a8a;  // 输入框提示、禁用文本
-  --app-text-hover: #000;           // 悬停
+  --app-page-bg-minor: #f0fbff;
 
   /* ==================== 按钮 ==================== */
-  --app-btn: #000;                  // 按钮背景
-  --app-btn-text: #fff;             // 按钮文字
-  --app-btn-hover: #000;            // 按钮悬停
-  --app-btn-text-hover: #fff;       // 文本悬停
+  --app-btn: var(--app-color-primary); // 按钮
+  --app-btn-text: #07354a;
+  --app-btn-hover: var(--app-color-sky);
+  --app-btn-text-hover: #07354a;
 
-  /* ==================== 边框 ==================== */
-  --app-border: #d2d2d7;            // 输入框、按钮
-  --app-border-line: #e8e8ed;       // 分割线
+  --app-border: #c9dfe8;
+  --app-border-line: #d8e8ed;
+  --app-input-fcous: var(--app-color-primary);
 
-  /* ==================== 卡片 ==================== */
-  --app-card: #fff;                 // 卡片、面板
-  --app-card-shadow: 0 8px 30px rgb(0 0 0 / 7%);  // 阴影
+  /* 登录页左侧 */
+  --app-login-left-bg: linear-gradient(145deg, #f0fbff 0%, #e5faff 52%, #efffed 100%);
+  --app-login-decoration-border: rgb(48 175 255 / 38%);
+  --app-login-decoration-bg: rgb(146 238 255 / 11%);
+  --app-login-dot: var(--app-color-primary);
+  --app-login-line: rgb(48 175 255 / 22%);
+  --app-login-title: #17698e;
+  --app-login-subtitle: #4d7f86;
+  /* 登录页表单点缀 */
+  --app-login-link: #197ba5;
+  --app-login-social-blue: #f4fdff;
+  --app-login-social-green: #f5fff2;
 
-  /* ==================== 圆角 ==================== */
-  --app-radius-btn: 10px;             // 按钮
-  --app-radius-card: 14px;            // 卡片、面板
-  --app-radius-input: 10px;           // 输入框
 
-  /* ==================== 输入框 ==================== */
-  --app-input: #fff;                // 输入框
-  --app-input-fcous: #1f1f1f;             // 获得焦点
+  /* ==================== 文字 ==================== */
+  --app-text-title: #18374a;
+  --app-text-minor: #18374a;
+  --app-text-description: #5c7480;
+  --app-text-placeholder: #8198a3;
+  --app-text-hover: #197ba5;
+
+  --app-input: #fbfeff;
+  --app-card-shadow: 0 8px 30px rgb(31 131 165 / 11%);
+
+  --app-page-bg-primary: #ffffff;
+  --app-card: #ffffff;
+
+  --app-radius-btn: 10px;
+  --app-radius-card: 14px;
+  --app-radius-input: 10px;
+
 }
 
+
+// :root,
+// :root[data-theme='light'] {
+//   color-scheme: light;
+
+//   /* ==================== 背景 ==================== */
+//   --app-page-bg-primary: #ffffff;   // 主要
+//   --app-page-bg-minor: #f5f5f7;     // 次要
+
+//   /* ==================== 文字 ==================== */
+//   --app-text-title: #000;           // 标题
+//   --app-text-minor: #333333;        // 正文、表单
+//   --app-text-description: #737373;  // 描述、说明、图标
+//   --app-text-placeholder: #8a8a8a;  // 输入框提示、禁用文本
+//   --app-text-hover: #000;           // 悬停
+
+//   /* ==================== 按钮 ==================== */
+//   --app-btn: #000;                  // 按钮背景
+//   --app-btn-text: #fff;             // 按钮文字
+//   --app-btn-hover: #000;            // 按钮悬停
+//   --app-btn-text-hover: #fff;       // 文本悬停
+
+//   /* ==================== 边框 ==================== */
+//   --app-border: #d2d2d7;            // 输入框、按钮
+//   --app-border-line: #e8e8ed;       // 分割线
+
+//   /* ==================== 卡片 ==================== */
+//   --app-card: #fff;                 // 卡片、面板
+//   --app-card-shadow: 0 8px 30px rgb(0 0 0 / 7%);  // 阴影
+
+//   /* ==================== 圆角 ==================== */
+//   --app-radius-btn: 10px;             // 按钮
+//   --app-radius-card: 14px;            // 卡片、面板
+//   --app-radius-input: 10px;           // 输入框
+
+//   /* ==================== 输入框 ==================== */
+//   --app-input: #fff;                // 输入框
+//   --app-input-fcous: #1f1f1f;             // 获得焦点
+// }

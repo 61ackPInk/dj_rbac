@@ -6,7 +6,7 @@
   // 左侧内容，移动端隐藏
   .login-left {
     width: 50%;
-    background-color: var(--app-page-bg-minor);
+    background: var(--app-login-left-bg);
     position: relative;
     overflow: hidden;
     display: flex;
@@ -18,8 +18,8 @@
       // 几何图形
       .decoration {
         position: absolute;
-        border: 1px solid rgba(0, 0, 0, 0.15);
-        background: rgba(0, 0, 0, 0.02);
+        border: 1px solid var(--app-login-decoration-border);
+        background: var(--app-login-decoration-bg);
       }
 
       .circle {
@@ -32,7 +32,7 @@
 
       .line {
         height: 1px;
-        background: rgba(0, 0, 0, 0.2);
+        background: var(--app-login-line);
         border: none;
       }
 
@@ -79,7 +79,7 @@
       .dot {
         width: 10px;
         height: 10px;
-        background: #333;
+        background: var(--app-login-dot);
         border-radius: 50%;
         position: absolute;
         top: 40%;
@@ -169,7 +169,7 @@
       .left-text {
         position: relative;
         z-index: 2;
-        color: var(--app-text-title);
+        color: var(--app-login-title);
         text-align: center;
         padding: 0 40px;
 
@@ -178,13 +178,14 @@
           font-weight: 600;
           letter-spacing: 2px;
           margin-bottom: 12px;
+          color: var(--app-login-title);
         }
 
         p {
           font-size: 14px;
           opacity: 1;
           letter-spacing: 1px;
-          color: var(--app-text-description);
+          color: var(--app-login-subtitle);
         }
       }
     }
@@ -292,7 +293,7 @@
 
           &:disabled {
             cursor: not-allowed;
-            opacity: 1;
+            opacity: 0.6;
           }
         }
 
@@ -417,12 +418,16 @@
           transition: background 0.5s;
 
           color: var(--app-text-description);
-          background-color: var(--app-page-bg-minor);
+          background-color: var(--app-login-social-blue);
           border: 1px solid var(--app-border);
           border-radius: var(--app-radius-btn);
 
-          &:hover {
-            background-color: var(--app-page-bg-primary);
+          // &:hover {
+          //   background-color: var(--app-page-bg-primary);
+          // }
+
+          &:last-child {
+            background-color: var(--app-login-social-green);
           }
         }
       }
@@ -435,7 +440,7 @@
         color: var(--app-text-description);
 
         .link-text {
-          color: var(--app-text-description);
+          color: var(--app-login-link);
           text-decoration: underline;
         }
       }
@@ -445,7 +450,7 @@
         border: none;
         background: transparent;
 
-        color: var(--app-text-description);
+        color: var(--app-login-link);
         font: inherit;
         text-decoration: underline;
         cursor: pointer;
