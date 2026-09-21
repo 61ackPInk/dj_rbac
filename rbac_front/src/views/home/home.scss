@@ -1,36 +1,90 @@
 .home-page {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-
+  width: 100%;
   color: var(--app-text-minor);
-  background-color: var(--app-page-bg-minor);
 }
 
-.welcome-card {
-  width: 100%;
-  max-width: 480px;
-  padding: 32px;
+.page-heading {
+  margin-bottom: 24px;
 
-  background-color: var(--app-card);
-  border-radius: var(--app-radius-card);
-  box-shadow: var(--app-card-shadow);
+  .page-label {
+    margin-bottom: 8px;
+    color: var(--app-nav-active-text);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+  }
 
-  p {
-    margin-top: 16px;
+  h1 {
+    color: var(--app-text-title);
+    font-size: 28px;
+    font-weight: 600;
+  }
+
+  p:last-child {
+    margin-top: 8px;
+    color: var(--app-text-description);
+    font-size: 14px;
   }
 }
 
-.card-title {
+.account-card {
+  width: 100%;
+  max-width: 640px;
+  padding: 28px;
+  background: var(--app-card);
+  border: 1px solid var(--app-border-line);
+  border-radius: var(--app-radius-card);
+  box-shadow: var(--app-card-shadow);
+}
+
+.card-heading {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 14px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--app-border-line);
 
-  color: var(--app-text-title);
-  font-size: 20px;
-  font-weight: 600;
+  > i {
+    color: var(--app-color-primary);
+    font-size: 32px;
+  }
+
+  h2 {
+    color: var(--app-text-title);
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  p {
+    margin-top: 4px;
+    color: var(--app-text-description);
+    font-size: 13px;
+  }
+}
+
+.account-details {
+  margin: 8px 0 24px;
+
+  > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--app-border-line);
+  }
+
+  dt {
+    flex-shrink: 0;
+    color: var(--app-text-description);
+  }
+
+  dd {
+    margin: 0;
+    color: var(--app-text-title);
+    font-weight: 600;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
 }
 
 .logout-button {
@@ -38,25 +92,31 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-
-  width: 100%;
-  margin-top: 24px;
-  padding: 12px 16px;
-
-  color: var(--app-btn-text);
-  background-color: var(--app-btn);
+  min-height: 42px;
+  padding: 0 18px;
   border: none;
   border-radius: var(--app-radius-btn);
-
+  background: var(--app-btn);
+  color: var(--app-btn-text);
   font: inherit;
   cursor: pointer;
 
   &:hover:not(:disabled) {
-    background-color: var(--app-btn-hover);
+    background: var(--app-btn-hover);
   }
 
   &:disabled {
     cursor: not-allowed;
     opacity: 0.6;
+  }
+}
+
+@media (max-width: 600px) {
+  .page-heading h1 {
+    font-size: 23px;
+  }
+
+  .account-card {
+    padding: 20px;
   }
 }

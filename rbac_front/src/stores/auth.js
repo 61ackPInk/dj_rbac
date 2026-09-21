@@ -1,5 +1,6 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
+import { useNavigationStore } from '@/stores/navigation'
 
 import {
   loginApi,
@@ -41,6 +42,7 @@ export const useAuthStore = defineStore('auth', () => {
     return Boolean(accessToken.value && user.value)
   })
 
+  /* ============= 登录 ============= */
   const login = async (formData) => {
     /*
      * request.js 已经取出了后端响应中的 data，
@@ -60,6 +62,7 @@ export const useAuthStore = defineStore('auth', () => {
     return result
   }
 
+  /* ============= 获取当前用户信息 ============= */
   const fetchCurrentUser = async () => {
     const result = await getCurrentUserApi()
 
@@ -68,13 +71,16 @@ export const useAuthStore = defineStore('auth', () => {
     return result
   }
 
+  /* ============= 清除Session ============= */
   const clearSession = () => {
     clearTokens()
+    useNavigationStore().clearPages()
 
     accessToken.value = ''
     user.value = null
   }
 
+  /* ============= 退出 ============= */
   const logout = async () => {
     /*
     * 先请求后端，使该用户之前签发的
@@ -86,6 +92,7 @@ export const useAuthStore = defineStore('auth', () => {
     clearSession()
   }
 
+  /* ============= 初始化 ============= */
   const initializeAuth = async () => {
     // 已经初始化过，不再重复请求
     if (initialized.value) {
