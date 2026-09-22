@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/stores/auth'
+import { getVisiblePagesApi } from '@/api/pages'
 
 // 接收路由实例，集中注册全局导航规则
 export const setupRouterGuards = (router) => {
@@ -39,6 +40,22 @@ export const setupRouterGuards = (router) => {
         query: {
           redirect: to.fullPath,
         },
+      }
+    }
+    // 有 pageCode 的页面，必须出现在当前用户的可见页面列表中
+    if (to.meta.pageCode) {
+      try {
+        const visiblePages = await getVisiblePagesApi()
+        const canAccess = visiblePages.some(
+          (page) => page.code === to.meta.pageCode,
+        )
+
+        if (!canAccess) {
+          return { name: 'home' }
+        }
+      } catch (error) {
+        console.warn('检查页面权限失败：', error)
+        return { name: 'home' }
       }
     }
 

@@ -17,17 +17,16 @@ export default [
       {
         path: 'system/dashboard',
         name: 'system-dashboard',
-        component: () =>
-          import('@/views/system/dashboard/dashboard.vue'),
+        component: () => import('@/views/system/dashboard/dashboard.vue'),
         meta: {
-          title: '数据概览',
+          title: '系统概览',
+          pageCode: 'SYSTEM_DASHBOARD',
         },
       },
       {
         path: ':pathMatch(.*)*',
         name: 'page-placeholder',
-        component: () =>
-          import('@/views/common/page-placeholder.vue'),
+        component: () => import('@/views/common/page-placeholder.vue'),
         meta: {
           title: '待开发页面',
         },
