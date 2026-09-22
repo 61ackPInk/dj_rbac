@@ -23,6 +23,16 @@ export default [
           pageCode: 'SYSTEM_DASHBOARD',
         },
       },
+      // 系统管理：用户管理
+      {
+        path: 'system/users',
+        name: 'system-users',
+        component: () => import('@/views/system/users/users.vue'),
+        meta: {
+          title: '用户管理',
+          pageCode: 'SYSTEM_USERS',
+        },
+      },
       {
         path: ':pathMatch(.*)*',
         name: 'page-placeholder',
