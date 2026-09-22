@@ -61,7 +61,7 @@ WSGI_APPLICATION = 'rbac_back.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'dj_db_conn_pool.backends.mysql',
-        'NAME': 'dj_rbac',
+        'NAME': '61_test',
         'USER': 'root',
         'PASSWORD': '010601',
         'HOST': '127.0.0.1',
