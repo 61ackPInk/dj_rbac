@@ -27,7 +27,7 @@
         <RouterLink
           v-for="menu in topMenus"
           :key="menu.id"
-          :to="menu.path"
+          :to="menu.entryPath || menu.path"
           :class="{ active: activeTopMenu?.id === menu.id }"
         >
           {{ menu.name }}
@@ -62,7 +62,7 @@
           <RouterLink
             v-for="menu in topMenus"
             :key="menu.id"
-            :to="menu.path"
+            :to="menu.entryPath || menu.path"
             :class="{ active: activeTopMenu?.id === menu.id }"
             @click="closeMobileMenu"
           >

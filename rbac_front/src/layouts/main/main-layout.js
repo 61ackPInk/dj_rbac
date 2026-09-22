@@ -45,10 +45,26 @@ export default defineComponent({
       () => authStore.user?.username || '用户',
     )
 
+    // const topMenus = computed(() => [
+    //   homeMenu,
+    //   ...navigationStore.topMenus.filter((menu) => menu.path !== '/'),
+    // ])
     const topMenus = computed(() => [
       homeMenu,
-      ...navigationStore.topMenus.filter((menu) => menu.path !== '/'),
+      ...navigationStore.topMenus
+        .filter((menu) => menu.path !== '/')
+        .map((menu) => {
+          // getChildMenus 已按 sort_order 排序，且只包含当前用户可见页面
+          const firstChild = navigationStore.getChildMenus(menu.id)[0]
+
+          return {
+            ...menu,
+            entryPath: firstChild?.path || menu.path,
+          }
+        }),
     ])
+
+
 
     // 根据当前页面，确定选中的顶部菜单
     const activeTopMenu = computed(() => {
