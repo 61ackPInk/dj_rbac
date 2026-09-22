@@ -2,13 +2,13 @@
 
 <template>
   <main class="home-page">
-    <div class="page-heading">
+    <div id="overview" class="page-heading">
       <p class="page-label">OVERVIEW</p>
       <h1>欢迎回来，{{ user?.username || '用户' }}</h1>
       <p>这里是你的账户概览。</p>
     </div>
 
-    <section class="account-card" aria-labelledby="account-title">
+    <section id="account" class="account-card" aria-labelledby="account-title">
       <div class="card-heading">
         <i class="bi bi-person-circle" aria-hidden="true"></i>
         <div>

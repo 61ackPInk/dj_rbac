@@ -14,6 +14,16 @@ const router = createRouter({
     ...homeRoutes,
     ...testRoutes,
   ],
+  scrollBehavior(to) {
+    if (to.hash) {
+      return {
+        el: to.hash,
+        behavior: 'smooth',
+      }
+    }
+
+    return { top: 0 }
+  },
 })
 
 // 只在入口注册一次，不要在各模块重复注册守卫

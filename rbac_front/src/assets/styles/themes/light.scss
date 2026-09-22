@@ -65,12 +65,20 @@
   --app-login-button-shadow-hover: 0 14px 26px rgb(48 175 255 / 32%);
 
   /* ==================== 后台导航 ==================== */
-  --app-layout-bg: #f9fcfd;
+  // --app-layout-bg: #f9fcfd;
+  --app-layout-bg: linear-gradient(120deg, #a9f2ff 0%, #d8ffc5 100%);
+  --app-layout-content-bg: linear-gradient(120deg, #e2fcff 0%, #ecfff0 100%);
   --app-nav-active-bg: #EEF9FF;
   --app-nav-active-text: #168FD7;
   --app-nav-muted-text: #79909e;
   --app-brand-mark: var(--app-color-primary);
   --app-mobile-menu-mask: rgb(24 55 74 / 35%);
+  /* 侧边栏：换主题时只需修改这里 */
+  --app-sidebar-bg: linear-gradient(160deg, #30AFFF 0%, #92EEFF 100%);
+  --app-sidebar-text: #ffffff;
+  --app-sidebar-active-bg: #ffffff;
+  --app-sidebar-active-text: #168FD7;
+  --app-sidebar-hover-bg: rgb(255 255 255 / 18%);
 
 }
 
