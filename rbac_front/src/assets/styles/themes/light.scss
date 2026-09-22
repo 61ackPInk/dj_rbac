@@ -37,18 +37,32 @@
   --app-radius-card: 14px;
   --app-radius-input: 10px;
 
-  /* ==================== 登录页 ==================== */
-  --app-login-left-bg: linear-gradient(145deg, #f0fbff 0%, #e5faff 52%, #efffed 100%);
-  --app-login-decoration-border: rgb(48 175 255 / 38%);
-  --app-login-decoration-bg: rgb(146 238 255 / 11%);
-  --app-login-dot: var(--app-color-primary);
-  --app-login-line: rgb(48 175 255 / 22%);
-  --app-login-title: #17698e;
+  /* ++++++++++++++++++++ 登录页 ++++++++++++++++++++ */
+  --app-login-left-bg: linear-gradient(165deg,
+      var(--app-color-primary) 0%,
+      var(--app-color-sky) 100%);
+  --app-login-decoration-border: rgb(255 255 255 / 55%);
+  --app-login-decoration-bg: rgb(255 255 255 / 12%);
+  --app-login-dot: var(--app-color-lime);
+  --app-login-line: rgb(255 255 255 / 40%);
+  --app-login-title: #ffffff;
+  --app-login-subtitle: #e8fbff;
   --app-login-subtitle: #4d7f86;
   /* 登录页表单点缀 */
+  --app-login-right-bg: linear-gradient(135deg,
+      #e5fbff 0%,
+      #e7fff2 72%,
+      #f2ffe8 100%);
+  --app-login-card-radius: 22px;
+  --app-login-card-shadow: 0 24px 60px rgb(31 131 165 / 14%);
   --app-login-link: #197ba5;
   --app-login-social-blue: #f4fdff;
   --app-login-social-green: #f5fff2;
+  --app-login-input-bg: #ffffff;
+  --app-login-input-border: #c5e3eb;
+  --app-login-input-focus-ring: rgb(48 175 255 / 16%);
+  --app-login-button-shadow: 0 10px 22px rgb(48 175 255 / 25%);
+  --app-login-button-shadow-hover: 0 14px 26px rgb(48 175 255 / 32%);
 
   /* ==================== 后台导航 ==================== */
   --app-layout-bg: #f9fcfd;
