@@ -15,6 +15,15 @@ export default [
         },
       },
       {
+        path: 'system/dashboard',
+        name: 'system-dashboard',
+        component: () =>
+          import('@/views/system/dashboard/dashboard.vue'),
+        meta: {
+          title: '数据概览',
+        },
+      },
+      {
         path: ':pathMatch(.*)*',
         name: 'page-placeholder',
         component: () =>
