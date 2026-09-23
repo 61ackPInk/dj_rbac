@@ -13,15 +13,17 @@
 
     <!-- ==================== 真实用户数量 ==================== -->
     <div class="users-summary">
-      <div>
+      <div class="summary-card summary-card--total">
         <span>用户总数</span>
         <strong>{{ users.length }}</strong>
       </div>
-      <div>
+
+      <div class="summary-card summary-card--active">
         <span>已启用</span>
         <strong>{{ activeCount }}</strong>
       </div>
-      <div>
+
+      <div class="summary-card summary-card--disabled">
         <span>已停用</span>
         <strong>{{ users.length - activeCount }}</strong>
       </div>
@@ -31,11 +33,7 @@
     <div class="users-toolbar">
       <label>
         <span>搜索用户</span>
-        <input
-          v-model="keyword"
-          type="search"
-          placeholder="输入用户名或邮箱"
-        />
+        <input v-model="keyword" type="search" placeholder="输入用户名或邮箱" />
       </label>
 
       <label>
@@ -80,7 +78,11 @@
             <td>
               {{ user.is_root ? '超级管理员' : user.role?.name || '未分配角色' }}
             </td>
-            <td>{{ user.is_active ? '已启用' : '已停用' }}</td>
+            <td>
+              <span class="status-badge" :class="user.is_active ? 'is-active' : 'is-disabled'">
+                {{ user.is_active ? '已启用' : '已停用' }}
+              </span>
+            </td>
             <td>{{ formatTime(user.create_time) }}</td>
           </tr>
         </tbody>
@@ -88,3 +90,4 @@
     </div>
   </section>
 </template>
+<style scoped lang="scss" src="./users.scss"></style>
