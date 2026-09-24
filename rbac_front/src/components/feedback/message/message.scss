@@ -133,16 +133,38 @@
   transition: transform 0.2s ease;
 }
 
-/* 手机端距离顶部更近 */
+/* ==================== 手机端适配 ==================== */
+
 @media (max-width: 768px) {
+  /* 消息提示容器 */
   .app-message-container {
     top: 20px;
-    padding: 0 12px;
+    padding: 0 20px;
   }
 
+  /* 单条消息提示 */
   .app-message-item {
-    width: 100%;
+    /*
+     * 根据消息内容自动决定宽度，
+     * 不再强制占满整个手机屏幕。
+     */
+    width: fit-content;
     min-width: 0;
+
+    /*
+     * 长消息最多占据屏幕宽度减去 40px，
+     * 左右分别保留至少 20px 空间。
+     */
+    max-width: calc(100vw - 40px);
+
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  /* 消息文字 */
+  .app-message-text {
+    font-size: 13px;
+    line-height: 1.5;
   }
 }
 
