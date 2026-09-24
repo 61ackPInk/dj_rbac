@@ -1,86 +1,147 @@
 :root,
 :root[data-theme="light"] {
-  color-scheme: light;
+  /* ==================== 品牌色 ==================== */
+  --primary: #5267e8;
+  --primary-hover: #4054d2;
+  --primary-light: #eef0ff;
 
-  /* ==================== 网站主色 ==================== */
-  --app-color-primary: #30AFFF;
-  --app-color-sky: #92EEFF;
-  --app-color-lime: #D8FFC5;
-  --app-color-mint: #C4F7CA;
+  /* ==================== 背景色 ==================== */
+  --bg-page: #f6f7f9;
+  --bg-card: #ffffff;
+  --bg-sidebar: #fbfcfd;
+  --bg-hover: #f0f2f6;
 
-  --app-page-bg-minor: #f0fbff;
+  /* ==================== 文字色 ==================== */
+  --text-main: #20242c;
+  --text-sub: #727987;
+  --text-muted: #a0a6b1;
 
-  /* ==================== 按钮 ==================== */
-  --app-btn: var(--app-color-primary); // 按钮
-  --app-btn-text: #07354a;
-  --app-btn-hover: var(--app-color-sky);
-  --app-btn-text-hover: #07354a;
+  /* ==================== 边框色 ==================== */
+  --border: #e6e8ec;
 
-  --app-border: #c9dfe8;
-  --app-border-line: #d8e8ed;
-  --app-input-fcous: var(--app-color-primary);
+  /* ==================== 状态色 ==================== */
+  --success: #31a675;
+  --warning: #e9a23b;
+  --danger: #dc5a5a;
 
-  /* ==================== 文字 ==================== */
-  --app-text-title: #18374a;
-  --app-text-minor: #18374a;
-  --app-text-description: #5c7480;
-  --app-text-placeholder: #8198a3;
-  --app-text-hover: #197ba5;
-
-  --app-input: #fbfeff;
-  --app-card-shadow: 0 8px 30px rgb(31 131 165 / 11%);
-
-  --app-page-bg-primary: #ffffff;
-  --app-card: #ffffff;
-
-  --app-radius-btn: 10px;
-  --app-radius-card: 14px;
-  --app-radius-input: 10px;
-
-  /* ++++++++++++++++++++ 登录页 ++++++++++++++++++++ */
-  --app-login-left-bg: linear-gradient(165deg,
-      var(--app-color-primary) 0%,
-      var(--app-color-sky) 100%);
-  --app-login-decoration-border: rgb(255 255 255 / 55%);
-  --app-login-decoration-bg: rgb(255 255 255 / 12%);
-  --app-login-dot: var(--app-color-lime);
-  --app-login-line: rgb(255 255 255 / 40%);
-  --app-login-title: #ffffff;
-  --app-login-subtitle: #e8fbff;
-  --app-login-subtitle: #4d7f86;
-  /* 登录页表单点缀 */
-  --app-login-right-bg: linear-gradient(135deg,
-      #e5fbff 0%,
-      #e7fff2 72%,
-      #f2ffe8 100%);
-  --app-login-card-radius: 22px;
-  --app-login-card-shadow: 0 24px 60px rgb(31 131 165 / 14%);
-  --app-login-link: #197ba5;
-  --app-login-social-blue: #f4fdff;
-  --app-login-social-green: #f5fff2;
-  --app-login-input-bg: #ffffff;
-  --app-login-input-border: #c5e3eb;
-  --app-login-input-focus-ring: rgb(48 175 255 / 16%);
-  --app-login-button-shadow: 0 10px 22px rgb(48 175 255 / 25%);
-  --app-login-button-shadow-hover: 0 14px 26px rgb(48 175 255 / 32%);
-
-  /* ==================== 后台导航 ==================== */
-  // --app-layout-bg: #f9fcfd;
-  --app-layout-bg: linear-gradient(120deg, #a9f2ff 0%, #d8ffc5 100%);
-  --app-layout-content-bg: linear-gradient(120deg, #e2fcff 0%, #ecfff0 100%);
-  --app-nav-active-bg: #EEF9FF;
-  --app-nav-active-text: #168FD7;
-  --app-nav-muted-text: #79909e;
-  --app-brand-mark: var(--app-color-primary);
-  --app-mobile-menu-mask: rgb(24 55 74 / 35%);
-  /* 侧边栏：换主题时只需修改这里 */
-  --app-sidebar-bg: linear-gradient(160deg, #30AFFF 0%, #92EEFF 100%);
-  --app-sidebar-text: #ffffff;
-  --app-sidebar-active-bg: #ffffff;
-  --app-sidebar-active-text: #168FD7;
-  --app-sidebar-hover-bg: rgb(255 255 255 / 18%);
-
+  /* ==================== 圆角 ==================== */
+  --radius-card: 10px;
 }
+
+// :root,
+// :root[data-theme="light"] {
+//     /* 品牌色 */
+//     --primary: #5267e8;         // 主色
+//     --primary-hover: #4054d2;   // 主色悬停
+//     --primary-light: #eef0ff;   // 主色浅背景
+
+//     /* 背景色 */
+//     --bg-page: #f6f7f9;         // 页面背景
+//     --bg-card: #ffffff;         // 卡片背景
+//     --bg-sidebar: #fbfcfd;      // 侧边栏背景
+//     --bg-hover: #f0f2f6;        // 悬停背景
+
+//     /* 文字色 */
+//     --text-main: #20242c;       // 主文字
+//     --text-sub: #727987;        // 次要文字
+//     --text-muted: #a0a6b1;      // 弱提示文字
+
+//     /* 边框色 */
+//     --border: #e6e8ec;          // 边框
+
+//     /* 状态色 */
+//     --success: #31a675;         // 成功
+//     --warning: #e9a23b;         // 警告
+//     --danger: #dc5a5a;          // 危险
+
+//     /* 圆角 */
+//     --radius-card: 10px;          // 圆角
+// }
+
+// :root,
+// :root[data-theme="light"] {
+//   color-scheme: light;
+
+//   /* ==================== 网站主色 ==================== */
+//   --app-color-primary: #30AFFF;
+//   --app-color-sky: #92EEFF;
+//   --app-color-lime: #D8FFC5;
+//   --app-color-mint: #C4F7CA;
+
+//   --app-page-bg-minor: #f0fbff;
+
+//   /* ==================== 按钮 ==================== */
+//   --app-btn: var(--app-color-primary); // 按钮
+//   --app-btn-text: #07354a;
+//   --app-btn-hover: var(--app-color-sky);
+//   --app-btn-text-hover: #07354a;
+
+//   --app-border: #c9dfe8;
+//   --app-border-line: #d8e8ed;
+//   --app-input-fcous: var(--app-color-primary);
+
+//   /* ==================== 文字 ==================== */
+//   --app-text-title: #18374a;
+//   --app-text-minor: #18374a;
+//   --app-text-description: #5c7480;
+//   --app-text-placeholder: #8198a3;
+//   --app-text-hover: #197ba5;
+
+//   --app-input: #fbfeff;
+//   --app-card-shadow: 0 8px 30px rgb(31 131 165 / 11%);
+
+//   --app-page-bg-primary: #ffffff;
+//   --app-card: #ffffff;
+
+//   --app-radius-btn: 10px;
+//   --app-radius-card: 14px;
+//   --app-radius-input: 10px;
+
+//   /* ++++++++++++++++++++ 登录页 ++++++++++++++++++++ */
+//   --app-login-left-bg: linear-gradient(165deg,
+//       var(--app-color-primary) 0%,
+//       var(--app-color-sky) 100%);
+//   --app-login-decoration-border: rgb(255 255 255 / 55%);
+//   --app-login-decoration-bg: rgb(255 255 255 / 12%);
+//   --app-login-dot: var(--app-color-lime);
+//   --app-login-line: rgb(255 255 255 / 40%);
+//   --app-login-title: #ffffff;
+//   --app-login-subtitle: #e8fbff;
+//   --app-login-subtitle: #4d7f86;
+//   /* 登录页表单点缀 */
+//   --app-login-right-bg: linear-gradient(135deg,
+//       #e5fbff 0%,
+//       #e7fff2 72%,
+//       #f2ffe8 100%);
+//   --app-login-card-radius: 22px;
+//   --app-login-card-shadow: 0 24px 60px rgb(31 131 165 / 14%);
+//   --app-login-link: #197ba5;
+//   --app-login-social-blue: #f4fdff;
+//   --app-login-social-green: #f5fff2;
+//   --app-login-input-bg: #ffffff;
+//   --app-login-input-border: #c5e3eb;
+//   --app-login-input-focus-ring: rgb(48 175 255 / 16%);
+//   --app-login-button-shadow: 0 10px 22px rgb(48 175 255 / 25%);
+//   --app-login-button-shadow-hover: 0 14px 26px rgb(48 175 255 / 32%);
+
+//   /* ==================== 后台导航 ==================== */
+//   // --app-layout-bg: #f9fcfd;
+//   --app-layout-bg: linear-gradient(120deg, #a9f2ff 0%, #d8ffc5 100%);
+//   --app-layout-content-bg: linear-gradient(120deg, #e2fcff 0%, #ecfff0 100%);
+//   --app-nav-active-bg: #EEF9FF;
+//   --app-nav-active-text: #168FD7;
+//   --app-nav-muted-text: #79909e;
+//   --app-brand-mark: var(--app-color-primary);
+//   --app-mobile-menu-mask: rgb(24 55 74 / 35%);
+//   /* 侧边栏：换主题时只需修改这里 */
+//   --app-sidebar-bg: linear-gradient(160deg, #30AFFF 0%, #92EEFF 100%);
+//   --app-sidebar-text: #ffffff;
+//   --app-sidebar-active-bg: #ffffff;
+//   --app-sidebar-active-text: #168FD7;
+//   --app-sidebar-hover-bg: rgb(255 255 255 / 18%);
+
+//   --app-page-bg: #F6F7F9;
+// }
 
 
 // :root,

@@ -1,159 +1,192 @@
+<!-- ==================== 登录页业务逻辑 ==================== -->
 <script src="./login.js"></script>
 
 <template>
-  <div class="login-warp">
-    <!-- 左侧内容，移动端隐藏 -->
-    <div class="login-left">
-      <div class="left-content">
-        <div class="decoration circle shape-1"></div>
-        <div class="decoration circle shape-2"></div>
-        <div class="decoration square shape-3"></div>
-        <div class="decoration square shape-4"></div>
-        <div class="decoration square shape-5"></div>
-        <div class="decoration line line-1"></div>
-        <div class="decoration line line-2"></div>
-        <div class="dot"></div>
+  <main class="login-page">
+    <!-- ==================== 背景装饰 ==================== -->
+    <span
+      class="background-shape background-shape--top"
+      aria-hidden="true"
+    ></span>
 
-        <div class="left-text">
-          <h1>WELCOME BACK</h1>
-          <p>Sign in to continue your journey</p>
-        </div>
+    <span
+      class="background-shape background-shape--bottom"
+      aria-hidden="true"
+    ></span>
+
+    <!-- ==================== 页面品牌 ==================== -->
+    <header class="page-brand">
+      <div
+        class="brand-logo"
+        aria-hidden="true"
+      >
+        <i class="bi bi-grid"></i>
       </div>
-    </div>
 
-    <!-- 右侧登录区域 -->
-    <div class="login-right">
-      <div class="login-card">
-        <h2 class="title">账户登录</h2>
-        <div class="sub-desc">请输入你的账号信息登录系统</div>
+      <span class="brand-name">
+        BP Workbench
+      </span>
+    </header>
+
+    <!-- ==================== 登录卡片 ==================== -->
+    <section
+      class="login-card"
+      aria-labelledby="login-title"
+    >
+      <!-- 登录卡片头部 -->
+      <header class="card-header">
+        <div
+          class="welcome-icon"
+          aria-hidden="true"
+        >
+          <i class="bi bi-shield-lock"></i>
+        </div>
+
+        <h1 id="login-title">
+          欢迎登录
+        </h1>
+
+        <p>
+          登录 BP Workbench，开始管理你的工作空间
+        </p>
+      </header>
+
+      <!-- ==================== 登录表单 ==================== -->
+      <form
+        novalidate
+        @submit.prevent="handleLogin"
+      >
+        <!-- 用户名 -->
+        <label class="form-field">
+          <span class="field-label">
+            用户名
+          </span>
+
+          <span class="input-wrapper">
+            <i
+              class="bi bi-person input-icon"
+              aria-hidden="true"
+            ></i>
+
+            <input
+              v-model.trim="form.username"
+              name="username"
+              type="text"
+              maxlength="20"
+              autocomplete="username"
+              placeholder="请输入用户名"
+            />
+          </span>
+        </label>
+
+        <!-- 密码 -->
+        <label class="form-field">
+          <span class="field-label">
+            密码
+          </span>
+
+          <span class="input-wrapper">
+            <i
+              class="bi bi-lock input-icon"
+              aria-hidden="true"
+            ></i>
+
+            <input
+              v-model="form.password"
+              name="password"
+              :type="showPassword ? 'text' : 'password'"
+              autocomplete="current-password"
+              placeholder="请输入密码"
+            />
+
+            <!-- 显示或隐藏密码 -->
+            <button
+              class="password-toggle"
+              type="button"
+              :aria-label="showPassword ? '隐藏密码' : '显示密码'"
+              :title="showPassword ? '隐藏密码' : '显示密码'"
+              @click="togglePassword"
+            >
+              <i
+                class="bi"
+                :class="showPassword ? 'bi-eye-slash' : 'bi-eye'"
+                aria-hidden="true"
+              ></i>
+            </button>
+          </span>
+        </label>
+
+        <!-- ==================== 表单辅助操作 ==================== -->
+        <div class="form-options">
+          <!-- 只保存用户名，不保存用户密码 -->
+          <label class="remember-option">
+            <input
+              v-model="rememberAccount"
+              type="checkbox"
+              name="remember"
+            />
+
+            <span>记住账号</span>
+          </label>
+
+          <button
+            class="text-button"
+            type="button"
+            @click="showUnavailable('找回密码')"
+          >
+            忘记密码？
+          </button>
+        </div>
 
         <!--
-          使用 form 的 submit 事件：
-          点击登录按钮或者在输入框中按 Enter，都会执行 handleLogin。
+          预留表单提示区域。
+          当前登录错误继续使用项目已有的消息提示。
         -->
-        <form novalidate @submit.prevent="handleLogin">
-          <!-- 账号 -->
-          <div class="form-item">
-            <div class="input-wrap">
-              <i class="bi bi-person" aria-hidden="true"></i>
+        <p
+          class="form-message"
+          aria-live="polite"
+        ></p>
 
-              <input
-                v-model="form.username"
-                class="username-input"
-                type="text"
-                name="username"
-                maxlength="20"
-                autocomplete="username"
-                placeholder="请输入账号"
-              />
-            </div>
-          </div>
+        <!-- ==================== 登录按钮 ==================== -->
+        <button
+          class="login-button"
+          type="submit"
+          :disabled="loading"
+        >
+          <span>
+            {{ loading ? '登录中...' : '登录' }}
+          </span>
 
-          <!-- 密码 -->
-          <div class="form-item">
-            <div class="input-wrap">
-              <i class="bi bi-lock" aria-hidden="true"></i>
+          <i
+            class="bi bi-arrow-right"
+            aria-hidden="true"
+          ></i>
+        </button>
+      </form>
 
-              <input
-                v-model="form.password"
-                class="password-input"
-                :type="showPassword ? 'text' : 'password'"
-                name="password"
-                autocomplete="current-password"
-                placeholder="请输入密码"
-                
-              />
+      <!-- ==================== 登录帮助 ==================== -->
+      <footer class="card-footer">
+        登录遇到问题？
 
-              <!-- type="button" 防止点击眼睛图标时提交表单 -->
-              <button
-                type="button"
-                class="password-toggle"
-                :aria-label="showPassword ? '隐藏密码' : '显示密码'"
-                :title="showPassword ? '隐藏密码' : '显示密码'"
-                
-                @click="togglePassword"
-              >
-                <i
-                  class="bi"
-                  :class="showPassword ? 'bi-eye-slash' : 'bi-eye'"
-                  aria-hidden="true"
-                ></i>
-              </button>
-            </div>
-          </div>
+        <button
+          type="button"
+          @click="showUnavailable('联系管理员')"
+        >
+          联系管理员
+        </button>
+      </footer>
+    </section>
 
-          <!-- 只记住账号，不在浏览器中保存密码 -->
-          <div class="form-row-between">
-            <label>
-              <input
-                v-model="rememberAccount"
-                type="checkbox"
-                
-              />
-              记住账号
-            </label>
-
-            <button
-              type="button"
-              class="text-link"
-              @click="showUnavailable('找回密码')"
-            >
-              忘记密码？
-            </button>
-          </div>
-
-          <!-- 登录主按钮 -->
-          <div class="form-item">
-            <button
-              type="submit"
-              class="btn-login"
-              :disabled="loading"
-            >
-              <span>登录</span>
-            </button>
-          </div>
-        </form>
-
-        <!-- 分隔线 -->
-        <div class="divider">
-          <span>或使用以下方式登录</span>
-        </div>
-
-        <!-- 第三方登录按钮组 -->
-        <div class="form-item social-login">
-          <button
-            type="button"
-            class="social-btn"
-            @click="showUnavailable('GitHub 登录')"
-          >
-            <i class="bi bi-github" aria-hidden="true"></i>
-            GitHub
-          </button>
-
-          <button
-            type="button"
-            class="social-btn"
-            @click="showUnavailable('微信登录')"
-          >
-            <i class="bi bi-wechat" aria-hidden="true"></i>
-            微信
-          </button>
-        </div>
-
-        <!-- 注册跳转提示 -->
-        <div class="tip-text">
-          还没有账号？
-          <button
-            type="button"
-            class="text-link link-text"
-            @click="showUnavailable('用户注册')"
-          >
-            立即注册
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+    <!-- ==================== 页面底部 ==================== -->
+    <footer class="page-footer">
+      © 2026 BP Workbench
+    </footer>
+  </main>
 </template>
 
-<style scoped lang="scss" src="./login.scss"></style>
+<!-- ==================== 登录页样式 ==================== -->
+<style
+  scoped
+  lang="scss"
+  src="./login.scss"
+></style>
