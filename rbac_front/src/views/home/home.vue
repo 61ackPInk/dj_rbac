@@ -1,52 +1,247 @@
+<!-- ==================== 首页业务逻辑 ==================== -->
 <script src="./home.js"></script>
 
 <template>
-  <main class="home-page">
-    <div id="overview" class="page-heading">
-      <p class="page-label">OVERVIEW</p>
-      <h1>欢迎回来，{{ user?.username || '用户' }}</h1>
-      <p>这里是你的账户概览。</p>
-    </div>
+  <div class="home-page">
+    <!-- ==================== 页面标题 ==================== -->
+    <header class="page-heading">
+      <h1>首页</h1>
+      <p>欢迎使用 BP Workbench</p>
+    </header>
 
-    <section id="account" class="account-card" aria-labelledby="account-title">
-      <div class="card-heading">
-        <i class="bi bi-person-circle" aria-hidden="true"></i>
-        <div>
-          <h2 id="account-title">账户信息</h2>
-          <p>当前登录账户的基本资料</p>
+    <!-- ==================== 首页卡片区域 ==================== -->
+    <section
+      class="card-grid"
+      aria-label="首页工作台"
+    >
+      <!-- ==================== 卡片 1 ==================== -->
+      <article class="dashboard-card card-1">
+        <header class="card-header">
+          <h2 class="card-title">
+            卡片 1
+          </h2>
+
+          <button
+            class="card-action"
+            type="button"
+            aria-label="卡片 1 更多操作"
+          >
+            <i
+              class="bi bi-three-dots"
+              aria-hidden="true"
+            ></i>
+          </button>
+        </header>
+
+        <div class="card-body">
+          <div class="card-placeholder">
+            <div
+              class="card-placeholder-icon"
+              aria-hidden="true"
+            >
+              <i class="bi bi-bar-chart"></i>
+            </div>
+
+            <span>卡片内容区域</span>
+
+            <small>
+              可替换为统计数据、图表或其他内容
+            </small>
+          </div>
         </div>
-      </div>
+      </article>
 
-      <dl class="account-details">
-        <div>
-          <dt>用户名</dt>
-          <dd>{{ user?.username || '未知用户' }}</dd>
+      <!-- ==================== 卡片 2 ==================== -->
+      <article class="dashboard-card card-2">
+        <header class="card-header">
+          <h2 class="card-title">
+            卡片 2
+          </h2>
+
+          <button
+            class="card-action"
+            type="button"
+            aria-label="卡片 2 更多操作"
+          >
+            <i
+              class="bi bi-three-dots"
+              aria-hidden="true"
+            ></i>
+          </button>
+        </header>
+
+        <div class="card-body">
+          <div class="card-placeholder">
+            <div
+              class="card-placeholder-icon"
+              aria-hidden="true"
+            >
+              <i class="bi bi-clock"></i>
+            </div>
+
+            <span>卡片内容区域</span>
+
+            <small>
+              可替换为统计数据、图表或其他内容
+            </small>
+          </div>
         </div>
+      </article>
 
-        <div>
-          <dt>当前身份</dt>
-          <dd v-if="user?.is_root">超级管理员</dd>
-          <dd v-else-if="user?.role">{{ user.role.name }}</dd>
-          <dd v-else>未分配角色</dd>
+      <!-- ==================== 卡片 3 ==================== -->
+      <article class="dashboard-card card-3">
+        <header class="card-header">
+          <h2 class="card-title">
+            卡片 3
+          </h2>
+
+          <button
+            class="card-action"
+            type="button"
+            aria-label="卡片 3 更多操作"
+          >
+            <i
+              class="bi bi-three-dots"
+              aria-hidden="true"
+            ></i>
+          </button>
+        </header>
+
+        <div class="card-body">
+          <div class="card-placeholder">
+            <div
+              class="card-placeholder-icon"
+              aria-hidden="true"
+            >
+              <i class="bi bi-window"></i>
+            </div>
+
+            <span>卡片内容区域</span>
+
+            <small>
+              在这里添加自定义内容
+            </small>
+          </div>
         </div>
+      </article>
 
-        <div v-if="user?.email">
-          <dt>邮箱</dt>
-          <dd>{{ user.email }}</dd>
+      <!-- ==================== 卡片 4 ==================== -->
+      <article class="dashboard-card card-4">
+        <header class="card-header">
+          <h2 class="card-title">
+            卡片 4
+          </h2>
+
+          <button
+            class="card-action"
+            type="button"
+            aria-label="卡片 4 更多操作"
+          >
+            <i
+              class="bi bi-three-dots"
+              aria-hidden="true"
+            ></i>
+          </button>
+        </header>
+
+        <div class="card-body">
+          <div class="card-placeholder">
+            <div
+              class="card-placeholder-icon"
+              aria-hidden="true"
+            >
+              <i class="bi bi-people"></i>
+            </div>
+
+            <span>卡片内容区域</span>
+
+            <small>
+              在这里添加自定义内容
+            </small>
+          </div>
         </div>
-      </dl>
+      </article>
 
-      <button
-        type="button"
-        class="logout-button"
-        :disabled="logoutLoading"
-        @click="handleLogout"
-      >
-        <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
-        {{ logoutLoading ? '退出中...' : '退出登录' }}
-      </button>
+      <!-- ==================== 卡片 5 ==================== -->
+      <article class="dashboard-card card-5">
+        <header class="card-header">
+          <h2 class="card-title">
+            卡片 5
+          </h2>
+
+          <button
+            class="card-action"
+            type="button"
+            aria-label="卡片 5 更多操作"
+          >
+            <i
+              class="bi bi-three-dots"
+              aria-hidden="true"
+            ></i>
+          </button>
+        </header>
+
+        <div class="card-body">
+          <div class="card-placeholder">
+            <div
+              class="card-placeholder-icon"
+              aria-hidden="true"
+            >
+              <i class="bi bi-person"></i>
+            </div>
+
+            <span>卡片内容区域</span>
+
+            <small>
+              在这里添加自定义内容
+            </small>
+          </div>
+        </div>
+      </article>
+
+      <!-- ==================== 卡片 6 ==================== -->
+      <article class="dashboard-card card-6">
+        <header class="card-header">
+          <h2 class="card-title">
+            卡片 6
+          </h2>
+
+          <button
+            class="card-action"
+            type="button"
+            aria-label="卡片 6 更多操作"
+          >
+            <i
+              class="bi bi-three-dots"
+              aria-hidden="true"
+            ></i>
+          </button>
+        </header>
+
+        <div class="card-body">
+          <div class="card-placeholder">
+            <div
+              class="card-placeholder-icon"
+              aria-hidden="true"
+            >
+              <i class="bi bi-bar-chart-line"></i>
+            </div>
+
+            <span>卡片内容区域</span>
+
+            <small>
+              可替换为表格、日志或其他较宽的内容
+            </small>
+          </div>
+        </div>
+      </article>
     </section>
-  </main>
+  </div>
 </template>
 
-<style scoped lang="scss" src="./home.scss"></style>
+<!-- ==================== 首页样式 ==================== -->
+<style
+  scoped
+  lang="scss"
+  src="./home.scss"
+></style>

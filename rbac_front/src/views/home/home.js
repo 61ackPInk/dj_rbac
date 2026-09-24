@@ -1,50 +1,19 @@
-import { defineComponent, ref } from 'vue'
-import { useRouter } from 'vue-router'
-
-import { useAuthStore } from '@/stores/auth'
-import { message } from '@/utils/message'
+/* ==================== Vue 相关依赖 ==================== */
+import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'HomeView',
 
   setup() {
-    const router = useRouter()
-    const authStore = useAuthStore()
+    /*
+     * 当前首页只负责展示工作台卡片。
+     *
+     * 后续卡片接入真实数据时，
+     * 再在这里增加接口调用、加载状态和数据处理。
+     */
 
-    const logoutLoading = ref(false)
+    /* ==================== 向模板暴露内容 ==================== */
 
-    const handleLogout = async () => {
-      // 防止连续点击导致重复退出
-      if (logoutLoading.value) return
-
-      logoutLoading.value = true
-
-      try {
-        await authStore.logout()
-
-        message.success('退出登录成功')
-
-        /*
-         * replace 不保留当前后台页面记录，
-         * 避免点击浏览器返回按钮又回到退出前页面。
-         */
-        await router.replace({
-          name: 'login',
-        })
-      } catch (error) {
-        message.error(
-          error.userMessage ||
-            '退出登录失败，请稍后重试',
-        )
-      } finally {
-        logoutLoading.value = false
-      }
-    }
-
-    return {
-      user: authStore.user,
-      logoutLoading,
-      handleLogout,
-    }
+    return {}
   },
 })
