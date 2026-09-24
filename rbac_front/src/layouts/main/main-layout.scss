@@ -559,9 +559,15 @@
     .layout-content {
       width: 100%;
       min-width: 0;
-      max-width: 1500px;
-      margin: 0 auto;
-      padding: 28px;
+      
+      // 固定最大宽距 
+      // max-width: 1700px;
+      // margin: 0 auto;
+      // padding: 28px;
+
+      // 改变中心内容宽距
+      margin: 0;
+      padding: 24px 50px;
     }
   }
 
