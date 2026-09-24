@@ -1,134 +1,280 @@
+<!-- ==================== 后台布局业务逻辑 ==================== -->
 <script src="./main-layout.js"></script>
 
 <template>
-  <div class="main-layout">
-    <!-- ==================== 顶部导航栏 ==================== -->
-    <header class="layout-header">
-      <!-- 手机端：打开或关闭侧边抽屉 -->
-      <button
-        type="button"
-        class="mobile-menu-button"
-        :aria-label="mobileMenuOpen ? '关闭侧边菜单' : '打开侧边菜单'"
-        aria-controls="mobile-sidebar"
-        :aria-expanded="mobileMenuOpen"
-        @click="toggleMobileMenu"
-      >
-        <i class="bi bi-list" aria-hidden="true"></i>
-      </button>
-
-      <!-- 手机端顶部 Logo；电脑端 Logo 显示在侧边栏 -->
-      <div class="header-brand">
-        <span class="logo-dot" aria-hidden="true"></span>
-        <span>RBAC</span>
-      </div>
-
-      <!-- 电脑端顶部主导航：固定首页 + 接口菜单 -->
-      <nav class="header-nav" aria-label="顶部导航">
+  <div
+    class="app-layout"
+    :class="{
+      'is-collapsed': sidebarCollapsed,
+      'is-mobile-open': mobileSidebarOpen,
+    }"
+  >
+    <!-- ==================== 左侧导航栏 ==================== -->
+    <aside
+      id="main-sidebar"
+      class="layout-sidebar"
+    >
+      <!-- 侧边栏品牌 -->
+      <header class="sidebar-header">
         <RouterLink
-          v-for="menu in topMenus"
-          :key="menu.id"
-          :to="menu.entryPath || menu.path"
-          :class="{ active: activeTopMenu?.id === menu.id }"
+          class="sidebar-brand"
+          to="/"
+          aria-label="返回首页"
+          @click="closeMobileSidebar"
         >
-          {{ menu.name }}
+          <span
+            class="brand-logo"
+            aria-hidden="true"
+          >
+            <i class="bi bi-grid"></i>
+          </span>
+
+          <span class="brand-name">
+            BP Workbench
+          </span>
         </RouterLink>
+      </header>
+
+      <!-- ==================== 侧边栏菜单 ==================== -->
+      <nav
+        class="sidebar-content"
+        aria-label="后台主导航"
+      >
+        <!-- 固定首页入口 -->
+        <section class="menu-group">
+          <p class="menu-title">
+            工作台
+          </p>
+
+          <RouterLink
+            class="menu-item"
+            :class="{ 'is-active': route.path === '/' }"
+            to="/"
+            title="首页"
+            @click="closeMobileSidebar"
+          >
+            <span
+              class="menu-icon"
+              aria-hidden="true"
+            >
+              <i class="bi bi-grid"></i>
+            </span>
+
+            <span class="menu-text">
+              首页
+            </span>
+          </RouterLink>
+        </section>
+
+        <!-- 后端返回的动态菜单分组 -->
+        <section
+          v-for="group in menuGroups"
+          :key="group.id"
+          class="menu-group"
+        >
+          <!-- 根页面作为菜单分组标题 -->
+          <p class="menu-title">
+            {{ group.name }}
+          </p>
+
+          <!-- 根页面下的子页面 -->
+          <RouterLink
+            v-for="menu in group.children"
+            :key="menu.id"
+            class="menu-item"
+            :class="{
+              'is-active': isMenuActive(menu.path),
+            }"
+            :to="menu.path"
+            :title="menu.name"
+            @click="closeMobileSidebar"
+          >
+            <span
+              class="menu-icon"
+              aria-hidden="true"
+            >
+              <i
+                class="bi"
+                :class="menu.icon || 'bi-circle'"
+              ></i>
+            </span>
+
+            <span class="menu-text">
+              {{ menu.name }}
+            </span>
+          </RouterLink>
+        </section>
       </nav>
 
-      <div class="header-user">{{ username }}</div>
-    </header>
+      <!-- ==================== 侧边栏底部 ==================== -->
+      <footer class="sidebar-footer">
+        <div class="system-status">
+          <span
+            class="status-dot"
+            aria-hidden="true"
+          ></span>
 
-    <!-- ==================== 手机端抽屉遮罩 ==================== -->
-    <div
-      v-if="mobileMenuOpen"
-      class="mobile-menu-mask"
-      @click="closeMobileMenu"
-    ></div>
+          <span class="status-text">
+            系统运行正常
+          </span>
+        </div>
+      </footer>
+    </aside>
 
-    <!-- ==================== 侧边栏与页面内容 ==================== -->
-    <div class="layout-body">
-      <aside
-        id="mobile-sidebar"
-        class="layout-sidebar"
-        :class="{ 'mobile-open': mobileMenuOpen }"
-      >
-        <!-- 电脑端侧边栏 Logo -->
-        <div class="header-brand sidebar-brand">
-          <span class="logo-dot" aria-hidden="true"></span>
-          <span>RBAC</span>
+    <!-- ==================== 手机端侧边栏遮罩 ==================== -->
+    <button
+      v-if="mobileSidebarOpen"
+      class="mobile-overlay"
+      type="button"
+      aria-label="关闭侧边栏"
+      @click="closeMobileSidebar"
+    ></button>
+
+    <!-- ==================== 后台主体 ==================== -->
+    <div class="layout-main">
+      <!-- ==================== 顶部栏 ==================== -->
+      <header class="layout-topbar">
+        <!-- 顶部栏左侧 -->
+        <div class="topbar-left">
+          <!-- 侧边栏切换按钮 -->
+          <button
+            class="sidebar-toggle"
+            type="button"
+            aria-controls="main-sidebar"
+            :aria-expanded="
+              mobileSidebarOpen || !sidebarCollapsed
+            "
+            :aria-label="
+              mobileSidebarOpen
+                ? '关闭侧边栏'
+                : '切换侧边栏'
+            "
+            @click="toggleSidebar"
+          >
+            <i
+              class="bi bi-list"
+              aria-hidden="true"
+            ></i>
+          </button>
+
+          <!-- 页面面包屑 -->
+          <nav
+            class="breadcrumb"
+            aria-label="面包屑导航"
+          >
+            <span>BP Workbench</span>
+
+            <template v-if="currentMenuGroup">
+              <i
+                class="bi bi-chevron-right breadcrumb-separator"
+                aria-hidden="true"
+              ></i>
+
+              <span>
+                {{ currentMenuGroup.name }}
+              </span>
+            </template>
+
+            <i
+              class="bi bi-chevron-right breadcrumb-separator"
+              aria-hidden="true"
+            ></i>
+
+            <strong class="mobile-page-name">
+              {{ currentPageName }}
+            </strong>
+          </nav>
         </div>
 
-        <!-- 手机端抽屉顶部：主导航 -->
-        <nav class="mobile-top-nav" aria-label="手机端主导航">
-          <RouterLink
-            v-for="menu in topMenus"
-            :key="menu.id"
-            :to="menu.entryPath || menu.path"
-            :class="{ active: activeTopMenu?.id === menu.id }"
-            @click="closeMobileMenu"
+        <!-- ==================== 右上角用户菜单 ==================== -->
+        <div
+          class="user-menu"
+          @click.stop="stopUserMenuPropagation"
+        >
+          <!-- 用户菜单触发按钮 -->
+          <button
+            class="user-trigger"
+            :class="{ 'is-open': userMenuOpen }"
+            type="button"
+            aria-haspopup="true"
+            :aria-expanded="userMenuOpen"
+            @click="toggleUserMenu"
           >
-            {{ menu.name }}
-          </RouterLink>
-        </nav>
+            <!-- 用户头像 -->
+            <span class="topbar-avatar">
+              {{ userInitial }}
+            </span>
 
-        <!-- 当前主导航下的侧边菜单；首页使用固定入口 -->
-        <nav aria-label="侧边导航">
-          <RouterLink
-            v-for="menu in sideMenus"
-            :key="menu.id"
-            :to="menu.path"
-            class="side-menu-item"
-            :class="{
-              active: route.path === '/'
-                ? menu.path === `/${route.hash || '#overview'}`
-                : route.path === menu.path
-            }"
-            @click="closeMobileMenu"
-          >
-            <i v-if="menu.icon" :class="menu.icon" aria-hidden="true"></i>
-            <span>{{ menu.name }}</span>
-          </RouterLink>
-        </nav>
+            <!-- 用户信息 -->
+            <span class="topbar-user-info">
+              <span class="topbar-user-name">
+                {{ userDisplayName }}
+              </span>
 
-        <!-- 预留：以后启用三级菜单时，可恢复下面的分组结构。
-             启用时还需从 main-layout.js 的 setup() 返回 navigationStore。 -->
-        <!--
-        <nav aria-label="侧边导航">
-          <div v-for="menu in sideMenus" :key="menu.id" class="side-menu-group">
-            <RouterLink
-              :to="menu.path"
-              class="side-menu-item"
-              :class="{
-                active:
-                  route.path === menu.path ||
-                  navigationStore.getChildMenus(menu.id).some(
-                    (child) => child.path === route.path,
-                  ),
-              }"
-              @click="closeMobileMenu"
-            >
-              <i v-if="menu.icon" :class="menu.icon" aria-hidden="true"></i>
-              <span>{{ menu.name }}</span>
-            </RouterLink>
+              <span class="topbar-user-role">
+                {{ userRoleName }}
+              </span>
+            </span>
 
+            <!-- 展开箭头 -->
+            <i
+              class="bi bi-chevron-down user-arrow"
+              aria-hidden="true"
+            ></i>
+          </button>
+
+          <!-- 用户下拉菜单 -->
+          <Transition name="user-dropdown">
             <div
-              v-if="navigationStore.getChildMenus(menu.id).length"
-              class="side-submenu"
+              v-if="userMenuOpen"
+              class="user-dropdown"
+              role="menu"
             >
-              <RouterLink
-                v-for="child in navigationStore.getChildMenus(menu.id)"
-                :key="child.id"
-                :to="child.path"
-                class="side-submenu-item"
-                :class="{ active: route.path === child.path }"
-                @click="closeMobileMenu"
+              <!-- 个人中心 -->
+              <button
+                class="dropdown-item"
+                type="button"
+                role="menuitem"
+                @click="showUnavailable('个人中心')"
               >
-                {{ child.name }}
-              </RouterLink>
+                <i
+                  class="bi bi-person"
+                  aria-hidden="true"
+                ></i>
+
+                <span>个人中心</span>
+              </button>
+
+              <div
+                class="dropdown-divider"
+                aria-hidden="true"
+              ></div>
+
+              <!-- 退出登录 -->
+              <button
+                class="dropdown-item logout"
+                type="button"
+                role="menuitem"
+                :disabled="logoutLoading"
+                @click="handleLogout"
+              >
+                <i
+                  class="bi bi-box-arrow-right"
+                  aria-hidden="true"
+                ></i>
+
+                <span>
+                  {{
+                    logoutLoading
+                      ? '正在退出...'
+                      : '退出登录'
+                  }}
+                </span>
+              </button>
             </div>
-          </div>
-        </nav>
-        -->
-      </aside>
+          </Transition>
+        </div>
+      </header>
 
       <!-- ==================== 当前路由页面 ==================== -->
       <main class="layout-content">
@@ -138,4 +284,30 @@
   </div>
 </template>
 
-<style scoped lang="scss" src="./main-layout.scss"></style>
+<!-- ==================== 后台布局样式 ==================== -->
+<style
+  scoped
+  lang="scss"
+  src="./main-layout.scss"
+></style>
+
+
+
+
+<!-- 
+页面结构
+app-layout
+├── layout-sidebar
+│   ├── sidebar-header
+│   ├── sidebar-content
+│   │   ├── 固定首页
+│   │   └── 后端动态菜单
+│   └── sidebar-footer
+├── mobile-overlay
+└── layout-main
+    ├── layout-topbar
+    │   ├── 面包屑
+    │   └── 用户菜单
+    └── layout-content
+        └── RouterView
+-->
