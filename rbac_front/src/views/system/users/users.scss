@@ -1,0 +1,238 @@
+/* ==================== 用户管理页面 ==================== */
+.users-page {
+  width: 100%;
+  color: var(--app-text-minor);
+
+  /* ==================== 页面标题 ==================== */
+  .users-heading {
+    margin-bottom: 22px;
+
+    .users-breadcrumb {
+      margin-bottom: 8px;
+      color: var(--app-nav-active-text);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    h1 {
+      color: var(--app-text-title);
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    p:last-child {
+      margin-top: 8px;
+      color: var(--app-text-description);
+      font-size: 14px;
+    }
+  }
+
+  /* ==================== 用户数量卡片 ==================== */
+  .users-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+
+    .summary-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 120px;
+      padding: 20px 22px;
+      border-radius: var(--app-radius-card);
+      box-shadow: var(--app-card-shadow);
+
+      span {
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      strong {
+        color: var(--app-text-title);
+        font-size: 34px;
+        line-height: 1;
+      }
+
+      &--total {
+        background: var(--app-color-sky);
+      }
+
+      &--active {
+        background: var(--app-color-mint);
+      }
+
+      &--disabled {
+        background: var(--app-color-lime);
+      }
+    }
+  }
+
+  /* ==================== 搜索与筛选工具栏 ==================== */
+  .users-toolbar {
+    display: flex;
+    align-items: end;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 18px;
+    padding: 18px;
+    background: var(--app-card);
+    border: 1px solid var(--app-border-line);
+    border-radius: var(--app-radius-card);
+    box-shadow: var(--app-card-shadow);
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      min-width: 180px;
+      flex: 1;
+
+      span {
+        color: var(--app-text-description);
+        font-size: 12px;
+      }
+    }
+
+    input,
+    select {
+      width: 100%;
+      height: 42px;
+      padding: 0 12px;
+      border: 1px solid var(--app-border);
+      border-radius: var(--app-radius-input);
+      background: var(--app-input);
+      color: var(--app-text-title);
+      font: inherit;
+
+      &:focus {
+        outline: 2px solid var(--app-input-fcous);
+        outline-offset: 1px;
+      }
+    }
+
+    button {
+      height: 42px;
+      padding: 0 18px;
+      border: none;
+      border-radius: var(--app-radius-btn);
+      background: var(--app-btn);
+      color: var(--app-btn-text);
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:hover:not(:disabled) {
+        background: var(--app-btn-hover);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  /* ==================== 加载、错误与空状态 ==================== */
+  .users-notice {
+    padding: 28px;
+    background: var(--app-card);
+    border: 1px solid var(--app-border-line);
+    border-radius: var(--app-radius-card);
+    color: var(--app-text-description);
+    text-align: center;
+  }
+
+  /* ==================== 用户表格 ==================== */
+  .users-table-wrap {
+    max-height: 50vh;
+    overflow: auto;
+    background: var(--app-card);
+    border: 1px solid var(--app-border-line);
+    border-radius: var(--app-radius-card);
+    box-shadow: var(--app-card-shadow);
+  }
+
+  .users-table {
+    width: 100%;
+    min-width: 680px;
+    border-collapse: collapse;
+    text-align: left;
+
+    th,
+    td {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--app-border-line);
+      font-size: 13px;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: var(--app-page-bg-minor);
+      color: var(--app-text-description);
+      font-weight: 600;
+    }
+
+    td {
+      color: var(--app-text-title);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: var(--app-radius-btn);
+      white-space: nowrap;
+
+      &.is-active {
+        background: var(--app-color-mint);
+      }
+
+      &.is-disabled {
+        background: var(--app-page-bg-minor);
+        color: var(--app-text-description);
+      }
+    }
+  }
+
+  /* ==================== 小屏幕适配 ==================== */
+  @media (max-width: 600px) {
+    .users-heading h1 {
+      font-size: 23px;
+    }
+
+    .users-summary {
+      gap: 8px;
+
+      .summary-card {
+        min-height: 95px;
+        padding: 14px;
+
+        span {
+          font-size: 11px;
+        }
+
+        strong {
+          font-size: 26px;
+        }
+      }
+    }
+
+    .users-toolbar {
+      label {
+        flex-basis: 100%;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+}

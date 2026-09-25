@@ -1,0 +1,178 @@
+.app-message-container {
+  position: fixed;
+  top: 32px;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+
+  padding: 0 16px;
+
+  // 容器空白区域不会挡住页面点击
+  pointer-events: none;
+}
+
+.app-message-list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-message-item {
+  // 默认使用普通信息的灰色
+  --message-accent: #525252;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  width: max-content;
+  min-width: min(280px, 100%);
+  max-width: min(480px, 100%);
+  padding: 14px 16px;
+
+  color: #1f1f1f;
+  background-color: #ffffff;
+  border: 1px solid #e8e8ed;
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgb(0 0 0 / 12%);
+
+  // 提示框自身允许点击
+  pointer-events: auto;
+
+  // 成功
+  &--success {
+    --message-accent: #4caf50;
+  }
+
+  // 错误
+  &--error {
+    --message-accent: #ff0000;
+  }
+
+  // 警告
+  &--warning {
+    --message-accent: #f9a825;
+  }
+
+  // 普通信息
+  &--info {
+    --message-accent: #03a9f4;
+  }
+}
+
+.app-message-icon {
+  flex-shrink: 0;
+  font-size: 19px;
+  color: var(--message-accent);
+}
+
+.app-message-text {
+  flex: 1;
+  min-width: 0;
+
+  color: #333333;
+  font-size: 14px;
+  line-height: 1.6;
+
+  // 长文字、连续英文或网址允许自动换行
+  overflow-wrap: anywhere;
+}
+
+.app-message-close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 26px;
+  height: 26px;
+  padding: 0;
+
+  color: #8a8a8a;
+  background-color: transparent;
+  border: none;
+  border-radius: 4px;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+
+  &:hover {
+    color: #1f1f1f;
+    background-color: #f0f0f2;
+  }
+
+  // 不显示鼠标点击或 Tab 选中时的外框
+  &:focus,
+  &:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+/* 新提示进入、旧提示退出 */
+.app-message-enter-active,
+.app-message-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.app-message-enter-from,
+.app-message-leave-to {
+  opacity: 0;
+  transform: translateY(-12px);
+}
+
+/* 其他提示补位时平滑移动 */
+.app-message-move {
+  transition: transform 0.2s ease;
+}
+
+/* ==================== 手机端适配 ==================== */
+
+@media (max-width: 768px) {
+  /* 消息提示容器 */
+  .app-message-container {
+    top: 20px;
+    padding: 0 20px;
+  }
+
+  /* 单条消息提示 */
+  .app-message-item {
+    /*
+     * 根据消息内容自动决定宽度，
+     * 不再强制占满整个手机屏幕。
+     */
+    width: fit-content;
+    min-width: 0;
+
+    /*
+     * 长消息最多占据屏幕宽度减去 40px，
+     * 左右分别保留至少 20px 空间。
+     */
+    max-width: calc(100vw - 40px);
+
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  /* 消息文字 */
+  .app-message-text {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+}
+
+/* 用户开启“减少动态效果”时取消动画 */
+@media (prefers-reduced-motion: reduce) {
+  .app-message-enter-active,
+  .app-message-leave-active,
+  .app-message-move {
+    transition: none;
+  }
+}

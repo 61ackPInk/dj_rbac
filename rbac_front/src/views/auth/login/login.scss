@@ -1,0 +1,549 @@
+/* ==================== 登录页面主体 ==================== */
+
+.login-page {
+  position: relative;
+  display: grid;
+  place-items: center;
+
+  width: 100%;
+  min-width: 320px;
+  min-height: 100vh;
+  padding: 32px 20px;
+  overflow: hidden;
+
+  color: var(--text-main);
+  background: var(--bg-page);
+
+  font-family:
+    Inter,
+    "PingFang SC",
+    "Microsoft YaHei",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  -webkit-font-smoothing: antialiased;
+
+  /* ==================== 页面基础控件 ==================== */
+
+  button,
+  input {
+    font: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  /* ==================== 背景装饰 ==================== */
+
+  .background-shape {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+
+    /* 右上角圆形 */
+    &--top {
+      top: -240px;
+      right: -160px;
+
+      width: 540px;
+      height: 540px;
+
+      border: 1px solid
+        color-mix(
+          in srgb,
+          var(--primary) 12%,
+          transparent
+        );
+
+      background:
+        color-mix(
+          in srgb,
+          var(--primary) 2.5%,
+          transparent
+        );
+
+      &::before {
+        position: absolute;
+        inset: 80px;
+
+        content: "";
+
+        border: 1px solid
+          color-mix(
+            in srgb,
+            var(--primary) 10%,
+            transparent
+          );
+
+        border-radius: inherit;
+      }
+    }
+
+    /* 左下角圆形 */
+    &--bottom {
+      bottom: -210px;
+      left: -150px;
+
+      width: 430px;
+      height: 430px;
+
+      background:
+        color-mix(
+          in srgb,
+          var(--primary) 5.5%,
+          transparent
+        );
+
+      filter: blur(2px);
+    }
+  }
+
+  /* ==================== 左上角品牌 ==================== */
+
+  .page-brand {
+    position: absolute;
+    top: 30px;
+    left: 36px;
+
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    /* 品牌图标 */
+    .brand-logo {
+      display: grid;
+      place-items: center;
+
+      width: 34px;
+      height: 34px;
+
+      border-radius: var(--radius-card);
+
+      color: var(--bg-card);
+      background: var(--primary);
+
+      box-shadow:
+        0 8px 18px
+        color-mix(
+          in srgb,
+          var(--primary) 22%,
+          transparent
+        );
+
+      i {
+        font-size: 20px;
+        line-height: 1;
+      }
+    }
+
+    /* 品牌名称 */
+    .brand-name {
+      color: var(--text-main);
+      font-size: 17px;
+      font-weight: 650;
+      letter-spacing: -0.2px;
+    }
+  }
+
+  /* ==================== 登录卡片 ==================== */
+
+  .login-card {
+    position: relative;
+    z-index: 1;
+
+    width: min(380px, 100%);
+    padding: 42px 40px 34px;
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+
+    background: var(--bg-card);
+
+    box-shadow:
+      0 2px 5px
+        color-mix(
+          in srgb,
+          var(--text-main) 2%,
+          transparent
+        ),
+      0 18px 50px
+        color-mix(
+          in srgb,
+          var(--text-main) 7%,
+          transparent
+        );
+
+    /* ==================== 登录卡片头部 ==================== */
+
+    .card-header {
+      margin-bottom: 32px;
+      text-align: center;
+
+      /* 欢迎图标 */
+      .welcome-icon {
+        display: grid;
+        place-items: center;
+
+        width: 46px;
+        height: 46px;
+        margin: 0 auto 18px;
+
+        border-radius: var(--radius-card);
+
+        color: var(--primary);
+        background: var(--primary-light);
+
+        i {
+          font-size: 23px;
+          line-height: 1;
+        }
+      }
+
+      /* 页面标题 */
+      h1 {
+        margin-bottom: 10px;
+
+        color: var(--text-main);
+        font-size: 26px;
+        font-weight: 650;
+        line-height: 1.3;
+        letter-spacing: -0.6px;
+      }
+
+      /* 页面说明 */
+      p {
+        color: var(--text-sub);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+    }
+
+    /* ==================== 登录表单 ==================== */
+
+    form {
+      /* 表单字段 */
+      .form-field {
+        display: block;
+        margin-bottom: 20px;
+
+        /* 字段标题 */
+        .field-label {
+          display: block;
+          margin-bottom: 8px;
+
+          color: var(--text-main);
+          font-size: 13px;
+          font-weight: 550;
+        }
+
+        /* 输入框容器 */
+        .input-wrapper {
+          display: flex;
+          align-items: center;
+
+          height: 46px;
+          padding: 0 13px;
+
+          border: 1px solid var(--border);
+          border-radius: var(--radius-card);
+
+          background: var(--bg-card);
+
+          transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+
+          /* 输入框悬停 */
+          &:hover {
+            border-color:
+              color-mix(
+                in srgb,
+                var(--text-muted) 55%,
+                var(--border)
+              );
+          }
+
+          /* 输入框聚焦 */
+          &:focus-within {
+            border-color: var(--primary);
+
+            box-shadow:
+              0 0 0 3px
+              color-mix(
+                in srgb,
+                var(--primary) 10%,
+                transparent
+              );
+          }
+
+          /* 输入框左侧图标 */
+          .input-icon {
+            flex: 0 0 auto;
+
+            width: 18px;
+            margin-right: 10px;
+
+            color: var(--text-muted);
+            font-size: 18px;
+            line-height: 1;
+          }
+
+          /* 原生输入框 */
+          input {
+            flex: 1;
+
+            min-width: 0;
+            height: 100%;
+
+            border: 0;
+            outline: none;
+
+            color: var(--text-main);
+            background: transparent;
+
+            font-size: 14px;
+
+            &::placeholder {
+              color: var(--text-muted);
+            }
+          }
+
+          /* 显示密码按钮 */
+          .password-toggle {
+            display: grid;
+            place-items: center;
+            flex: 0 0 auto;
+
+            width: 32px;
+            height: 32px;
+            margin-right: -7px;
+            padding: 0;
+
+            border: 0;
+            border-radius: var(--radius-card);
+
+            color: var(--text-muted);
+            background: transparent;
+
+            transition:
+              color 0.2s ease,
+              background-color 0.2s ease;
+
+            i {
+              font-size: 18px;
+              line-height: 1;
+            }
+
+            &:hover {
+              color: var(--primary);
+              background: var(--primary-light);
+            }
+          }
+        }
+      }
+
+      /* ==================== 表单辅助操作 ==================== */
+
+      .form-options {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        margin-top: -2px;
+
+        /* 记住账号 */
+        .remember-option {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          color: var(--text-sub);
+          font-size: 13px;
+
+          cursor: pointer;
+          user-select: none;
+
+          input {
+            width: 16px;
+            height: 16px;
+
+            accent-color: var(--primary);
+          }
+        }
+
+        /* 忘记密码按钮 */
+        .text-button {
+          padding: 0;
+          border: 0;
+
+          color: var(--primary);
+          background: transparent;
+
+          font-size: 13px;
+
+          &:hover {
+            color: var(--primary-hover);
+          }
+        }
+      }
+
+      /* ==================== 表单消息区域 ==================== */
+
+      .form-message {
+        min-height: 20px;
+        margin-top: 12px;
+
+        color: var(--danger);
+        font-size: 12px;
+      }
+
+      /* ==================== 登录主按钮 ==================== */
+
+      .login-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+
+        width: 100%;
+        height: 46px;
+        margin-top: 8px;
+        padding: 0;
+
+        border: 0;
+        border-radius: var(--radius-card);
+
+        color: var(--bg-card);
+        background: var(--primary);
+
+        box-shadow:
+          0 9px 18px
+          color-mix(
+            in srgb,
+            var(--primary) 18%,
+            transparent
+          );
+
+        font-size: 14px;
+        font-weight: 600;
+
+        transition:
+          background-color 0.2s ease,
+          box-shadow 0.2s ease,
+          transform 0.2s ease,
+          opacity 0.2s ease;
+
+        i {
+          font-size: 17px;
+          line-height: 1;
+        }
+
+        /* 登录按钮悬停 */
+        &:hover:not(:disabled) {
+          background: var(--primary-hover);
+
+          box-shadow:
+            0 11px 22px
+            color-mix(
+              in srgb,
+              var(--primary) 24%,
+              transparent
+            );
+
+          transform: translateY(-1px);
+        }
+
+        /* 登录按钮按下 */
+        &:active:not(:disabled) {
+          box-shadow:
+            0 6px 14px
+            color-mix(
+              in srgb,
+              var(--primary) 18%,
+              transparent
+            );
+
+          transform: translateY(0);
+        }
+
+        /* 登录按钮禁用 */
+        &:disabled {
+          cursor: not-allowed;
+          opacity: 0.65;
+          box-shadow: none;
+        }
+      }
+    }
+
+    /* ==================== 登录帮助 ==================== */
+
+    .card-footer {
+      margin-top: 28px;
+
+      color: var(--text-muted);
+      text-align: center;
+      font-size: 12px;
+
+      button {
+        margin-left: 3px;
+        padding: 0;
+
+        border: 0;
+
+        color: var(--primary);
+        background: transparent;
+
+        font-size: 12px;
+
+        &:hover {
+          color: var(--primary-hover);
+        }
+      }
+    }
+  }
+
+  /* ==================== 页面底部 ==================== */
+
+  .page-footer {
+    position: absolute;
+    bottom: 24px;
+
+    color: var(--text-muted);
+    font-size: 11px;
+  }
+
+  /* ==================== 手机端适配 ==================== */
+
+  @media (max-width: 600px) {
+    align-items: start;
+    padding: 100px 16px 64px;
+
+    /* 手机端品牌位置 */
+    .page-brand {
+      top: 28px;
+      left: 22px;
+    }
+
+    /* 手机端登录卡片 */
+    .login-card {
+      padding: 34px 23px 29px;
+      border-radius: var(--radius-card);
+
+      .card-header {
+        margin-bottom: 28px;
+
+        h1 {
+          font-size: 24px;
+        }
+      }
+    }
+
+    /* 手机端隐藏页面底部版权 */
+    .page-footer {
+      display: none;
+    }
+  }
+}
