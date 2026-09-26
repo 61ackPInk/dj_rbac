@@ -11,6 +11,52 @@
       <p>查看系统账号、角色和启用状态。</p>
     </header>
 
+    <!-- ==================== 公共弹出层测试 ==================== -->
+    <div class="modal-test-area">
+      <button type="button" @click="openModalTest">
+        测试公共弹出层
+      </button>
+
+      <label>
+        弹出层宽度：
+
+        <select v-model.number="modalTestWidth">
+          <option :value="420">
+            420px
+          </option>
+
+          <option :value="560">
+            560px
+          </option>
+
+          <option :value="760">
+            760px
+          </option>
+        </select>
+      </label>
+    </div>
+
+    <!-- ==================== 公共弹出层 ==================== -->
+    <AppModal v-model="modalTestVisible" title="公共弹出层测试" :width="modalTestWidth">
+      <p>
+        这是公共弹出层的内容区域。
+      </p>
+
+      <p>
+        当前设置宽度：{{ modalTestWidth }}px
+      </p>
+
+      <template #footer>
+        <button type="button" @click="closeModalTest">
+          关闭
+        </button>
+
+        <button type="button" @click="closeModalTest">
+          确定
+        </button>
+      </template>
+    </AppModal>
+
     <!-- ==================== 真实用户数量 ==================== -->
     <div class="users-summary">
       <div class="summary-card summary-card--total">

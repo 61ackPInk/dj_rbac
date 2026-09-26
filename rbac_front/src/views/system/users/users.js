@@ -4,9 +4,15 @@ import { useRoute } from 'vue-router'
 import { getUsersApi } from '@/api/users'
 import { useAuthStore } from '@/stores/auth'
 import { useNavigationStore } from '@/stores/navigation'
+import AppModal from '@/components/feedback/modal/app-modal.vue'
 
 export default defineComponent({
   name: 'SystemUsers',
+
+  /* ==================== 页面使用的公共组件 ==================== */
+  components: {
+    AppModal,
+  },
 
   setup() {
     const route = useRoute()
@@ -90,6 +96,22 @@ export default defineComponent({
         : date.toLocaleString('zh-CN', { hour12: false })
     }
 
+    /* ==================== 公共弹出层测试 ==================== */
+
+    // 是否显示测试弹出层
+    const modalTestVisible = ref(false)
+
+    // 测试弹出层宽度
+    const modalTestWidth = ref(560)
+
+    const openModalTest = () => {
+      modalTestVisible.value = true
+    }
+
+    const closeModalTest = () => {
+      modalTestVisible.value = false
+    }
+
     return {
       currentPage,
       parentPage,
@@ -102,6 +124,12 @@ export default defineComponent({
       filteredUsers,
       activeCount,
       formatTime,
+
+      // 公共弹出层
+      modalTestVisible,
+      modalTestWidth,
+      openModalTest,
+      closeModalTest,
     }
   },
 })
