@@ -801,3 +801,16 @@
   lang="scss"
   src="./users.scss"
 ></style>
+<!-- ==================== 用户弹出层样式 ==================== -->
+
+<!--
+  弹出层通过 Teleport 渲染到 body 下，
+  因此单独使用不带 scoped 的样式文件。
+
+  users-modal.scss 中的全部样式都限制在
+  .app-modal-overlay 内，不会影响其他页面。
+-->
+<style
+  lang="scss"
+  src="./users-modal.scss"
+></style>
