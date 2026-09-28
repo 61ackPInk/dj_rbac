@@ -8,7 +8,7 @@
   <el-select
     class="app-select"
     :style="selectStyle"
-    :model-value="modelValue"
+    :model-value="selectModelValue"
     :placeholder="placeholder"
     :disabled="disabled"
     :loading="loading"
@@ -32,20 +32,20 @@
     <!-- ==================== 下拉选项 ==================== -->
 
     <el-option
-      v-for="option in options"
-      :key="String(option.value)"
-      :label="option.label"
-      :value="option.value"
-      :disabled="Boolean(option.disabled)"
+        v-for="option in normalizedOptions"
+        :key="option.appSelectKey"
+        :label="option.label"
+        :value="option.appSelectValue"
+        :disabled="Boolean(option.disabled)"
     />
 
     <!-- ==================== 无数据状态 ==================== -->
 
     <template #empty>
-      <div class="app-select-empty">
+        <div class="app-select-empty">
         <i
-          class="bi bi-inbox"
-          aria-hidden="true"
+            class="bi bi-inbox"
+            aria-hidden="true"
         ></i>
 
         <span>{{ emptyText }}</span>

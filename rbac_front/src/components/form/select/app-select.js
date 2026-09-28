@@ -28,6 +28,21 @@ const SelectChevronIcon = defineComponent({
     },
 })
 
+/* ==================== null 选项内部占位值 ==================== */
+
+/*
+ * Element Plus 的 ElOption 不允许 value 为 null。
+ *
+ * 但 RBAC 项目中的 null 有明确业务含义：
+ * 例如“暂不分配角色”。
+ *
+ * 因此在 AppSelect 内部使用一个唯一对象代替 null，
+ * 对外仍然保持 null，不影响接口提交。
+ */
+const NULL_OPTION_VALUE = Object.freeze({
+    __appSelectNullValue: true,
+})
+
 /* ==================== 公共下拉框组件 ==================== */
 
 export default defineComponent({
@@ -174,6 +189,61 @@ export default defineComponent({
     ],
 
     setup(props, { emit }) {
+        /* ==================== 选项数据转换 ==================== */
+
+        /*
+         * 将 value 为 null 的选项转换为内部占位对象，
+         * 避免 ElOption 出现类型警告。
+         */
+        const normalizedOptions = computed(() => {
+            return props.options.map(
+                (option, index) => {
+                    return {
+                        ...option,
+
+                        /*
+                         * 模板循环使用的稳定标识。
+                         */
+                        appSelectKey:
+                            `${index}-${String(option.value)}`,
+
+                        /*
+                         * Element Plus 实际接收的值。
+                         */
+                        appSelectValue:
+                            option.value === null
+                                ? NULL_OPTION_VALUE
+                                : option.value,
+                    }
+                },
+            )
+        })
+
+        /*
+         * 判断当前选项中是否存在 null 业务值。
+         */
+        const hasNullOption = computed(() => {
+            return props.options.some((option) => {
+                return option.value === null
+            })
+        })
+
+        /*
+         * 如果当前业务值是 null，
+         * 并且选项中确实存在 null 选项，
+         * 则向 Element Plus 传入内部占位对象。
+         */
+        const selectModelValue = computed(() => {
+            if (
+                props.modelValue === null &&
+                hasNullOption.value
+            ) {
+                return NULL_OPTION_VALUE
+            }
+
+            return props.modelValue
+        })
+
         /* ==================== 下拉框宽度 ==================== */
 
         const selectWidth = computed(() => {
@@ -197,7 +267,19 @@ export default defineComponent({
         /* ==================== 数据更新 ==================== */
 
         const handleUpdate = (value) => {
-            emit('update:modelValue', value)
+            /*
+             * 用户选择内部 null 占位选项时，
+             * 对外重新发送真正的 null。
+             */
+            const businessValue =
+                value === NULL_OPTION_VALUE
+                    ? null
+                    : value
+
+            emit(
+                'update:modelValue',
+                businessValue,
+            )
         }
 
         const handleChange = (value) => {
@@ -224,6 +306,9 @@ export default defineComponent({
 
         return {
             SelectChevronIcon,
+
+            normalizedOptions,
+            selectModelValue,
             selectStyle,
 
             handleUpdate,
