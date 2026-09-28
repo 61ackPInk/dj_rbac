@@ -84,11 +84,9 @@
 
       &:hover:not(:disabled) {
         background:
-          color-mix(
-            in srgb,
+          color-mix(in srgb,
             var(--danger) 88%,
-            black
-          );
+            black);
       }
     }
 
@@ -97,11 +95,9 @@
 
       &:hover:not(:disabled) {
         background:
-          color-mix(
-            in srgb,
+          color-mix(in srgb,
             var(--success) 88%,
-            black
-          );
+            black);
       }
     }
   }
@@ -140,8 +136,13 @@
           }
         }
 
-        input,
-        select {
+        /*
+        * 只设置表单的直接输入框。
+        *
+        * AppSelect 内部也包含 input，
+        * 使用 > 可以避免这些样式污染公共下拉框内部结构。
+        */
+        >input {
           width: 100%;
           height: 41px;
           padding: 0 11px;
@@ -164,12 +165,9 @@
             border-color: var(--primary);
 
             box-shadow:
-              0 0 0 3px
-              color-mix(
-                in srgb,
+              0 0 0 3px color-mix(in srgb,
                 var(--primary) 10%,
-                transparent
-              );
+                transparent);
           }
 
           &::placeholder {
@@ -203,8 +201,7 @@
       font-size: 20px;
 
       animation:
-        users-modal-rotate
-        0.8s linear infinite;
+        users-modal-rotate 0.8s linear infinite;
     }
   }
 
@@ -238,7 +235,7 @@
         font-weight: 650;
       }
 
-      > div {
+      >div {
         flex: 1;
         min-width: 0;
 
@@ -271,7 +268,7 @@
 
       margin: 8px 0 0;
 
-      > div {
+      >div {
         padding: 15px 0;
 
         border-bottom: 1px solid var(--border);
@@ -410,8 +407,7 @@
 
   .button-loading {
     animation:
-      users-modal-rotate
-      0.8s linear infinite;
+      users-modal-rotate 0.8s linear infinite;
   }
 
   /* ==================== 手机端适配 ==================== */
@@ -457,6 +453,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .app-modal-overlay {
+
     .button-loading,
     .detail-loading i {
       animation: none;

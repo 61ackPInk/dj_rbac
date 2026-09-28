@@ -211,29 +211,20 @@
         }
       }
 
-      /* 筛选选择框 */
-      .filter-select {
-        height: 39px;
-        min-width: 112px;
-        padding: 0 32px 0 11px;
+      /* ==================== 工具栏下拉框布局 ==================== */
 
-        border: 1px solid var(--border);
-        border-radius: 7px;
-        outline: none;
+      /*
+      * 下拉框自身的颜色、边框和选项面板，
+      * 统一由公共 AppSelect 组件管理。
+      *
+      * 当前页面只负责工具栏中的宽度和排列。
+      */
+      .toolbar-select {
+        flex: 0 0 132px;
 
-        color: var(--text-sub);
-        background: var(--bg-card);
-
-        font-size: var(--font-small);
-
-        &:focus {
-          border-color: var(--primary);
-
-          box-shadow:
-            0 0 0 3px color-mix(in srgb,
-              var(--primary) 10%,
-              transparent);
-        }
+        width: 132px;
+        min-width: 0;
+        max-width: 100%;
       }
 
       /* 刷新按钮 */
@@ -817,8 +808,14 @@
           flex-direction: column;
 
           .search-box,
-          .filter-select {
+          .toolbar-select {
             width: 100%;
+            min-width: 0;
+            max-width: 100%;
+          }
+
+          .toolbar-select {
+            flex: 0 0 auto;
           }
         }
 

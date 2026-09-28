@@ -10,15 +10,8 @@
         <p>管理系统用户、角色和账号状态。</p>
       </div>
 
-      <button
-        class="primary-button"
-        type="button"
-        @click="openCreateModal"
-      >
-        <i
-          class="bi bi-plus-lg"
-          aria-hidden="true"
-        ></i>
+      <button class="primary-button" type="button" @click="openCreateModal">
+        <i class="bi bi-plus-lg" aria-hidden="true"></i>
 
         <span>创建用户</span>
       </button>
@@ -31,115 +24,39 @@
         <div class="toolbar-left">
           <!-- 搜索用户 -->
           <label class="search-box">
-            <i
-              class="bi bi-search"
-              aria-hidden="true"
-            ></i>
+            <i class="bi bi-search" aria-hidden="true"></i>
 
-            <input
-              v-model="keyword"
-              type="search"
-              placeholder="搜索用户名、邮箱或角色"
-              aria-label="搜索用户"
-            />
+            <input v-model="keyword" type="search" placeholder="搜索用户名、邮箱或角色" aria-label="搜索用户" />
           </label>
 
           <!-- 角色筛选 -->
-          <select
-            v-model="roleFilter"
-            class="filter-select"
-            aria-label="按角色筛选"
-          >
-            <option value="all">
-              全部角色
-            </option>
-
-            <option value="">
-              未分配角色
-            </option>
-
-            <option
-              v-for="role in roles"
-              :key="role.id"
-              :value="String(role.id)"
-            >
-              {{ role.name }}
-            </option>
-          </select>
+          <AppSelect v-model="roleFilter" class="toolbar-select" :options="roleFilterOptions" :width="132"
+            placeholder="全部角色" aria-label="按角色筛选" />
 
           <!-- 状态筛选 -->
-          <select
-            v-model="statusFilter"
-            class="filter-select"
-            aria-label="按状态筛选"
-          >
-            <option value="all">
-              全部状态
-            </option>
-
-            <option value="active">
-              已启用
-            </option>
-
-            <option value="disabled">
-              已禁用
-            </option>
-          </select>
+          <AppSelect v-model="statusFilter" class="toolbar-select" :options="statusFilterOptions" :width="132"
+            placeholder="全部状态" aria-label="按状态筛选" />
         </div>
 
         <div class="toolbar-right">
           <!-- 刷新用户列表 -->
-          <button
-            class="refresh-button"
-            type="button"
-            :disabled="loading"
-            aria-label="刷新用户列表"
-            title="刷新用户列表"
-            @click="loadPageData"
-          >
-            <i
-              class="bi bi-arrow-clockwise"
-              :class="{ 'is-rotating': loading }"
-              aria-hidden="true"
-            ></i>
+          <button class="refresh-button" type="button" :disabled="loading" aria-label="刷新用户列表" title="刷新用户列表"
+            @click="loadPageData">
+            <i class="bi bi-arrow-clockwise" :class="{ 'is-rotating': loading }" aria-hidden="true"></i>
           </button>
 
           <!-- 显示模式切换 -->
-          <div
-            class="view-switch"
-            role="group"
-            aria-label="用户显示方式"
-          >
-            <button
-              class="view-button"
-              :class="{
-                'is-active': viewMode === 'list',
-              }"
-              type="button"
-              aria-label="列表显示"
-              :aria-pressed="viewMode === 'list'"
-              @click="setViewMode('list')"
-            >
-              <i
-                class="bi bi-list-ul"
-                aria-hidden="true"
-              ></i>
+          <div class="view-switch" role="group" aria-label="用户显示方式">
+            <button class="view-button" :class="{
+              'is-active': viewMode === 'list',
+            }" type="button" aria-label="列表显示" :aria-pressed="viewMode === 'list'" @click="setViewMode('list')">
+              <i class="bi bi-list-ul" aria-hidden="true"></i>
             </button>
 
-            <button
-              class="view-button"
-              :class="{
-                'is-active': viewMode === 'card',
-              }"
-              type="button"
-              aria-label="卡片显示"
-              :aria-pressed="viewMode === 'card'"
-              @click="setViewMode('card')"
-            >
-              <i
-                class="bi bi-grid"
-                aria-hidden="true"
-              ></i>
+            <button class="view-button" :class="{
+              'is-active': viewMode === 'card',
+            }" type="button" aria-label="卡片显示" :aria-pressed="viewMode === 'card'" @click="setViewMode('card')">
+              <i class="bi bi-grid" aria-hidden="true"></i>
             </button>
           </div>
         </div>
@@ -160,61 +77,35 @@
       </div>
 
       <!-- ==================== 加载状态 ==================== -->
-      <div
-        v-if="loading && users.length === 0"
-        class="page-state"
-      >
-        <i
-          class="bi bi-arrow-clockwise state-loading"
-          aria-hidden="true"
-        ></i>
+      <div v-if="loading && users.length === 0" class="page-state">
+        <i class="bi bi-arrow-clockwise state-loading" aria-hidden="true"></i>
 
         <strong>正在加载用户</strong>
         <span>请稍候...</span>
       </div>
 
       <!-- ==================== 错误状态 ==================== -->
-      <div
-        v-else-if="errorMessage"
-        class="page-state error"
-        role="alert"
-      >
-        <i
-          class="bi bi-exclamation-circle"
-          aria-hidden="true"
-        ></i>
+      <div v-else-if="errorMessage" class="page-state error" role="alert">
+        <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
 
         <strong>用户数据加载失败</strong>
         <span>{{ errorMessage }}</span>
 
-        <button
-          class="secondary-button"
-          type="button"
-          @click="loadPageData"
-        >
+        <button class="secondary-button" type="button" @click="loadPageData">
           重新加载
         </button>
       </div>
 
       <!-- ==================== 空状态 ==================== -->
-      <div
-        v-else-if="filteredUsers.length === 0"
-        class="page-state"
-      >
-        <i
-          class="bi bi-person-x"
-          aria-hidden="true"
-        ></i>
+      <div v-else-if="filteredUsers.length === 0" class="page-state">
+        <i class="bi bi-person-x" aria-hidden="true"></i>
 
         <strong>没有找到用户</strong>
         <span>请尝试修改搜索内容或筛选条件。</span>
       </div>
 
       <!-- ==================== 列表显示模式 ==================== -->
-      <div
-        v-else-if="viewMode === 'list'"
-        class="list-view"
-      >
+      <div v-else-if="viewMode === 'list'" class="list-view">
         <table class="user-table">
           <thead>
             <tr>
@@ -228,10 +119,7 @@
           </thead>
 
           <tbody>
-            <tr
-              v-for="user in filteredUsers"
-              :key="user.id"
-            >
+            <tr v-for="user in filteredUsers" :key="user.id">
               <!-- 用户信息 -->
               <td>
                 <div class="user-cell">
@@ -253,17 +141,11 @@
 
               <!-- 角色 -->
               <td>
-                <span
-                  v-if="user.role"
-                  class="role-tag"
-                >
+                <span v-if="user.role" class="role-tag">
                   {{ getUserRoleName(user) }}
                 </span>
 
-                <span
-                  v-else
-                  class="role-tag empty"
-                >
+                <span v-else class="role-tag empty">
                   未分配角色
                 </span>
               </td>
@@ -275,14 +157,10 @@
 
               <!-- 用户状态 -->
               <td>
-                <span
-                  class="status-tag"
-                  :class="
-                    user.is_active
-                      ? 'enabled'
-                      : 'disabled'
-                  "
-                >
+                <span class="status-tag" :class="user.is_active
+                  ? 'enabled'
+                  : 'disabled'
+                  ">
                   {{
                     user.is_active
                       ? '已启用'
@@ -294,32 +172,18 @@
               <!-- 用户操作 -->
               <td>
                 <div class="action-group">
-                  <button
-                    class="table-action"
-                    type="button"
-                    @click="openDetailModal(user)"
-                  >
+                  <button class="table-action" type="button" @click="openDetailModal(user)">
                     查看
                   </button>
 
-                  <button
-                    class="table-action"
-                    type="button"
-                    @click="openEditModal(user)"
-                  >
+                  <button class="table-action" type="button" @click="openEditModal(user)">
                     编辑
                   </button>
 
-                  <button
-                    class="table-action"
-                    :class="
-                      user.is_active
-                        ? 'disable'
-                        : 'enable'
-                    "
-                    type="button"
-                    @click="openStatusModal(user)"
-                  >
+                  <button class="table-action" :class="user.is_active
+                    ? 'disable'
+                    : 'enable'
+                    " type="button" @click="openStatusModal(user)">
                     {{
                       user.is_active
                         ? '禁用'
@@ -334,15 +198,8 @@
       </div>
 
       <!-- ==================== 卡片显示模式 ==================== -->
-      <div
-        v-else
-        class="card-view"
-      >
-        <article
-          v-for="user in filteredUsers"
-          :key="user.id"
-          class="user-card"
-        >
+      <div v-else class="card-view">
+        <article v-for="user in filteredUsers" :key="user.id" class="user-card">
           <!-- 用户卡片头部 -->
           <header class="user-card-header">
             <div class="user-card-person">
@@ -356,14 +213,10 @@
               </div>
             </div>
 
-            <span
-              class="status-tag"
-              :class="
-                user.is_active
-                  ? 'enabled'
-                  : 'disabled'
-              "
-            >
+            <span class="status-tag" :class="user.is_active
+              ? 'enabled'
+              : 'disabled'
+              ">
               {{
                 user.is_active
                   ? '已启用'
@@ -401,31 +254,18 @@
 
           <!-- 用户卡片操作 -->
           <footer class="user-card-footer">
-            <button
-              class="card-action"
-              type="button"
-              @click="openDetailModal(user)"
-            >
+            <button class="card-action" type="button" @click="openDetailModal(user)">
               查看
             </button>
 
-            <button
-              class="card-action"
-              type="button"
-              @click="openEditModal(user)"
-            >
+            <button class="card-action" type="button" @click="openEditModal(user)">
               编辑
             </button>
 
-            <button
-              class="card-action"
-              :class="{
-                disable: user.is_active,
-                enable: !user.is_active,
-              }"
-              type="button"
-              @click="openStatusModal(user)"
-            >
+            <button class="card-action" :class="{
+              disable: user.is_active,
+              enable: !user.is_active,
+            }" type="button" @click="openStatusModal(user)">
               {{
                 user.is_active
                   ? '禁用'
@@ -438,20 +278,9 @@
     </section>
 
     <!-- ==================== 创建与编辑用户弹出层 ==================== -->
-    <AppModal
-      v-model="formModalVisible"
-      :title="formModalTitle"
-      :width="620"
-      :closable="!submitting"
-      :close-on-overlay="!submitting"
-      :close-on-escape="!submitting"
-    >
-      <form
-        id="user-form"
-        class="user-form"
-        novalidate
-        @submit.prevent="submitUserForm"
-      >
+    <AppModal v-model="formModalVisible" :title="formModalTitle" :width="620" :closable="!submitting"
+      :close-on-overlay="!submitting" :close-on-escape="!submitting">
+      <form id="user-form" class="user-form" novalidate @submit.prevent="submitUserForm">
         <div class="form-grid">
           <!-- 用户名 -->
           <label class="form-field full">
@@ -460,13 +289,8 @@
               <i aria-hidden="true">*</i>
             </span>
 
-            <input
-              v-model="userForm.username"
-              type="text"
-              maxlength="20"
-              autocomplete="off"
-              placeholder="请输入 4～20 位用户名"
-            />
+            <input v-model="userForm.username" type="text" maxlength="20" autocomplete="off"
+              placeholder="请输入 4～20 位用户名" />
           </label>
 
           <!-- 邮箱 -->
@@ -475,12 +299,7 @@
               电子邮箱
             </span>
 
-            <input
-              v-model="userForm.email"
-              type="email"
-              autocomplete="off"
-              placeholder="请输入电子邮箱"
-            />
+            <input v-model="userForm.email" type="email" autocomplete="off" placeholder="请输入电子邮箱" />
           </label>
 
           <!-- 创建时输入密码 -->
@@ -491,12 +310,7 @@
                 <i aria-hidden="true">*</i>
               </span>
 
-              <input
-                v-model="userForm.password"
-                type="password"
-                autocomplete="new-password"
-                placeholder="请输入密码"
-              />
+              <input v-model="userForm.password" type="password" autocomplete="new-password" placeholder="请输入密码" />
             </label>
 
             <label class="form-field">
@@ -505,12 +319,8 @@
                 <i aria-hidden="true">*</i>
               </span>
 
-              <input
-                v-model="userForm.passwordConfirm"
-                type="password"
-                autocomplete="new-password"
-                placeholder="请再次输入密码"
-              />
+              <input v-model="userForm.passwordConfirm" type="password" autocomplete="new-password"
+                placeholder="请再次输入密码" />
             </label>
           </template>
 
@@ -520,19 +330,7 @@
               用户角色
             </span>
 
-            <select v-model="userForm.roleId">
-              <option :value="null">
-                暂不分配角色
-              </option>
-
-              <option
-                v-for="role in activeRoles"
-                :key="role.id"
-                :value="role.id"
-              >
-                {{ role.name }}
-              </option>
-            </select>
+            <AppSelect v-model="userForm.roleId" :options="userRoleOptions" placeholder="请选择用户角色" />
           </label>
 
           <!-- 用户状态 -->
@@ -541,40 +339,18 @@
               账号状态
             </span>
 
-            <select v-model="userForm.isActive">
-              <option :value="true">
-                启用
-              </option>
-
-              <option :value="false">
-                禁用
-              </option>
-            </select>
+            <AppSelect v-model="userForm.isActive" :options="userStatusOptions" placeholder="请选择账号状态" />
           </label>
         </div>
       </form>
 
       <template #footer>
-        <button
-          class="secondary-button"
-          type="button"
-          :disabled="submitting"
-          @click="closeFormModal"
-        >
+        <button class="secondary-button" type="button" :disabled="submitting" @click="closeFormModal">
           取消
         </button>
 
-        <button
-          class="primary-button"
-          type="submit"
-          form="user-form"
-          :disabled="submitting"
-        >
-          <i
-            v-if="submitting"
-            class="bi bi-arrow-clockwise button-loading"
-            aria-hidden="true"
-          ></i>
+        <button class="primary-button" type="submit" form="user-form" :disabled="submitting">
+          <i v-if="submitting" class="bi bi-arrow-clockwise button-loading" aria-hidden="true"></i>
 
           {{
             submitting
@@ -588,32 +364,17 @@
     </AppModal>
 
     <!-- ==================== 用户详情弹出层 ==================== -->
-    <AppModal
-      v-model="detailModalVisible"
-      title="用户信息"
-      :width="620"
-      :closable="!detailLoading"
-      :close-on-overlay="!detailLoading"
-      :close-on-escape="!detailLoading"
-    >
+    <AppModal v-model="detailModalVisible" title="用户信息" :width="620" :closable="!detailLoading"
+      :close-on-overlay="!detailLoading" :close-on-escape="!detailLoading">
       <!-- 详情加载状态 -->
-      <div
-        v-if="detailLoading"
-        class="detail-loading"
-      >
-        <i
-          class="bi bi-arrow-clockwise"
-          aria-hidden="true"
-        ></i>
+      <div v-if="detailLoading" class="detail-loading">
+        <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
 
         <span>正在加载用户信息...</span>
       </div>
 
       <!-- 用户详情 -->
-      <div
-        v-else-if="selectedUser"
-        class="user-detail"
-      >
+      <div v-else-if="selectedUser" class="user-detail">
         <!-- 详情头部 -->
         <header class="detail-profile">
           <span class="detail-avatar">
@@ -625,14 +386,10 @@
             <p>@{{ selectedUser.username }}</p>
           </div>
 
-          <span
-            class="status-tag"
-            :class="
-              selectedUser.is_active
-                ? 'enabled'
-                : 'disabled'
-            "
-          >
+          <span class="status-tag" :class="selectedUser.is_active
+            ? 'enabled'
+            : 'disabled'
+            ">
             {{
               selectedUser.is_active
                 ? '已启用'
@@ -686,27 +443,13 @@
       </div>
 
       <template #footer>
-        <button
-          class="secondary-button"
-          type="button"
-          :disabled="detailLoading"
-          @click="closeDetailModal"
-        >
+        <button class="secondary-button" type="button" :disabled="detailLoading" @click="closeDetailModal">
           关闭
         </button>
 
-        <button
-          class="primary-button"
-          type="button"
-          :disabled="
-            detailLoading || !selectedUser
-          "
-          @click="editSelectedUser"
-        >
-          <i
-            class="bi bi-pencil"
-            aria-hidden="true"
-          ></i>
+        <button class="primary-button" type="button" :disabled="detailLoading || !selectedUser
+          " @click="editSelectedUser">
+          <i class="bi bi-pencil" aria-hidden="true"></i>
 
           编辑用户
         </button>
@@ -714,33 +457,16 @@
     </AppModal>
 
     <!-- ==================== 状态确认弹出层 ==================== -->
-    <AppModal
-      v-model="statusModalVisible"
-      :title="statusModalTitle"
-      :width="430"
-      :closable="!submitting"
-      :close-on-overlay="!submitting"
-      :close-on-escape="!submitting"
-    >
-      <div
-        v-if="statusTargetUser"
-        class="status-confirm"
-      >
-        <div
-          class="confirm-icon"
-          :class="{
-            enable: !statusTargetUser.is_active,
-          }"
-          aria-hidden="true"
-        >
-          <i
-            class="bi"
-            :class="
-              statusTargetUser.is_active
-                ? 'bi-person-x'
-                : 'bi-person-check'
-            "
-          ></i>
+    <AppModal v-model="statusModalVisible" :title="statusModalTitle" :width="430" :closable="!submitting"
+      :close-on-overlay="!submitting" :close-on-escape="!submitting">
+      <div v-if="statusTargetUser" class="status-confirm">
+        <div class="confirm-icon" :class="{
+          enable: !statusTargetUser.is_active,
+        }" aria-hidden="true">
+          <i class="bi" :class="statusTargetUser.is_active
+            ? 'bi-person-x'
+            : 'bi-person-check'
+            "></i>
         </div>
 
         <div>
@@ -763,27 +489,16 @@
       </div>
 
       <template #footer>
-        <button
-          class="secondary-button"
-          type="button"
-          :disabled="submitting"
-          @click="closeStatusModal"
-        >
+        <button class="secondary-button" type="button" :disabled="submitting" @click="closeStatusModal">
           取消
         </button>
 
-        <button
-          class="confirm-button"
-          :class="{
-            danger:
-              statusTargetUser?.is_active,
-            success:
-              !statusTargetUser?.is_active,
-          }"
-          type="button"
-          :disabled="submitting"
-          @click="confirmUserStatus"
-        >
+        <button class="confirm-button" :class="{
+          danger:
+            statusTargetUser?.is_active,
+          success:
+            !statusTargetUser?.is_active,
+        }" type="button" :disabled="submitting" @click="confirmUserStatus">
           {{
             submitting
               ? '正在处理...'
@@ -796,11 +511,7 @@
 </template>
 
 <!-- ==================== 用户管理样式 ==================== -->
-<style
-  scoped
-  lang="scss"
-  src="./users.scss"
-></style>
+<style scoped lang="scss" src="./users.scss"></style>
 <!-- ==================== 用户弹出层样式 ==================== -->
 
 <!--
@@ -810,7 +521,4 @@
   users-modal.scss 中的全部样式都限制在
   .app-modal-overlay 内，不会影响其他页面。
 -->
-<style
-  lang="scss"
-  src="./users-modal.scss"
-></style>
+<style lang="scss" src="./users-modal.scss"></style>

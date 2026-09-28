@@ -16,6 +16,8 @@
     :filterable="filterable"
     :multiple="multiple"
     :fit-input-width="fitInputWidth"
+    :empty-values="emptyValues"
+    :value-on-clear="valueOnClear"
     :suffix-icon="SelectChevronIcon"
     popper-class="app-select-popper"
     placement="bottom-start"

@@ -9,6 +9,7 @@ import {
 
 /* ==================== 公共组件 ==================== */
 import AppModal from '@/components/feedback/modal/app-modal.vue'
+import AppSelect from '@/components/form/select/app-select.vue'
 
 /* ==================== 用户与角色接口 ==================== */
 import {
@@ -39,6 +40,43 @@ const createInitialForm = () => {
   }
 }
 
+/* ==================== 固定下拉选项 ==================== */
+
+/*
+ * 用户状态筛选选项。
+ */
+const statusFilterOptions = [
+  {
+    label: '全部状态',
+    value: 'all',
+  },
+  {
+    label: '已启用',
+    value: 'active',
+  },
+  {
+    label: '已禁用',
+    value: 'disabled',
+  },
+]
+
+/*
+ * 创建、编辑用户时使用的账号状态选项。
+ *
+ * value 保持 Boolean 类型，
+ * 与 userForm.isActive 的数据类型一致。
+ */
+const userStatusOptions = [
+  {
+    label: '启用',
+    value: true,
+  },
+  {
+    label: '禁用',
+    value: false,
+  },
+]
+
 export default defineComponent({
   name: 'SystemUsers',
 
@@ -46,6 +84,7 @@ export default defineComponent({
 
   components: {
     AppModal,
+    AppSelect,
   },
 
   setup() {
@@ -74,6 +113,56 @@ export default defineComponent({
       return roles.value.filter((role) => {
         return role.is_active
       })
+    })
+
+    /* ==================== 角色下拉选项 ==================== */
+
+    /*
+     * 用户列表的角色筛选选项。
+     *
+     * 角色 ID 转换为字符串，
+     * 与 roleFilter 当前使用的数据类型保持一致。
+     */
+    const roleFilterOptions = computed(() => {
+      return [
+        {
+          label: '全部角色',
+          value: 'all',
+        },
+        {
+          label: '未分配角色',
+          value: '',
+        },
+        ...roles.value.map((role) => {
+          return {
+            label: role.name,
+            value: String(role.id),
+            disabled: !role.is_active,
+          }
+        }),
+      ]
+    })
+
+    /*
+     * 创建和编辑用户时使用的角色选项。
+     *
+     * 未分配角色使用 null，
+     * 角色 ID 保持 Number 类型，
+     * 与后端接口需要的数据类型一致。
+     */
+    const userRoleOptions = computed(() => {
+      return [
+        {
+          label: '暂不分配角色',
+          value: null,
+        },
+        ...activeRoles.value.map((role) => {
+          return {
+            label: role.name,
+            value: role.id,
+          }
+        }),
+      ]
     })
 
     /* ==================== 加载用户列表 ==================== */
@@ -149,7 +238,7 @@ export default defineComponent({
         const matchesRole =
           roleFilter.value === 'all' ||
           String(user.role?.id ?? '') ===
-            String(roleFilter.value)
+          String(roleFilter.value)
 
         const matchesStatus =
           statusFilter.value === 'all' ||
@@ -766,6 +855,11 @@ export default defineComponent({
       activeRoles,
       loading,
       errorMessage,
+
+      roleFilterOptions,
+      statusFilterOptions,
+      userRoleOptions,
+      userStatusOptions,
 
       keyword,
       roleFilter,
