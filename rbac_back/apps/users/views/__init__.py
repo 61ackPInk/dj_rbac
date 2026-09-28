@@ -25,6 +25,15 @@ from .passwords import (
     UserPasswordResetAPIView,
 )
 
+from .permissions import (
+    PermissionListCreateAPIView,
+    PermissionDetailAPIView,
+)
+
+from .role_permissions import (
+    RolePermissionAssignAPIView,
+)
+
 __all__ = [
     "UserRegisterAPIView",
     "UserLoginAPIView",
@@ -38,4 +47,7 @@ __all__ = [
     "UserDetailAPIView",
     "UserPasswordChangeAPIView",
     "UserPasswordResetAPIView",
+    "PermissionListCreateAPIView",
+    "PermissionDetailAPIView",
+    "RolePermissionAssignAPIView",
 ]

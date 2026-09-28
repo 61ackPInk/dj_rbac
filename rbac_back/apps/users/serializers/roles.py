@@ -7,10 +7,52 @@
 """
 from rest_framework import serializers
 
-from apps.users.models import Role
+from apps.users.models import Permission, Role
+
+
+class RolePermissionInfoSerializer(
+    serializers.ModelSerializer
+):
+    """角色拥有的操作权限简要信息"""
+
+    # 返回权限所属页面的信息，
+    # 方便前端按照页面对权限进行分组
+    page_id = serializers.IntegerField(
+        read_only=True,
+    )
+
+    page_name = serializers.CharField(
+        source="page.name",
+        read_only=True,
+    )
+
+    page_code = serializers.CharField(
+        source="page.code",
+        read_only=True,
+    )
+
+    class Meta:
+        model = Permission
+
+        fields = [
+            "id",
+            "name",
+            "code",
+            "page_id",
+            "page_name",
+            "page_code",
+            "is_active",
+        ]
+
+        read_only_fields = fields
 
 class RoleSerializer(serializers.ModelSerializer):
     """角色序列化器"""
+
+    permissions = RolePermissionInfoSerializer(
+        many=True,
+        read_only=True,
+    )
 
     name = serializers.CharField(
         min_length=2,
@@ -54,6 +96,7 @@ class RoleSerializer(serializers.ModelSerializer):
             "rank",
             "description",
             "is_active",
+            "permissions",
             "create_time",
             "update_time",
         ]

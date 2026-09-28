@@ -45,7 +45,10 @@ class RoleListCreateAPIView(GenericAPIView):
 
         # Role 模型已经配置 ordering，
         # 所以查询结果默认按照 rank 从高到低排列
-        roles = Role.objects.all()
+        # roles = Role.objects.all()
+        roles = Role.objects.prefetch_related(
+            "permissions__page",
+        )
 
         # many=True 表示序列化多个角色对象
         serializer = self.get_serializer(
@@ -71,7 +74,16 @@ class RoleListCreateAPIView(GenericAPIView):
 
         # 再序列化一次创建后的角色，
         # 返回 ID、创建时间等数据库生成的字段
-        response_serializer = self.get_serializer(role)
+        # response_serializer = self.get_serializer(role)
+        role = Role.objects.prefetch_related(
+            "permissions__page",
+        ).get(
+            id=role.id,
+        )
+
+        response_serializer = self.get_serializer(
+            role,
+        )
 
         return Response(
             response_serializer.data,
@@ -111,7 +123,9 @@ class RoleDetailAPIView(GenericAPIView):
         role_id = self.kwargs["role_id"]
 
         return get_object_or_404(
-            Role,
+            Role.objects.prefetch_related(
+                "permissions__page",
+            ),
             id=role_id,
         )
 

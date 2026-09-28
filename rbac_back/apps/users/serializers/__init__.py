@@ -23,6 +23,12 @@ from .passwords import (
     UserPasswordResetSerializer,
 )
 
+from .permissions import PermissionSerializer
+
+from .role_permissions import (
+    RolePermissionAssignSerializer,
+)
+
 __all__ = [
     "UserRegisterSerializer",
     "UserLoginSerializer",
@@ -34,4 +40,6 @@ __all__ = [
     "UserRoleAssignSerializer",
     "UserPasswordChangeSerializer",
     "UserPasswordResetSerializer",
+    "PermissionSerializer",
+    "RolePermissionAssignSerializer",
 ]

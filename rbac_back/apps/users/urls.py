@@ -23,6 +23,11 @@ from apps.users.views import (
     UserRoleAssignAPIView,
     UserDetailAPIView,
     UserPasswordResetAPIView,
+
+    PermissionListCreateAPIView,
+    PermissionDetailAPIView,
+
+    RolePermissionAssignAPIView
 )
 
 # 接口
@@ -110,4 +115,30 @@ urlpatterns = [
         name="user-password-reset",
     ),
 
+    # --------------------
+    # 操作权限管理
+    # --------------------
+
+    # GET：权限列表
+    # POST：创建权限
+    path(
+        "permissions/",
+        PermissionListCreateAPIView.as_view(),
+        name="permission-list-create",
+    ),
+
+    # GET：权限详情
+    # PATCH：修改权限
+    # DELETE：停用权限
+    path(
+        "permissions/<int:permission_id>/",
+        PermissionDetailAPIView.as_view(),
+        name="permission-detail",
+    ),
+    # 查询或修改指定角色的操作权限
+    path(
+        "roles/<int:role_id>/permissions/",
+        RolePermissionAssignAPIView.as_view(),
+        name="role-permission-assign",
+    ),
 ]
