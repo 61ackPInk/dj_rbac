@@ -39,6 +39,10 @@ class LogConfig:
         # 图标配置
         self.icons = log_config.ICONS
 
+        # 记录日志资源是否已经清理，
+        # 防止信号处理和 atexit 重复执行清理
+        self._cleanup_completed = False
+
         # 计算项目根目录
         self.project_root = self.find_project_root()
         # 构建日志文件路径
@@ -107,17 +111,32 @@ class LogConfig:
 
     def _cleanup_logger(self):
         """
-        清理日志资源，释放文件句柄
-        程序退出后即可删除日志文件
+        清理日志资源并释放文件句柄。
+
+        信号处理器调用 sys.exit() 后，
+        Python 还会继续执行 atexit 回调，
+        因此清理函数可能被调用两次。
         """
+
+        # 已经清理完成时不再重复处理
+        if self._cleanup_completed:
+            return
+
         try:
-            # 刷新所有待写入的日志
+            # 等待异步日志全部写入完成
             logger.complete()
-            # 移除所有处理器，释放文件句柄
+
+            # 移除 Loguru 的全部处理器，
+            # 释放日志文件句柄
             logger.remove()
-            print("✅ 日志资源已释放，可以安全删除日志文件")
-        except Exception as e:
-            print(f"⚠️ 清理日志资源时出错: {e}")
+
+            self._cleanup_completed = True
+
+        except Exception:
+            # 程序正在退出时，标准输出可能已经关闭，
+            # 此处不再使用 print() 输出错误，
+            # 避免产生二次编码异常
+            self._cleanup_completed = True
 
     def setup(self):
         """
