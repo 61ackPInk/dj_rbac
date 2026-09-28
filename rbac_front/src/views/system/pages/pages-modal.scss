@@ -1,10 +1,573 @@
-/* ==================== 页面弹出层业务样式 ==================== */
+/* ==================== 页面弹出层作用域 ==================== */
 
 /*
- * 页面创建、编辑、详情和状态确认的样式，
- * 后续统一限制在：
- *
- * .app-modal-overlay.pages-modal-scope
- *
- * 避免与用户、角色弹出层互相覆盖。
+ * 页面管理的创建、编辑、详情和状态确认样式，
+ * 全部限制在 pages-modal-scope 中。
  */
+.app-modal-overlay.pages-modal-scope {
+    /* ==================== 弹出层公共按钮 ==================== */
+
+    .primary-button,
+    .secondary-button,
+    .confirm-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+
+        min-height: 38px;
+        padding: 0 15px;
+
+        border: 0;
+        border-radius: 7px;
+
+        font-family: inherit;
+        font-size: var(--font-small);
+        font-weight: 550;
+        line-height: 1;
+
+        cursor: pointer;
+
+        transition:
+            color 0.2s ease,
+            border-color 0.2s ease,
+            background-color 0.2s ease,
+            opacity 0.2s ease;
+
+        i {
+            font-size: 15px;
+            line-height: 1;
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+    }
+
+    .primary-button {
+        color: var(--bg-card);
+        background: var(--primary);
+
+        &:hover:not(:disabled) {
+            background: var(--primary-hover);
+        }
+    }
+
+    .secondary-button {
+        border: 1px solid var(--border);
+
+        color: var(--text-sub);
+        background: var(--bg-card);
+
+        &:hover:not(:disabled) {
+            color: var(--text-main);
+            background: var(--bg-hover);
+        }
+    }
+
+    .confirm-button {
+        color: var(--bg-card);
+
+        &.danger {
+            background: var(--danger);
+
+            &:hover:not(:disabled) {
+                background:
+                    color-mix(in srgb,
+                        var(--danger) 88%,
+                        black);
+            }
+        }
+
+        &.success {
+            background: var(--success);
+
+            &:hover:not(:disabled) {
+                background:
+                    color-mix(in srgb,
+                        var(--success) 88%,
+                        black);
+            }
+        }
+    }
+
+    /* ==================== 页面创建与编辑表单 ==================== */
+
+    .page-form {
+        .form-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+            gap: 20px 18px;
+
+            .form-field {
+                display: block;
+
+                min-width: 0;
+                max-width: 100%;
+
+                /*
+         * 可见角色占据完整一行。
+         */
+                &.full {
+                    grid-column: span 2;
+                }
+
+                /* 字段名称 */
+                .field-label {
+                    display: block;
+                    margin-bottom: 8px;
+
+                    color: var(--text-main);
+
+                    font-size: var(--font-small);
+                    font-weight: 550;
+
+                    i {
+                        color: var(--danger);
+                        font-style: normal;
+                    }
+                }
+
+                /*
+         * 只设置表单直接包含的输入框。
+         *
+         * AppSelect 内部也存在 input，
+         * 不能使用普通后代选择器。
+         */
+                >input {
+                    box-sizing: border-box;
+
+                    width: 100%;
+                    min-width: 0;
+                    max-width: 100%;
+                    height: 41px;
+                    padding: 0 11px;
+
+                    border: 1px solid var(--border);
+                    border-radius: 7px;
+                    outline: none;
+
+                    color: var(--text-main);
+                    background: var(--bg-card);
+
+                    font-family: inherit;
+                    font-size: var(--font-small);
+
+                    transition:
+                        border-color 0.2s ease,
+                        box-shadow 0.2s ease,
+                        background-color 0.2s ease;
+
+                    &:hover:not(:disabled) {
+                        border-color:
+                            color-mix(in srgb,
+                                var(--primary) 45%,
+                                var(--border));
+                    }
+
+                    &:focus {
+                        border-color: var(--primary);
+
+                        box-shadow:
+                            0 0 0 3px color-mix(in srgb,
+                                var(--primary) 10%,
+                                transparent);
+                    }
+
+                    &::placeholder {
+                        color: var(--text-muted);
+                    }
+
+                    &:disabled {
+                        cursor: not-allowed;
+                        background: var(--bg-hover);
+                    }
+                }
+
+                /* 字段提示 */
+                .field-help {
+                    display: block;
+                    margin-top: 7px;
+
+                    color: var(--text-muted);
+
+                    font-size: 11px;
+                    line-height: 1.55;
+                }
+            }
+        }
+    }
+
+    /* ==================== 多选角色标签 ==================== */
+
+    /*
+   * 可见角色使用 AppSelect multiple。
+   * 这里仅补充页面弹出层中的标签尺寸。
+   */
+    .page-form {
+        .el-select__selection {
+            min-width: 0;
+        }
+
+        .el-tag {
+            max-width: 180px;
+
+            border-color:
+                color-mix(in srgb,
+                    var(--primary) 18%,
+                    var(--border));
+
+            color: var(--primary);
+            background: var(--primary-light);
+
+            .el-tag__content {
+                overflow: hidden;
+
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .el-tag__close {
+                color: var(--primary);
+
+                &:hover {
+                    color: var(--bg-card);
+                    background: var(--primary);
+                }
+            }
+        }
+    }
+
+    /* ==================== 页面详情加载状态 ==================== */
+
+    .detail-loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+
+        min-height: 220px;
+
+        color: var(--text-sub);
+        font-size: var(--font-small);
+
+        i {
+            color: var(--primary);
+            font-size: 20px;
+
+            animation:
+                pages-modal-rotate 0.8s linear infinite;
+        }
+    }
+
+    /* ==================== 页面详情 ==================== */
+
+    .page-detail {
+
+        /* 详情头部 */
+        .detail-profile {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+
+            padding-bottom: 22px;
+
+            border-bottom: 1px solid var(--border);
+
+            .detail-avatar {
+                display: grid;
+                place-items: center;
+                flex: 0 0 auto;
+
+                width: 52px;
+                height: 52px;
+
+                border-radius: 14px;
+
+                color: var(--primary);
+                background: var(--primary-light);
+
+                i {
+                    font-size: 22px;
+                    line-height: 1;
+                }
+            }
+
+            >div {
+                flex: 1;
+                min-width: 0;
+
+                h3 {
+                    overflow: hidden;
+
+                    color: var(--text-main);
+
+                    font-size: 17px;
+                    font-weight: 620;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                p {
+                    margin-top: 5px;
+                    overflow: hidden;
+
+                    color: var(--text-muted);
+
+                    font-family:
+                        Consolas,
+                        "Courier New",
+                        monospace;
+                    font-size: 12px;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+            }
+        }
+
+        /* 详情字段 */
+        .detail-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+            gap: 0 24px;
+
+            margin: 8px 0 0;
+
+            >div {
+                min-width: 0;
+                padding: 15px 0;
+
+                border-bottom: 1px solid var(--border);
+
+                &.full {
+                    grid-column: span 2;
+                }
+
+                dt {
+                    margin-bottom: 7px;
+
+                    color: var(--text-muted);
+                    font-size: 11px;
+                }
+
+                dd {
+                    margin: 0;
+                    overflow-wrap: anywhere;
+
+                    color: var(--text-main);
+
+                    font-size: var(--font-small);
+                    font-weight: 550;
+                    line-height: 1.6;
+
+                    /*
+           * 路由、组件和编码可能较长。
+           */
+                    font-family: inherit;
+                }
+
+                .detail-icon-value {
+                    display: flex;
+                    align-items: center;
+                    gap: 9px;
+
+                    i {
+                        color: var(--primary);
+                        font-size: 18px;
+                        line-height: 1;
+                    }
+
+                    span {
+                        color: var(--text-sub);
+
+                        font-family:
+                            Consolas,
+                            "Courier New",
+                            monospace;
+                        font-size: 12px;
+                    }
+                }
+            }
+        }
+    }
+
+    /* ==================== 状态标签 ==================== */
+
+    .status-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        flex: 0 0 auto;
+
+        padding: 5px 9px;
+
+        border-radius: 20px;
+
+        font-size: 11px;
+        white-space: nowrap;
+
+        &::before {
+            width: 5px;
+            height: 5px;
+
+            border-radius: 50%;
+
+            content: "";
+            background: currentColor;
+        }
+
+        &.enabled {
+            color: var(--success);
+            background: var(--success-light);
+        }
+
+        &.disabled {
+            color: var(--text-sub);
+            background: var(--bg-hover);
+        }
+    }
+
+    /* ==================== 页面状态确认 ==================== */
+
+    .status-confirm {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+
+        padding: 4px 0;
+
+        .confirm-icon {
+            display: grid;
+            place-items: center;
+            flex: 0 0 auto;
+
+            width: 44px;
+            height: 44px;
+
+            border-radius: 12px;
+
+            color: var(--danger);
+            background: var(--danger-light);
+
+            i {
+                font-size: 21px;
+                line-height: 1;
+            }
+
+            &.enable {
+                color: var(--success);
+                background: var(--success-light);
+            }
+        }
+
+        h3 {
+            margin-top: 2px;
+
+            color: var(--text-main);
+
+            font-size: 15px;
+            font-weight: 620;
+            line-height: 1.5;
+        }
+
+        p {
+            margin-top: 8px;
+
+            color: var(--text-sub);
+
+            font-size: var(--font-small);
+            line-height: 1.7;
+        }
+    }
+
+    /* ==================== 按钮加载动画 ==================== */
+
+    .button-loading {
+        animation:
+            pages-modal-rotate 0.8s linear infinite;
+    }
+
+    /* ==================== 手机端适配 ==================== */
+
+    @media (max-width: 600px) {
+        .page-form {
+            .form-grid {
+                grid-template-columns: 1fr;
+
+                .form-field {
+                    &.full {
+                        grid-column: auto;
+                    }
+
+                    /*
+           * 避免手机浏览器聚焦时自动放大页面。
+           */
+                    >input {
+                        font-size: 16px;
+                    }
+                }
+            }
+
+            .el-tag {
+                max-width: 130px;
+            }
+        }
+
+        .page-detail {
+            .detail-profile {
+                align-items: flex-start;
+
+                .status-tag {
+                    margin-left: auto;
+                }
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+
+                >div {
+                    &.full {
+                        grid-column: auto;
+                    }
+                }
+            }
+        }
+
+        .status-confirm {
+            gap: 13px;
+
+            .confirm-icon {
+                width: 40px;
+                height: 40px;
+            }
+        }
+    }
+}
+
+/* ==================== 页面弹出层加载动画 ==================== */
+
+@keyframes pages-modal-rotate {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ==================== 减少动态效果 ==================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .app-modal-overlay.pages-modal-scope {
+
+        .button-loading,
+        .detail-loading i {
+            animation: none;
+        }
+    }
+}
