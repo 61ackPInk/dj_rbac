@@ -7,7 +7,7 @@
  * 所有样式都限制在 .app-modal-overlay 内，
  * 避免影响网站中的其他页面和其他普通按钮。
  */
-.app-modal-overlay {
+.app-modal-overlay.users-modal-scope {
   /* ==================== 弹出层公共按钮 ==================== */
 
   .primary-button,
@@ -452,7 +452,7 @@
 /* ==================== 减少动态效果 ==================== */
 
 @media (prefers-reduced-motion: reduce) {
-  .app-modal-overlay {
+  .app-modal-overlay.users-modal-scope {
 
     .button-loading,
     .detail-loading i {

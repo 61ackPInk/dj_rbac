@@ -72,6 +72,20 @@ export default defineComponent({
       type: String,
       default: '',
     },
+    /*
+    * 弹出层业务样式作用域。
+    *
+    * 例如：
+    * users-modal-scope
+    * roles-modal-scope
+    *
+    * 不同页面使用不同作用域，
+    * 避免业务弹出层样式互相覆盖。
+    */
+    scopeClass: {
+      type: String,
+      default: '',
+    },
 
     /*
      * 弹出层宽度。

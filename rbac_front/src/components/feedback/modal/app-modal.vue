@@ -13,6 +13,7 @@
       <div
         v-if="modelValue"
         class="app-modal-overlay"
+        :class="scopeClass"
         @mousedown.self="handleOverlayClick"
         @keydown="handleKeydown"
       >

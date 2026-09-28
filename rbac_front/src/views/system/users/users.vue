@@ -278,7 +278,7 @@
     </section>
 
     <!-- ==================== 创建与编辑用户弹出层 ==================== -->
-    <AppModal v-model="formModalVisible" :title="formModalTitle" :width="620" :closable="!submitting"
+    <AppModal v-model="formModalVisible" scope-class="users-modal-scope" :title="formModalTitle" :width="620" :closable="!submitting"
       :close-on-overlay="!submitting" :close-on-escape="!submitting">
       <form id="user-form" class="user-form" novalidate @submit.prevent="submitUserForm">
         <div class="form-grid">
@@ -364,7 +364,7 @@
     </AppModal>
 
     <!-- ==================== 用户详情弹出层 ==================== -->
-    <AppModal v-model="detailModalVisible" title="用户信息" :width="620" :closable="!detailLoading"
+    <AppModal v-model="detailModalVisible" scope-class="users-modal-scope" title="用户信息" :width="620" :closable="!detailLoading"
       :close-on-overlay="!detailLoading" :close-on-escape="!detailLoading">
       <!-- 详情加载状态 -->
       <div v-if="detailLoading" class="detail-loading">
@@ -457,7 +457,7 @@
     </AppModal>
 
     <!-- ==================== 状态确认弹出层 ==================== -->
-    <AppModal v-model="statusModalVisible" :title="statusModalTitle" :width="430" :closable="!submitting"
+    <AppModal v-model="statusModalVisible" scope-class="users-modal-scope" :title="statusModalTitle" :width="430" :closable="!submitting"
       :close-on-overlay="!submitting" :close-on-escape="!submitting">
       <div v-if="statusTargetUser" class="status-confirm">
         <div class="confirm-icon" :class="{
