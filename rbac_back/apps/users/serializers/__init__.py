@@ -10,8 +10,9 @@ from .login import UserLoginSerializer
 from .refresh_token import RefreshTokenSerializer
 
 from .users import (
-    UserInfoSerializer,
+    CurrentUserInfoSerializer,
     UserAdminUpdateSerializer,
+    UserInfoSerializer,
     UserProfileUpdateSerializer,
     UserStatusUpdateSerializer,
 )
@@ -37,6 +38,7 @@ __all__ = [
     "UserRegisterSerializer",
     "UserLoginSerializer",
     "RefreshTokenSerializer",
+    "CurrentUserInfoSerializer",
     "UserInfoSerializer",
     "UserAdminUpdateSerializer",
     "UserProfileUpdateSerializer",

@@ -9,34 +9,64 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from apps.users.models import User
 from apps.users.serializers import (
-    UserInfoSerializer,
+    CurrentUserInfoSerializer,
     UserProfileUpdateSerializer,
 )
 
 
 class CurrentUserAPIView(GenericAPIView):
-    """获取和修改当前登录用户信息"""
+    """
+    获取和修改当前登录用户信息。
 
-    serializer_class = UserInfoSerializer
-    permission_classes = [IsAuthenticated]
+    GET：
+        返回当前登录用户信息；
+        同时返回当前用户的操作权限编码。
+
+    PATCH：
+        当前用户修改自己的用户名或邮箱。
+    """
+
+    serializer_class = CurrentUserInfoSerializer
+
+    # 当前接口只要求用户已经登录
+    permission_classes = [
+        IsAuthenticated,
+    ]
 
     def get_serializer_class(self):
-        """
-        GET：返回用户完整信息
-        PATCH：验证允许修改的个人资料
-        """
+        """根据请求方法选择序列化器"""
 
         if self.request.method == "PATCH":
             return UserProfileUpdateSerializer
 
-        return UserInfoSerializer
+        return CurrentUserInfoSerializer
+
+    def get_current_user(self):
+        """
+        重新查询当前登录用户及其角色。
+
+        JWT 身份认证已经得到 request.user，
+        但没有提前加载角色。
+
+        使用 select_related("role") 后，
+        获取 user.role 时不需要再次查询数据库。
+        """
+
+        return User.objects.select_related(
+            "role",
+        ).get(
+            id=self.request.user.id,
+        )
 
     def get(self, request, *args, **kwargs):
-        """获取当前登录用户信息"""
+        """获取当前登录用户及操作权限"""
+
+        user = self.get_current_user()
 
         serializer = self.get_serializer(
-            request.user
+            user,
         )
 
         return Response(serializer.data)
@@ -44,19 +74,34 @@ class CurrentUserAPIView(GenericAPIView):
     def patch(self, request, *args, **kwargs):
         """修改当前用户的用户名或邮箱"""
 
+        user = self.get_current_user()
+
         serializer = self.get_serializer(
-            request.user,
+            user,
             data=request.data,
 
-            # 允许只提交需要修改的字段
+            # 只需要提交发生修改的字段
             partial=True,
         )
 
-        serializer.is_valid(raise_exception=True)
+        serializer.is_valid(
+            raise_exception=True,
+        )
+
         user = serializer.save()
 
-        # 修改成功后使用只读序列化器
-        # 返回完整的用户信息
-        response_serializer = UserInfoSerializer(user)
+        # 修改完成后重新查询角色信息，
+        # 再使用当前用户专用序列化器返回权限
+        user = User.objects.select_related(
+            "role",
+        ).get(
+            id=user.id,
+        )
 
-        return Response(response_serializer.data)
+        response_serializer = (
+            CurrentUserInfoSerializer(user)
+        )
+
+        return Response(
+            response_serializer.data,
+        )
