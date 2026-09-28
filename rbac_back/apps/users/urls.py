@@ -22,6 +22,7 @@ from apps.users.views import (
     UserListAPIView,
     UserRoleAssignAPIView,
     UserDetailAPIView,
+    UserStatusUpdateAPIView,
     UserPasswordResetAPIView,
 
     PermissionListCreateAPIView,
@@ -140,5 +141,11 @@ urlpatterns = [
         "roles/<int:role_id>/permissions/",
         RolePermissionAssignAPIView.as_view(),
         name="role-permission-assign",
+    ),
+    # 修改指定用户的启用状态
+    path(
+        "users/<int:user_id>/status/",
+        UserStatusUpdateAPIView.as_view(),
+        name="user-status-update",
     ),
 ]

@@ -18,6 +18,7 @@ from .user_roles import UserRoleAssignAPIView
 from .users import (
     UserListAPIView,
     UserDetailAPIView,
+    UserStatusUpdateAPIView,
 )
 
 from .passwords import (
@@ -45,6 +46,7 @@ __all__ = [
     "UserRoleAssignAPIView",
     "UserListAPIView",
     "UserDetailAPIView",
+    "UserStatusUpdateAPIView",
     "UserPasswordChangeAPIView",
     "UserPasswordResetAPIView",
     "PermissionListCreateAPIView",

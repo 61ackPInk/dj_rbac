@@ -14,7 +14,11 @@ from apps.users.serializers import (
     UserInfoSerializer,
     UserRoleAssignSerializer,
 )
-from common.permissions import IsRootUser
+from rest_framework.exceptions import PermissionDenied
+
+from common.permissions import (
+    HasOperationPermission,
+)
 
 
 class UserRoleAssignAPIView(GenericAPIView):
@@ -23,7 +27,15 @@ class UserRoleAssignAPIView(GenericAPIView):
     serializer_class = UserRoleAssignSerializer
 
     # 只有根管理员能够分配用户角色
-    permission_classes = [IsRootUser]
+    # permission_classes = [IsRootUser]
+    permission_classes = [
+        HasOperationPermission,
+    ]
+
+    required_permissions = {
+        "PATCH": "USER_ASSIGN_ROLE",
+    }
+
 
     def get_object(self):
         """
@@ -45,10 +57,19 @@ class UserRoleAssignAPIView(GenericAPIView):
 
         user = self.get_object()
 
+        # 普通权限管理员不能修改根管理员角色
+        if (
+                user.is_root
+                and not request.user.is_root
+        ):
+            raise PermissionDenied(
+                "不能修改根管理员角色"
+            )
+
         serializer = self.get_serializer(
             user,
             data=request.data,
-            partial=True,
+            partial=False,
         )
 
         serializer.is_valid(raise_exception=True)

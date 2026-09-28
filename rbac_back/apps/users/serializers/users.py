@@ -83,13 +83,6 @@ class UserAdminUpdateSerializer(serializers.ModelSerializer):
         },
     )
 
-    is_active = serializers.BooleanField(
-        required=False,
-        error_messages={
-            "invalid": "用户状态必须是布尔值",
-        },
-    )
-
     class Meta:
         model = User
 
@@ -97,7 +90,6 @@ class UserAdminUpdateSerializer(serializers.ModelSerializer):
         fields = [
             "username",
             "email",
-            "is_active",
         ]
 
     def validate_username(self, value):
@@ -138,24 +130,6 @@ class UserAdminUpdateSerializer(serializers.ModelSerializer):
             return None
 
         return value
-
-    def validate(self, attrs):
-        """执行涉及当前用户对象的验证"""
-
-        user = self.instance
-        is_active = attrs.get("is_active")
-
-        # 不允许通过普通用户管理接口禁用根管理员
-        if (
-            user
-            and user.is_root
-            and is_active is False
-        ):
-            raise serializers.ValidationError({
-                "is_active": "不能禁用根管理员账号"
-            })
-
-        return attrs
 
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer):
@@ -224,3 +198,35 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
             return None
 
         return value
+
+
+class UserStatusUpdateSerializer(serializers.ModelSerializer):
+    """管理员修改用户启用状态"""
+
+    is_active = serializers.BooleanField(
+        required=True,
+        error_messages={
+            "required": "必须提交用户状态",
+            "invalid": "用户状态必须是布尔值",
+        },
+    )
+
+    class Meta:
+        model = User
+
+        fields = [
+            "is_active",
+        ]
+
+    def validate(self, attrs):
+        """禁止停用根管理员账号"""
+
+        user = self.instance
+        is_active = attrs["is_active"]
+
+        if user.is_root and is_active is False:
+            raise serializers.ValidationError({
+                "is_active": "不能停用根管理员账号",
+            })
+
+        return attrs
