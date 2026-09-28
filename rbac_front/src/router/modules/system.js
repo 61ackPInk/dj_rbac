@@ -40,4 +40,17 @@ export default [
       pageCode: 'SYSTEM_ROLES',
     },
   },
+  // 页面管理：/system/pages
+  {
+    path: 'system/pages',
+    name: 'system-pages',
+    component: () =>
+      import(
+        '@/views/system/pages/pages.vue'
+      ),
+    meta: {
+      title: '页面管理',
+      pageCode: 'SYSTEM_PAGES',
+    },
+  },
 ]
