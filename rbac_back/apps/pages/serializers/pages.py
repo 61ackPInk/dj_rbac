@@ -77,17 +77,17 @@ class PageSerializer(serializers.ModelSerializer):
     )
 
     # 用于请求，接收角色 ID 数组
-    visible_role_ids = serializers.PrimaryKeyRelatedField(
-        queryset=Role.objects.filter(is_active=True),
-        source="visible_roles",
-        many=True,
-        write_only=True,
-        required=False,
-        error_messages={
-            "does_not_exist": "角色不存在或已被停用",
-            "incorrect_type": "角色ID格式错误",
-        },
-    )
+    # visible_role_ids = serializers.PrimaryKeyRelatedField(
+    #     queryset=Role.objects.filter(is_active=True),
+    #     source="visible_roles",
+    #     many=True,
+    #     write_only=True,
+    #     required=False,
+    #     error_messages={
+    #         "does_not_exist": "角色不存在或已被停用",
+    #         "incorrect_type": "角色ID格式错误",
+    #     },
+    # )
 
     code = serializers.RegexField(
         # 页面编码必须以字母开头，
@@ -125,7 +125,7 @@ class PageSerializer(serializers.ModelSerializer):
             "parent",
             "parent_id",
             "visible_roles",
-            "visible_role_ids",
+            # "visible_role_ids",
             "sort_order",
             "is_active",
             "create_time",
@@ -134,6 +134,7 @@ class PageSerializer(serializers.ModelSerializer):
 
         read_only_fields = [
             "id",
+            "is_active",
             "create_time",
             "update_time",
         ]
@@ -269,3 +270,92 @@ class VisiblePageSerializer(serializers.ModelSerializer):
 
         read_only_fields = fields
 
+
+class PageStatusUpdateSerializer(
+    serializers.ModelSerializer
+):
+    """修改页面启用状态"""
+
+    is_active = serializers.BooleanField(
+        required=True,
+        error_messages={
+            "required": "必须提交页面状态",
+            "invalid": "页面状态必须是布尔值",
+        },
+    )
+
+    class Meta:
+        model = Page
+
+        fields = [
+            "is_active",
+        ]
+
+
+class PageRoleAssignSerializer(
+    serializers.ModelSerializer
+):
+    """给页面分配可见角色"""
+
+    role_ids = serializers.PrimaryKeyRelatedField(
+        # 只能把页面分配给启用状态的角色
+        queryset=Role.objects.filter(
+            is_active=True,
+        ),
+
+        # 前端提交 role_ids，
+        # 实际修改 Page.visible_roles
+        source="visible_roles",
+
+        many=True,
+        write_only=True,
+        required=True,
+
+        error_messages={
+            "required": "请提交角色ID列表",
+            "does_not_exist": (
+                "角色不存在或已经停用"
+            ),
+            "incorrect_type": "角色ID格式错误",
+            "not_a_list": "角色ID必须使用数组格式",
+        },
+    )
+
+    class Meta:
+        model = Page
+
+        fields = [
+            "role_ids",
+        ]
+
+    def validate_role_ids(self, value):
+        """禁止提交重复角色 ID"""
+
+        role_ids = [
+            role.id
+            for role in value
+        ]
+
+        if len(role_ids) != len(
+            set(role_ids)
+        ):
+            raise serializers.ValidationError(
+                "角色ID不能重复"
+            )
+
+        return value
+
+    def update(self, instance, validated_data):
+        """替换页面当前的全部可见角色"""
+
+        visible_roles = validated_data[
+            "visible_roles"
+        ]
+
+        # set() 会将原来的角色关系替换成
+        # 本次提交的完整角色列表
+        instance.visible_roles.set(
+            visible_roles,
+        )
+
+        return instance

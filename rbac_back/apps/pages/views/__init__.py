@@ -8,6 +8,8 @@
 from .pages import (
     PageDetailAPIView,
     PageListCreateAPIView,
+    PageRoleAssignAPIView,
+    PageStatusUpdateAPIView,
     VisiblePageListAPIView,
 )
 
@@ -15,5 +17,7 @@ from .pages import (
 __all__ = [
     "PageDetailAPIView",
     "PageListCreateAPIView",
+    "PageRoleAssignAPIView",
+    "PageStatusUpdateAPIView",
     "VisiblePageListAPIView",
 ]
