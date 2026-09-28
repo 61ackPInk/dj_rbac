@@ -27,5 +27,17 @@ export default [
     },
   },
 
-  // 将来完成角色管理视图后，再在这里加入对应路由
+  // 角色管理：/system/roles
+  {
+    path: 'system/roles',
+    name: 'system-roles',
+    component: () =>
+      import(
+        '@/views/system/roles/roles.vue'
+      ),
+    meta: {
+      title: '角色管理',
+      pageCode: 'SYSTEM_ROLES',
+    },
+  },
 ]

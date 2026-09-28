@@ -1,0 +1,87 @@
+/* ==================== 角色管理页面 ==================== */
+
+.roles-page {
+  width: 100%;
+  min-width: 0;
+
+  color: var(--text-main);
+
+  /* ==================== 页面标题 ==================== */
+
+  .page-heading {
+    margin-bottom: 24px;
+
+    h1 {
+      margin-bottom: 7px;
+
+      font-size: var(--font-title);
+      font-weight: 650;
+      line-height: 1.3;
+      letter-spacing: -0.5px;
+    }
+
+    p {
+      color: var(--text-sub);
+
+      font-size: var(--font-main);
+      line-height: 1.7;
+    }
+  }
+
+  /* ==================== 临时页面提示 ==================== */
+
+  .roles-placeholder {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+
+    min-height: 320px;
+    padding: 40px 20px;
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+
+    color: var(--text-muted);
+    background: var(--bg-card);
+
+    text-align: center;
+
+    > i {
+      margin-bottom: 14px;
+
+      color: var(--primary);
+
+      font-size: 38px;
+      line-height: 1;
+    }
+
+    strong {
+      color: var(--text-main);
+
+      font-size: var(--font-card-title);
+      font-weight: 600;
+    }
+
+    span {
+      margin-top: 8px;
+
+      font-size: var(--font-small);
+      line-height: 1.6;
+    }
+  }
+
+  /* ==================== 手机端适配 ==================== */
+
+  @media (max-width: 600px) {
+    .page-heading {
+      h1 {
+        font-size: 22px;
+      }
+    }
+
+    .roles-placeholder {
+      min-height: 260px;
+    }
+  }
+}
