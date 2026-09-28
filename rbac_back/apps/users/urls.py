@@ -18,6 +18,7 @@ from apps.users.views import (
     # 角色
     RoleDetailAPIView,
     RoleListCreateAPIView,
+    RoleStatusUpdateAPIView,
     # 管理员操作用户
     UserListAPIView,
     UserRoleAssignAPIView,
@@ -147,5 +148,11 @@ urlpatterns = [
         "users/<int:user_id>/status/",
         UserStatusUpdateAPIView.as_view(),
         name="user-status-update",
+    ),
+    # PATCH：修改角色启用状态
+    path(
+        "roles/<int:role_id>/status/",
+        RoleStatusUpdateAPIView.as_view(),
+        name="role-status-update",
     ),
 ]

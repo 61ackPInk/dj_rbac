@@ -15,7 +15,10 @@ from .users import (
     UserProfileUpdateSerializer,
     UserStatusUpdateSerializer,
 )
-from .roles import RoleSerializer
+from .roles import (
+    RoleSerializer,
+    RoleStatusUpdateSerializer,
+)
 
 from .user_roles import UserRoleAssignSerializer
 
@@ -39,6 +42,7 @@ __all__ = [
     "UserProfileUpdateSerializer",
     "UserStatusUpdateSerializer",
     "RoleSerializer",
+    "RoleStatusUpdateSerializer",
     "UserRoleAssignSerializer",
     "UserPasswordChangeSerializer",
     "UserPasswordResetSerializer",

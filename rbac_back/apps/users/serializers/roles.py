@@ -104,6 +104,7 @@ class RoleSerializer(serializers.ModelSerializer):
         # 这些字段由数据库自动生成，前端不能修改
         read_only_fields = [
             "id",
+            "is_active",
             "create_time",
             "update_time",
         ]
@@ -169,3 +170,23 @@ class RoleSerializer(serializers.ModelSerializer):
                 })
 
         return attrs
+
+class RoleStatusUpdateSerializer(
+    serializers.ModelSerializer
+):
+    """修改角色启用状态"""
+
+    is_active = serializers.BooleanField(
+        required=True,
+        error_messages={
+            "required": "必须提交角色状态",
+            "invalid": "角色状态必须是布尔值",
+        },
+    )
+
+    class Meta:
+        model = Role
+
+        fields = [
+            "is_active",
+        ]
