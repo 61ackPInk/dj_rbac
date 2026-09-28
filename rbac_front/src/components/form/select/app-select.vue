@@ -29,6 +29,26 @@
     @focus="handleFocus"
     @blur="handleBlur"
   >
+
+    <!-- ==================== 当前选中项图标 ==================== -->
+
+    <!--
+    普通选项没有 icon 时不显示任何内容。
+    页面图标选项存在 icon 时显示 Bootstrap Icon。
+    -->
+    <template
+    v-if="selectedOption?.icon"
+    #prefix
+    >
+    <i
+        :class="[
+        selectedOption.icon,
+        'app-select__selected-icon',
+        ]"
+        aria-hidden="true"
+    ></i>
+    </template>
+
     <!-- ==================== 下拉选项 ==================== -->
 
     <el-option
@@ -37,7 +57,33 @@
         :label="option.label"
         :value="option.appSelectValue"
         :disabled="Boolean(option.disabled)"
-    />
+    >
+    <!-- ==================== 自定义选项内容 ==================== -->
+
+        <div class="app-select-option">
+            <!-- Bootstrap 图标 -->
+            <span
+                v-if="option.icon"
+                class="app-select-option__icon"
+                aria-hidden="true"
+            >
+            <i :class="option.icon"></i>
+            </span>
+
+            <!-- 选项名称 -->
+            <span class="app-select-option__label">
+                {{ option.label }}
+            </span>
+
+            <!-- 可选说明 -->
+            <small
+                v-if="option.description"
+                class="app-select-option__description"
+                >
+                {{ option.description }}
+            </small>
+        </div>
+    </el-option>
 
     <!-- ==================== 无数据状态 ==================== -->
 

@@ -244,6 +244,32 @@ export default defineComponent({
             return props.modelValue
         })
 
+        /* ==================== 当前选中选项 ==================== */
+
+        /*
+         * 查找当前单选下拉框选中的完整选项。
+         *
+         * 如果选项配置了 icon，
+         * AppSelect 会在输入区域显示对应图标。
+         *
+         * 多选下拉框不显示单个前缀图标。
+         */
+        const selectedOption = computed(() => {
+            if (
+                props.multiple ||
+                Array.isArray(props.modelValue)
+            ) {
+                return null
+            }
+
+            return props.options.find((option) => {
+                return Object.is(
+                    option.value,
+                    props.modelValue,
+                )
+            }) || null
+        })
+
         /* ==================== 下拉框宽度 ==================== */
 
         const selectWidth = computed(() => {
@@ -309,6 +335,7 @@ export default defineComponent({
 
             normalizedOptions,
             selectModelValue,
+            selectedOption,
             selectStyle,
 
             handleUpdate,
