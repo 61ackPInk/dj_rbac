@@ -1,11 +1,590 @@
-/* ==================== 角色弹出层样式 ==================== */
+/* ==================== 角色弹出层作用域 ==================== */
 
 /*
- * 角色创建、编辑、详情和状态确认的业务样式，
- * 将在实现对应弹出层时添加到这里。
+ * 角色管理页面的创建、编辑、详情和状态确认弹出层，
+ * 全部限制在 roles-modal-scope 中。
  *
- * 所有样式都必须限制在：
- * .app-modal-overlay
- *
- * 避免影响其他页面。
+ * 不会覆盖用户管理或其他页面的弹出层样式。
  */
+.app-modal-overlay.roles-modal-scope {
+  /* ==================== 弹出层公共按钮 ==================== */
+
+  .primary-button,
+  .secondary-button,
+  .confirm-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    min-height: 38px;
+    padding: 0 15px;
+
+    border: 0;
+    border-radius: 7px;
+
+    font-family: inherit;
+    font-size: var(--font-small);
+    font-weight: 550;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease,
+      background-color 0.2s ease,
+      opacity 0.2s ease;
+
+    i {
+      font-size: 15px;
+      line-height: 1;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+
+  /* 主按钮 */
+  .primary-button {
+    color: var(--bg-card);
+    background: var(--primary);
+
+    &:hover:not(:disabled) {
+      background: var(--primary-hover);
+    }
+  }
+
+  /* 次要按钮 */
+  .secondary-button {
+    border: 1px solid var(--border);
+
+    color: var(--text-sub);
+    background: var(--bg-card);
+
+    &:hover:not(:disabled) {
+      color: var(--text-main);
+      background: var(--bg-hover);
+    }
+  }
+
+  /* 状态确认按钮 */
+  .confirm-button {
+    color: var(--bg-card);
+
+    &.danger {
+      background: var(--danger);
+
+      &:hover:not(:disabled) {
+        background:
+          color-mix(
+            in srgb,
+            var(--danger) 88%,
+            black
+          );
+      }
+    }
+
+    &.success {
+      background: var(--success);
+
+      &:hover:not(:disabled) {
+        background:
+          color-mix(
+            in srgb,
+            var(--success) 88%,
+            black
+          );
+      }
+    }
+  }
+
+  /* ==================== 角色创建与编辑表单 ==================== */
+
+  .role-form {
+    .form-grid {
+      display: grid;
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+      gap: 20px 18px;
+
+      .form-field {
+        display: block;
+
+        min-width: 0;
+        max-width: 100%;
+
+        /*
+         * 描述字段占据完整一行。
+         */
+        &.full {
+          grid-column: span 2;
+        }
+
+        /* 字段标题 */
+        .field-label {
+          display: block;
+          margin-bottom: 8px;
+
+          color: var(--text-main);
+
+          font-size: var(--font-small);
+          font-weight: 550;
+
+          /* 必填标记 */
+          i {
+            color: var(--danger);
+            font-style: normal;
+          }
+        }
+
+        /*
+         * 只设置表单的直接输入框。
+         *
+         * AppSelect 内部也包含 input，
+         * 不能使用普通的 input 后代选择器，
+         * 否则会破坏公共下拉框样式。
+         */
+        > input {
+          box-sizing: border-box;
+
+          width: 100%;
+          min-width: 0;
+          max-width: 100%;
+          height: 41px;
+          padding: 0 11px;
+
+          border: 1px solid var(--border);
+          border-radius: 7px;
+          outline: none;
+
+          color: var(--text-main);
+          background: var(--bg-card);
+
+          font-family: inherit;
+          font-size: var(--font-small);
+
+          transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease,
+            background-color 0.2s ease;
+
+          &:hover:not(:disabled) {
+            border-color:
+              color-mix(
+                in srgb,
+                var(--primary) 45%,
+                var(--border)
+              );
+          }
+
+          &:focus {
+            border-color: var(--primary);
+
+            box-shadow:
+              0 0 0 3px
+              color-mix(
+                in srgb,
+                var(--primary) 10%,
+                transparent
+              );
+          }
+
+          &::placeholder {
+            color: var(--text-muted);
+          }
+
+          &:disabled {
+            cursor: not-allowed;
+            background: var(--bg-hover);
+          }
+        }
+
+        /* 角色描述 */
+        > textarea {
+          display: block;
+          resize: vertical;
+
+          box-sizing: border-box;
+
+          width: 100%;
+          min-width: 0;
+          max-width: 100%;
+          min-height: 104px;
+          max-height: 220px;
+          padding: 10px 11px;
+
+          border: 1px solid var(--border);
+          border-radius: 7px;
+          outline: none;
+
+          color: var(--text-main);
+          background: var(--bg-card);
+
+          font-family: inherit;
+          font-size: var(--font-small);
+          line-height: 1.7;
+
+          transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+
+          &:hover:not(:disabled) {
+            border-color:
+              color-mix(
+                in srgb,
+                var(--primary) 45%,
+                var(--border)
+              );
+          }
+
+          &:focus {
+            border-color: var(--primary);
+
+            box-shadow:
+              0 0 0 3px
+              color-mix(
+                in srgb,
+                var(--primary) 10%,
+                transparent
+              );
+          }
+
+          &::placeholder {
+            color: var(--text-muted);
+          }
+        }
+
+        /* 字段帮助文字 */
+        .field-help {
+          display: block;
+          margin-top: 7px;
+
+          color: var(--text-muted);
+
+          font-size: 11px;
+          line-height: 1.5;
+        }
+
+        /* 描述字数 */
+        .field-count {
+          display: block;
+          margin-top: 6px;
+
+          color: var(--text-muted);
+
+          font-size: 11px;
+          line-height: 1;
+          text-align: right;
+        }
+      }
+    }
+  }
+
+  /* ==================== 角色详情加载状态 ==================== */
+
+  .detail-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    min-height: 220px;
+
+    color: var(--text-sub);
+    font-size: var(--font-small);
+
+    i {
+      color: var(--primary);
+      font-size: 20px;
+
+      animation:
+        roles-modal-rotate
+        0.8s linear infinite;
+    }
+  }
+
+  /* ==================== 角色详情 ==================== */
+
+  .role-detail {
+    /* 详情头部 */
+    .detail-profile {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+
+      padding-bottom: 22px;
+
+      border-bottom: 1px solid var(--border);
+
+      .detail-avatar {
+        display: grid;
+        place-items: center;
+        flex: 0 0 auto;
+
+        width: 52px;
+        height: 52px;
+
+        border-radius: 14px;
+
+        color: var(--primary);
+        background: var(--primary-light);
+
+        font-size: 17px;
+        font-weight: 650;
+      }
+
+      > div {
+        flex: 1;
+        min-width: 0;
+
+        h3 {
+          overflow: hidden;
+
+          color: var(--text-main);
+
+          font-size: 17px;
+          font-weight: 620;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        p {
+          margin-top: 5px;
+          overflow: hidden;
+
+          color: var(--text-muted);
+
+          font-family:
+            Consolas,
+            "Courier New",
+            monospace;
+          font-size: 12px;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+    }
+
+    /* 详情字段 */
+    .detail-grid {
+      display: grid;
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+      gap: 0 24px;
+
+      margin: 8px 0 0;
+
+      > div {
+        min-width: 0;
+        padding: 15px 0;
+
+        border-bottom: 1px solid var(--border);
+
+        /*
+         * 描述字段占据完整一行。
+         */
+        &.full {
+          grid-column: span 2;
+        }
+
+        dt {
+          margin-bottom: 7px;
+
+          color: var(--text-muted);
+          font-size: 11px;
+        }
+
+        dd {
+          margin: 0;
+          overflow-wrap: anywhere;
+
+          color: var(--text-main);
+
+          font-size: var(--font-small);
+          font-weight: 550;
+          line-height: 1.6;
+        }
+      }
+    }
+  }
+
+  /* ==================== 状态标签 ==================== */
+
+  .status-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex: 0 0 auto;
+
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+    white-space: nowrap;
+
+    &::before {
+      width: 5px;
+      height: 5px;
+
+      border-radius: 50%;
+
+      content: "";
+      background: currentColor;
+    }
+
+    &.enabled {
+      color: var(--success);
+      background: var(--success-light);
+    }
+
+    &.disabled {
+      color: var(--text-sub);
+      background: var(--bg-hover);
+    }
+  }
+
+  /* ==================== 状态修改确认 ==================== */
+
+  .status-confirm {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+
+    padding: 4px 0;
+
+    .confirm-icon {
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+
+      width: 44px;
+      height: 44px;
+
+      border-radius: 12px;
+
+      color: var(--danger);
+      background: var(--danger-light);
+
+      i {
+        font-size: 21px;
+        line-height: 1;
+      }
+
+      /*
+       * 启用角色使用成功状态颜色。
+       */
+      &.enable {
+        color: var(--success);
+        background: var(--success-light);
+      }
+    }
+
+    h3 {
+      margin-top: 2px;
+
+      color: var(--text-main);
+
+      font-size: 15px;
+      font-weight: 620;
+      line-height: 1.5;
+    }
+
+    p {
+      margin-top: 8px;
+
+      color: var(--text-sub);
+
+      font-size: var(--font-small);
+      line-height: 1.7;
+    }
+  }
+
+  /* ==================== 按钮加载动画 ==================== */
+
+  .button-loading {
+    animation:
+      roles-modal-rotate
+      0.8s linear infinite;
+  }
+
+  /* ==================== 平板与手机端 ==================== */
+
+  @media (max-width: 600px) {
+    .role-form {
+      .form-grid {
+        grid-template-columns: 1fr;
+
+        .form-field {
+          &.full {
+            grid-column: auto;
+          }
+
+          /*
+           * 防止手机浏览器聚焦输入框时自动放大。
+           */
+          > input,
+          > textarea {
+            font-size: 16px;
+          }
+        }
+      }
+    }
+
+    .role-detail {
+      .detail-profile {
+        align-items: flex-start;
+
+        .status-tag {
+          margin-left: auto;
+        }
+      }
+
+      .detail-grid {
+        grid-template-columns: 1fr;
+
+        > div {
+          &.full {
+            grid-column: auto;
+          }
+        }
+      }
+    }
+
+    .status-confirm {
+      gap: 13px;
+
+      .confirm-icon {
+        width: 40px;
+        height: 40px;
+      }
+    }
+  }
+}
+
+/* ==================== 弹出层加载动画 ==================== */
+
+@keyframes roles-modal-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==================== 减少动态效果 ==================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .app-modal-overlay.roles-modal-scope {
+    .button-loading,
+    .detail-loading i {
+      animation: none;
+    }
+  }
+}
