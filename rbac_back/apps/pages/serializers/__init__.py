@@ -6,16 +6,16 @@
 @Desc : 
 """
 from .pages import (
-    PageParentInfoSerializer,
-    PageRoleInfoSerializer,
     PageSerializer,
     VisiblePageSerializer,
+    PageStatusUpdateSerializer,
+    PageRoleAssignSerializer,
 )
 
 
 __all__ = [
-    "PageParentInfoSerializer",
-    "PageRoleInfoSerializer",
     "PageSerializer",
     "VisiblePageSerializer",
+    "PageStatusUpdateSerializer",
+    "PageRoleAssignSerializer",
 ]

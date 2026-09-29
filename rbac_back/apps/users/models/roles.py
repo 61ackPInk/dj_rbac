@@ -18,6 +18,21 @@ class Role(models.Model):
     rank = models.PositiveIntegerField(default=0, db_index=True, verbose_name='角色权重', help_text='数字越大，等级越高')
     description = models.CharField(max_length=255, blank=True, default='', verbose_name='角色描述')
     is_active = models.BooleanField(default=True, verbose_name="是否启用")
+    permissions = models.ManyToManyField(
+        "users.Permission",
+
+        # 可以通过 permission.roles.all()
+        # 查询拥有该权限的全部角色
+        related_name="roles",
+
+        # 创建角色时可以暂时不分配权限
+        blank=True,
+
+        # 明确指定角色和权限的中间表
+        db_table="sys_role_permissions",
+
+        verbose_name="操作权限",
+    )
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
     update_time = models.DateTimeField(
         auto_now=True,

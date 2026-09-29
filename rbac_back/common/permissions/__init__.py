@@ -7,9 +7,11 @@
 """
 from .users import IsRootUser
 from .pages import CanAccessPage
+from .operations import HasOperationPermission
 
 
 __all__ = [
     "IsRootUser",
-    "CanAccessPage"
+    "CanAccessPage",
+    "HasOperationPermission",
 ]

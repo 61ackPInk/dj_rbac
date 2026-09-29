@@ -10,19 +10,31 @@ from .login import UserLoginAPIView
 from .logout import UserLogoutAPIView
 from .current_user import CurrentUserAPIView
 from .refresh_token import RefreshTokenAPIView
+
 from .roles import (
     RoleListCreateAPIView,
-    RoleDetailAPIView
+    RoleDetailAPIView,
+    RoleStatusUpdateAPIView,
 )
 from .user_roles import UserRoleAssignAPIView
 from .users import (
     UserListAPIView,
     UserDetailAPIView,
+    UserStatusUpdateAPIView,
 )
 
 from .passwords import (
     UserPasswordChangeAPIView,
     UserPasswordResetAPIView,
+)
+
+from .permissions import (
+    PermissionListCreateAPIView,
+    PermissionDetailAPIView,
+)
+
+from .role_permissions import (
+    RolePermissionAssignAPIView,
 )
 
 __all__ = [
@@ -33,9 +45,14 @@ __all__ = [
     "RefreshTokenAPIView",
     "RoleListCreateAPIView",
     "RoleDetailAPIView",
+    "RoleStatusUpdateAPIView",
     "UserRoleAssignAPIView",
     "UserListAPIView",
     "UserDetailAPIView",
+    "UserStatusUpdateAPIView",
     "UserPasswordChangeAPIView",
     "UserPasswordResetAPIView",
+    "PermissionListCreateAPIView",
+    "PermissionDetailAPIView",
+    "RolePermissionAssignAPIView",
 ]
