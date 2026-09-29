@@ -17,14 +17,16 @@ import AppSelect from '@/components/form/select/app-select.vue'
 
 import {
     createPageApi,
-    disablePageApi,
-    enablePageApi,
     getPageDetailApi,
     getPagesApi,
     updatePageApi,
+    updatePageRolesApi,
+    updatePageStatusApi,
 } from '@/api/pages'
 
-import { getRolesApi } from '@/api/roles'
+import {
+    getRolesApi,
+} from '@/api/roles'
 
 /* ==================== 图标配置 ==================== */
 
@@ -100,13 +102,63 @@ export default defineComponent({
         const navigationStore =
             useNavigationStore()
 
-        /* ==================== 当前用户权限 ==================== */
+        /* ==================== 当前用户操作权限 ==================== */
+
+        // 查看页面列表
+        const canViewPageList = computed(() => {
+            return authStore.hasPermission(
+                'PAGE_LIST',
+            )
+        })
+
+        // 查看页面详情
+        const canViewPageDetail = computed(() => {
+            return authStore.hasPermission(
+                'PAGE_DETAIL',
+            )
+        })
+
+        // 创建页面
+        const canCreatePage = computed(() => {
+            return authStore.hasPermission(
+                'PAGE_CREATE',
+            )
+        })
+
+        // 修改页面基础资料
+        const canUpdatePage = computed(() => {
+            return authStore.hasPermission(
+                'PAGE_UPDATE',
+            )
+        })
+
+        // 启用或停用页面
+        const canChangePageStatus = computed(() => {
+            return authStore.hasPermission(
+                'PAGE_CHANGE_STATUS',
+            )
+        })
+
+        // 配置页面可见角色
+        const canAssignPageRole = computed(() => {
+            return authStore.hasPermission(
+                'PAGE_ASSIGN_ROLE',
+            )
+        })
 
         /*
-         * 页面管理接口只允许根管理员访问。
+         * 编辑弹出层包含：
+         *
+         * 1. 页面基础资料；
+         * 2. 页面可见角色。
+         *
+         * 拥有其中任意权限即可打开。
          */
-        const canManagePages = computed(() => {
-            return Boolean(authStore.user?.is_root)
+        const canEditPage = computed(() => {
+            return (
+                canUpdatePage.value ||
+                canAssignPageRole.value
+            )
         })
 
         /* ==================== 页面与角色数据 ==================== */
@@ -120,12 +172,12 @@ export default defineComponent({
         /* ==================== 加载页面列表 ==================== */
 
         const loadPages = async () => {
-            if (!canManagePages.value) {
+            if (!canViewPageList.value) {
                 pages.value = []
+                errorMessage.value =
+                    '当前用户没有查看页面列表的权限'
 
-                throw new Error(
-                    '当前用户无权查看页面列表',
-                )
+                return
             }
 
             pages.value = await getPagesApi()
@@ -134,6 +186,19 @@ export default defineComponent({
         /* ==================== 加载角色列表 ==================== */
 
         const loadRoles = async () => {
+            /*
+             * 只有配置页面角色时才需要角色选项。
+             *
+             * 角色列表接口还需要 ROLE_LIST 权限。
+             */
+            if (
+                !canAssignPageRole.value ||
+                !authStore.hasPermission('ROLE_LIST')
+            ) {
+                roles.value = []
+                return
+            }
+
             roles.value = await getRolesApi()
         }
 
@@ -487,9 +552,9 @@ export default defineComponent({
         /* ==================== 打开创建弹出层 ==================== */
 
         const openCreateModal = () => {
-            if (!canManagePages.value) {
+            if (!canCreatePage.value) {
                 message.warning(
-                    '当前用户无权创建页面',
+                    '当前用户没有创建页面的权限',
                 )
 
                 return
@@ -504,9 +569,9 @@ export default defineComponent({
         /* ==================== 打开编辑弹出层 ==================== */
 
         const openEditModal = (page) => {
-            if (!canManagePages.value) {
+            if (!canEditPage.value) {
                 message.warning(
-                    '当前用户无权编辑页面',
+                    '当前用户没有修改页面的权限',
                 )
 
                 return
@@ -686,9 +751,16 @@ export default defineComponent({
             return true
         }
 
-        /* ==================== 生成提交数据 ==================== */
+        /* ==================== 生成页面资料数据 ==================== */
 
-        const createSubmitData = () => {
+        /*
+         * 页面资料接口只接收页面自身字段。
+         *
+         * 以下内容不能混入：
+         * visible_role_ids
+         * is_active
+         */
+        const createPageData = () => {
             return {
                 name: pageForm.name,
                 code: pageForm.code,
@@ -698,24 +770,83 @@ export default defineComponent({
                 icon: pageForm.icon,
                 parent_id:
                     pageForm.parentId,
-                visible_role_ids:
-                    pageForm.visibleRoleIds,
                 sort_order:
                     pageForm.sortOrder,
-                is_active:
-                    pageForm.isActive,
             }
         }
 
         /* ==================== 创建页面 ==================== */
 
         const createPage = async () => {
-            await createPageApi(
-                createSubmitData(),
-            )
+            /*
+             * 第一步：创建页面基础资料。
+             */
+            const createdPage =
+                await createPageApi(
+                    createPageData(),
+                )
+
+            const followUpErrors = []
+
+            /*
+             * 第二步：配置页面可见角色。
+             *
+             * 只有同时拥有 PAGE_ASSIGN_ROLE 时执行。
+             */
+            if (
+                canAssignPageRole.value &&
+                pageForm.visibleRoleIds.length > 0
+            ) {
+                try {
+                    await updatePageRolesApi(
+                        createdPage.id,
+                        pageForm.visibleRoleIds,
+                    )
+                } catch (error) {
+                    followUpErrors.push(
+                        getErrorMessage(
+                            error,
+                            '可见角色配置失败',
+                        ),
+                    )
+                }
+            }
+
+            /*
+             * 第三步：设置页面初始状态。
+             *
+             * 页面创建后默认启用。
+             * 选择停用时调用独立状态接口。
+             */
+            if (
+                canChangePageStatus.value &&
+                !pageForm.isActive
+            ) {
+                try {
+                    await updatePageStatusApi(
+                        createdPage.id,
+                        false,
+                    )
+                } catch (error) {
+                    followUpErrors.push(
+                        getErrorMessage(
+                            error,
+                            '页面状态设置失败',
+                        ),
+                    )
+                }
+            }
 
             await loadPages()
             await refreshNavigation()
+
+            if (followUpErrors.length) {
+                message.warning(
+                    `页面已创建，但${followUpErrors.join('；')}`,
+                )
+
+                return
+            }
 
             formModalVisible.value = false
 
@@ -729,13 +860,63 @@ export default defineComponent({
                 return
             }
 
-            await updatePageApi(
-                editingPage.value.id,
-                createSubmitData(),
-            )
+            const pageId =
+                editingPage.value.id
+
+            const followUpErrors = []
+
+            /*
+             * 拥有 PAGE_UPDATE 时，
+             * 才修改页面基础资料。
+             */
+            if (canUpdatePage.value) {
+                try {
+                    await updatePageApi(
+                        pageId,
+                        createPageData(),
+                    )
+                } catch (error) {
+                    followUpErrors.push(
+                        getErrorMessage(
+                            error,
+                            '页面资料修改失败',
+                        ),
+                    )
+                }
+            }
+
+            /*
+             * 拥有 PAGE_ASSIGN_ROLE 时，
+             * 使用独立接口替换页面全部可见角色。
+             *
+             * 空数组表示清空可见角色。
+             */
+            if (canAssignPageRole.value) {
+                try {
+                    await updatePageRolesApi(
+                        pageId,
+                        pageForm.visibleRoleIds,
+                    )
+                } catch (error) {
+                    followUpErrors.push(
+                        getErrorMessage(
+                            error,
+                            '页面可见角色配置失败',
+                        ),
+                    )
+                }
+            }
 
             await loadPages()
             await refreshNavigation()
+
+            if (followUpErrors.length) {
+                message.warning(
+                    followUpErrors.join('；'),
+                )
+
+                return
+            }
 
             formModalVisible.value = false
 
@@ -781,6 +962,14 @@ export default defineComponent({
         const selectedPage = ref(null)
 
         const openDetailModal = async (page) => {
+            if (!canViewPageDetail.value) {
+                message.warning(
+                    '当前用户没有查看页面详情的权限',
+                )
+
+                return
+            }
+
             if (!page || detailLoading.value) {
                 return
             }
@@ -829,9 +1018,9 @@ export default defineComponent({
         const statusTargetPage = ref(null)
 
         const openStatusModal = (page) => {
-            if (!canManagePages.value) {
+            if (!canChangePageStatus.value) {
                 message.warning(
-                    '当前用户无权修改页面状态',
+                    '当前用户没有修改页面状态的权限',
                 )
 
                 return
@@ -884,11 +1073,13 @@ export default defineComponent({
                 !target.is_active
 
             try {
-                if (shouldEnable) {
-                    await enablePageApi(target.id)
-                } else {
-                    await disablePageApi(target.id)
-                }
+                /*
+                * 新版后端统一使用页面状态接口。
+                */
+                await updatePageStatusApi(
+                    target.id,
+                    shouldEnable,
+                )
 
                 await loadPages()
                 await refreshNavigation()
@@ -917,7 +1108,15 @@ export default defineComponent({
         /* ==================== 向模板暴露内容 ==================== */
 
         return {
-            canManagePages,
+            /* ==================== 操作权限 ==================== */
+
+            canViewPageList,
+            canViewPageDetail,
+            canCreatePage,
+            canUpdatePage,
+            canChangePageStatus,
+            canAssignPageRole,
+            canEditPage,
 
             pages,
             roles,

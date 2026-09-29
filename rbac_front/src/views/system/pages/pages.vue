@@ -15,7 +15,7 @@
                 </p>
             </div>
 
-            <button v-if="canManagePages" class="primary-button" type="button" @click="openCreateModal">
+            <button v-if="canCreatePage" class="primary-button" type="button" @click="openCreateModal">
                 <i class="bi bi-plus-lg" aria-hidden="true"></i>
 
                 <span>创建页面</span>
@@ -52,7 +52,7 @@
                             'is-active':
                                 viewMode === 'list',
                         }" type="button" aria-label="列表显示" :aria-pressed="viewMode === 'list'
-                " @click="setViewMode('list')">
+                            " @click="setViewMode('list')">
                             <i class="bi bi-list-ul" aria-hidden="true"></i>
                         </button>
 
@@ -60,7 +60,7 @@
                             'is-active':
                                 viewMode === 'card',
                         }" type="button" aria-label="卡片显示" :aria-pressed="viewMode === 'card'
-                " @click="setViewMode('card')">
+                            " @click="setViewMode('card')">
                             <i class="bi bi-grid" aria-hidden="true"></i>
                         </button>
                     </div>
@@ -196,13 +196,13 @@
                             <!-- 状态 -->
                             <td>
                                 <span class="status-tag" :class="page.is_active
-                                        ? 'enabled'
-                                        : 'disabled'
+                                    ? 'enabled'
+                                    : 'disabled'
                                     ">
                                     {{
                                         page.is_active
                                             ? '已启用'
-                                    : '已停用'
+                                            : '已停用'
                                     }}
                                 </span>
                             </td>
@@ -210,29 +210,21 @@
                             <!-- 操作 -->
                             <td>
                                 <div class="action-group">
-                                    <button class="table-action" type="button" @click="
-                                        openDetailModal(page)
-                                        ">
+                                    <!-- 列表-查看 -->
+                                    <button v-if="canViewPageDetail" class="table-action" type="button"
+                                        @click="openDetailModal(page)">
                                         查看
                                     </button>
-
-                                    <button v-if="canManagePages" class="table-action" type="button" @click="
-                                        openEditModal(page)
-                                        ">
+                                    <!-- 列表-编辑 -->
+                                    <button v-if="canEditPage" class="table-action" type="button"
+                                        @click="openEditModal(page)">
                                         编辑
                                     </button>
-
-                                    <button v-if="canManagePages" class="table-action" :class="page.is_active
-                                            ? 'disable'
-                                            : 'enable'
-                                        " type="button" @click="
-                        openStatusModal(page)
-                        ">
-                                        {{
-                                            page.is_active
-                                                ? '停用'
-                                        : '启用'
-                                        }}
+                                    <!-- 列表-状态 -->
+                                    <button v-if="canChangePageStatus" class="table-action"
+                                        :class="page.is_active ? 'disable' : 'enable'" type="button"
+                                        @click="openStatusModal(page)">
+                                        {{ page.is_active ? '停用' : '启用' }}
                                     </button>
                                 </div>
                             </td>
@@ -259,13 +251,13 @@
                         </div>
 
                         <span class="status-tag" :class="page.is_active
-                                ? 'enabled'
-                                : 'disabled'
+                            ? 'enabled'
+                            : 'disabled'
                             ">
                             {{
                                 page.is_active
                                     ? '已启用'
-                            : '已停用'
+                                    : '已停用'
                             }}
                         </span>
                     </header>
@@ -299,27 +291,20 @@
 
                     <!-- 卡片操作 -->
                     <footer class="page-card-footer">
-                        <button class="card-action" type="button" @click="
-                            openDetailModal(page)
-                            ">
+                        <!-- 卡片-查看 -->
+                        <button v-if="canViewPageDetail" class="card-action" type="button"
+                            @click="openDetailModal(page)">
                             查看
                         </button>
-
-                        <button v-if="canManagePages" class="card-action" type="button" @click="openEditModal(page)">
+                        <!-- 卡片-编辑 -->
+                        <button v-if="canEditPage" class="card-action" type="button" @click="openEditModal(page)">
                             编辑
                         </button>
-
-                        <button v-if="canManagePages" class="card-action" :class="{
-                            disable: page.is_active,
-                            enable: !page.is_active,
-                        }" type="button" @click="
-                openStatusModal(page)
-                ">
-                            {{
-                                page.is_active
-                                    ? '停用'
-                            : '启用'
-                            }}
+                        <!-- 卡片-状态 -->
+                        <button v-if="canChangePageStatus" class="card-action"
+                            :class="{ disable: page.is_active, enable: !page.is_active, }" type="button"
+                            @click="openStatusModal(page)">
+                            {{ page.is_active ? '停用' : '启用' }}
                         </button>
                     </footer>
                 </article>
@@ -333,7 +318,7 @@
             <form id="page-form" class="page-form" novalidate @submit.prevent="submitPageForm">
                 <div class="form-grid">
                     <!-- 页面名称 -->
-                    <label class="form-field">
+                    <label v-if="isCreateMode || canUpdatePage" class="form-field">
                         <span class="field-label">
                             页面名称
                             <i aria-hidden="true">*</i>
@@ -344,7 +329,7 @@
                     </label>
 
                     <!-- 页面编码 -->
-                    <label class="form-field">
+                    <label v-if="isCreateMode || canUpdatePage" class="form-field">
                         <span class="field-label">
                             页面编码
                             <i aria-hidden="true">*</i>
@@ -359,7 +344,7 @@
                     </label>
 
                     <!-- 页面路由 -->
-                    <label class="form-field">
+                    <label v-if="isCreateMode || canUpdatePage" class="form-field">
                         <span class="field-label">
                             页面路由
                             <i aria-hidden="true">*</i>
@@ -374,7 +359,7 @@
                     </label>
 
                     <!-- 前端组件 -->
-                    <label class="form-field">
+                    <label v-if="isCreateMode || canUpdatePage" class="form-field">
                         <span class="field-label">
                             前端组件
                         </span>
@@ -388,7 +373,7 @@
                     </label>
 
                     <!-- 页面图标 -->
-                    <label class="form-field">
+                    <label v-if="isCreateMode || canUpdatePage" class="form-field">
                         <span class="field-label">
                             页面图标
                         </span>
@@ -402,7 +387,7 @@
                     </label>
 
                     <!-- 父页面 -->
-                    <label class="form-field">
+                    <label v-if="isCreateMode || canUpdatePage" class="form-field">
                         <span class="field-label">
                             父页面
                         </span>
@@ -416,7 +401,7 @@
                     </label>
 
                     <!-- 页面排序 -->
-                    <label class="form-field">
+                    <label v-if="isCreateMode || canUpdatePage" class="form-field">
                         <span class="field-label">
                             页面排序
                         </span>
@@ -430,22 +415,26 @@
                     </label>
 
                     <!-- 页面状态 -->
-                    <label class="form-field">
+                    <!--
+                    只有创建页面时可以设置初始状态。
+                    编辑页面状态使用独立的状态按钮。
+                    -->
+                    <label v-if="isCreateMode && canChangePageStatus" class="form-field">
                         <span class="field-label">
                             页面状态
                         </span>
-
                         <AppSelect v-model="pageForm.isActive" :options="pageStatusOptions" placeholder="请选择页面状态" />
                     </label>
 
                     <!-- 可见角色 -->
-                    <label class="form-field full">
+                    <!-- 拥有页面角色分配权限时显示 -->
+                    <label v-if="canAssignPageRole" class="form-field full">
                         <span class="field-label">
                             可见角色
                         </span>
 
-                        <AppSelect v-model="pageForm.visibleRoleIds
-                            " :options="roleOptions" placeholder="请选择可以访问该页面的角色" multiple filterable clearable />
+                        <AppSelect v-model="pageForm.visibleRoleIds" :options="roleOptions" placeholder="请选择可以访问该页面的角色"
+                            multiple filterable clearable />
 
                         <small class="field-help">
                             根管理员不受角色分配限制；普通用户必须拥有这里配置的角色。
@@ -470,7 +459,7 @@
                             ? '正在保存...'
                             : isCreateMode
                                 ? '创建页面'
-                    : '保存修改'
+                                : '保存修改'
                     }}
                 </button>
             </template>
@@ -481,7 +470,7 @@
         <AppModal v-model="detailModalVisible" scope-class="pages-modal-scope" title="页面信息" :width="680"
             :closable="!detailLoading" :close-on-overlay="!detailLoading
                 " :close-on-escape="!detailLoading
-        ">
+                    ">
             <div v-if="detailLoading" class="detail-loading">
                 <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
 
@@ -502,13 +491,13 @@
                     </div>
 
                     <span class="status-tag" :class="selectedPage.is_active
-                            ? 'enabled'
-                            : 'disabled'
+                        ? 'enabled'
+                        : 'disabled'
                         ">
                         {{
                             selectedPage.is_active
                                 ? '已启用'
-                        : '已停用'
+                                : '已停用'
                         }}
                     </span>
                 </header>
@@ -535,7 +524,7 @@
                         <dd>
                             {{
                                 selectedPage.component ||
-                            '未配置'
+                                '未配置'
                             }}
                         </dd>
                     </div>
@@ -575,7 +564,7 @@
                             {{
                                 selectedPage.is_active
                                     ? '已启用'
-                            : '已停用'
+                                    : '已停用'
                             }}
                         </dd>
                     </div>
@@ -587,7 +576,7 @@
                             {{
                                 getVisibleRoleNames(
                                     selectedPage,
-                            )
+                                )
                             }}
                         </dd>
                     </div>
@@ -598,7 +587,7 @@
                             {{
                                 formatTime(
                                     selectedPage.create_time,
-                            )
+                                )
                             }}
                         </dd>
                     </div>
@@ -609,7 +598,7 @@
                             {{
                                 formatTime(
                                     selectedPage.update_time,
-                            )
+                                )
                             }}
                         </dd>
                     </div>
@@ -621,7 +610,7 @@
                     关闭
                 </button>
 
-                <button v-if="canManagePages" class="primary-button" type="button" :disabled="detailLoading ||
+                <button v-if="canEditPage" class="primary-button" type="button" :disabled="detailLoading ||
                     !selectedPage
                     " @click="editSelectedPage">
                     <i class="bi bi-pencil" aria-hidden="true"></i>
@@ -641,8 +630,8 @@
                         !statusTargetPage.is_active,
                 }" aria-hidden="true">
                     <i class="bi" :class="statusTargetPage.is_active
-                            ? 'bi-window-x'
-                            : 'bi-window-check'
+                        ? 'bi-window-x'
+                        : 'bi-window-check'
                         "></i>
                 </div>
 
