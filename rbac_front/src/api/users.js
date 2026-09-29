@@ -1,13 +1,14 @@
 /* ==================== 公共请求工具 ==================== */
+
 import request from '@/utils/request'
 
 /* ==================== 获取用户列表 ==================== */
 
 /*
- * 根管理员获取系统中的全部用户。
+ * 获取系统中的用户列表。
  *
- * 当前后端没有分页、搜索和筛选参数，
- * 搜索与筛选由前端完成。
+ * 所需操作权限：
+ * USER_LIST
  */
 export const getUsersApi = () => {
   return request({
@@ -19,22 +20,25 @@ export const getUsersApi = () => {
 /* ==================== 创建用户 ==================== */
 
 /*
- * 创建新用户。
+ * 通过用户管理接口创建普通用户。
  *
- * data 包含：
- * username
- * email
- * password
- * password_confirm
+ * 所需操作权限：
+ * USER_CREATE
  *
- * 创建成功后返回：
- * id
- * username
- * email
+ * 注意：
+ * 管理员创建用户不能继续使用公开注册接口。
+ *
+ * data 示例：
+ * {
+ *   username: 'example',
+ *   email: 'example@test.com',
+ *   password: 'password',
+ *   password_confirm: 'password',
+ * }
  */
 export const createUserApi = (data) => {
   return request({
-    url: '/auth/register/',
+    url: '/users/',
     method: 'post',
     data,
   })
@@ -43,9 +47,14 @@ export const createUserApi = (data) => {
 /* ==================== 获取用户详情 ==================== */
 
 /*
- * 根管理员根据用户 ID 获取完整用户信息。
+ * 获取指定用户的完整资料。
+ *
+ * 所需操作权限：
+ * USER_DETAIL
  */
-export const getUserDetailApi = (userId) => {
+export const getUserDetailApi = (
+  userId,
+) => {
   return request({
     url: `/users/${userId}/`,
     method: 'get',
@@ -55,14 +64,16 @@ export const getUserDetailApi = (userId) => {
 /* ==================== 修改用户资料 ==================== */
 
 /*
- * 根管理员修改指定用户的基础资料。
+ * 修改指定用户的基础资料。
  *
- * 当前后端允许修改：
+ * 所需操作权限：
+ * USER_UPDATE
+ *
+ * 当前接口只负责：
  * username
  * email
- * is_active
  *
- * 角色和密码不能通过这个接口修改。
+ * 不通过该接口修改状态、角色和密码。
  */
 export const updateUserApi = (
   userId,
@@ -78,33 +89,34 @@ export const updateUserApi = (
 /* ==================== 修改用户状态 ==================== */
 
 /*
- * 启用或禁用指定用户。
+ * 启用或停用指定用户。
  *
- * enabled 为 true：启用账号。
- * enabled 为 false：禁用账号。
+ * 所需操作权限：
+ * USER_CHANGE_STATUS
  */
 export const updateUserStatusApi = (
   userId,
-  enabled,
+  isActive,
 ) => {
   return request({
-    url: `/users/${userId}/`,
+    url: `/users/${userId}/status/`,
     method: 'patch',
     data: {
-      is_active: enabled,
+      is_active: isActive,
     },
   })
 }
 
-/* ==================== 分配或取消用户角色 ==================== */
+/* ==================== 分配用户角色 ==================== */
 
 /*
- * 为指定用户分配角色。
+ * 为指定用户分配或取消角色。
  *
- * roleId 传入角色 ID：分配角色。
- * roleId 传入 null：取消当前角色。
+ * 所需操作权限：
+ * USER_ASSIGN_ROLE
  *
- * 后端只允许分配当前处于启用状态的角色。
+ * roleId 为角色 ID：分配角色。
+ * roleId 为 null：取消当前角色。
  */
 export const assignUserRoleApi = (
   userId,
@@ -116,5 +128,26 @@ export const assignUserRoleApi = (
     data: {
       role_id: roleId,
     },
+  })
+}
+
+/* ==================== 重置用户密码 ==================== */
+
+/*
+ * 管理员重置指定普通用户的密码。
+ *
+ * 所需操作权限：
+ * USER_RESET_PASSWORD
+ *
+ * data 的具体密码字段沿用后端接口定义。
+ */
+export const resetUserPasswordApi = (
+  userId,
+  data,
+) => {
+  return request({
+    url: `/users/${userId}/password/`,
+    method: 'patch',
+    data,
   })
 }

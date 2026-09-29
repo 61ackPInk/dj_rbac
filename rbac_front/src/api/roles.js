@@ -1,4 +1,4 @@
-/* ==================== 请求工具 ==================== */
+/* ==================== 公共请求工具 ==================== */
 
 import request from '@/utils/request'
 
@@ -7,12 +7,8 @@ import request from '@/utils/request'
 /*
  * 获取系统中的全部角色。
  *
- * 权限：
- * 所有已登录用户都可以访问。
- *
- * 返回顺序由后端 Role 模型控制：
- * 先按照 rank 从高到低，
- * 权重相同时按照 id 从小到大。
+ * 所需操作权限：
+ * ROLE_LIST
  */
 export const getRolesApi = () => {
   return request({
@@ -24,19 +20,10 @@ export const getRolesApi = () => {
 /* ==================== 创建角色 ==================== */
 
 /*
- * 创建一个新角色。
+ * 创建角色。
  *
- * 权限：
- * 只有根管理员可以访问。
- *
- * data 格式：
- * {
- *   name: '系统管理员',
- *   code: 'SYSTEM_ADMIN',
- *   rank: 100,
- *   description: '负责系统基础管理',
- *   is_active: true,
- * }
+ * 所需操作权限：
+ * ROLE_CREATE
  */
 export const createRoleApi = (data) => {
   return request({
@@ -49,28 +36,30 @@ export const createRoleApi = (data) => {
 /* ==================== 获取角色详情 ==================== */
 
 /*
- * 根据角色 ID 获取完整角色信息。
+ * 获取指定角色的完整资料。
  *
- * 权限：
- * 所有已登录用户都可以访问。
+ * 所需操作权限：
+ * ROLE_DETAIL
  */
-export const getRoleDetailApi = (roleId) => {
+export const getRoleDetailApi = (
+  roleId,
+) => {
   return request({
     url: `/roles/${roleId}/`,
     method: 'get',
   })
 }
 
-/* ==================== 修改角色 ==================== */
+/* ==================== 修改角色资料 ==================== */
 
 /*
- * 局部修改指定角色。
+ * 修改角色名称、编码、权重和描述。
  *
- * 权限：
- * 只有根管理员可以访问。
+ * 所需操作权限：
+ * ROLE_UPDATE
  *
- * 使用 PATCH，前端只需要提交发生修改的字段，
- * 不要求每次都提交全部角色数据。
+ * 注意：
+ * 不能通过这个接口修改 is_active。
  */
 export const updateRoleApi = (
   roleId,
@@ -83,36 +72,91 @@ export const updateRoleApi = (
   })
 }
 
+/* ==================== 修改角色状态 ==================== */
+
+/*
+ * 启用或停用指定角色。
+ *
+ * 所需操作权限：
+ * ROLE_CHANGE_STATUS
+ */
+export const updateRoleStatusApi = (
+  roleId,
+  isActive,
+) => {
+  return request({
+    url: `/roles/${roleId}/status/`,
+    method: 'patch',
+    data: {
+      is_active: isActive,
+    },
+  })
+}
+
 /* ==================== 停用角色 ==================== */
 
 /*
- * 停用指定角色。
+ * 保留当前页面正在使用的函数名称，
+ * 避免业务页面在本步骤立即报错。
  *
- * 后端虽然使用 DELETE 请求，
- * 但不会真正删除数据库记录，
- * 只会把 is_active 修改为 false。
+ * 后续角色页面改造完成后，
+ * 可以直接统一使用 updateRoleStatusApi。
  */
-export const disableRoleApi = (roleId) => {
-  return request({
-    url: `/roles/${roleId}/`,
-    method: 'delete',
-  })
+export const disableRoleApi = (
+  roleId,
+) => {
+  return updateRoleStatusApi(
+    roleId,
+    false,
+  )
 }
 
 /* ==================== 启用角色 ==================== */
 
+export const enableRoleApi = (
+  roleId,
+) => {
+  return updateRoleStatusApi(
+    roleId,
+    true,
+  )
+}
+
+/* ==================== 获取角色操作权限 ==================== */
+
 /*
- * 重新启用已经停用的角色。
+ * 获取指定角色当前拥有的操作权限。
  *
- * 后端没有单独的“启用角色”接口，
- * 因此使用角色修改接口更新 is_active。
+ * 只有根管理员可以访问。
  */
-export const enableRoleApi = (roleId) => {
+export const getRolePermissionsApi = (
+  roleId,
+) => {
   return request({
-    url: `/roles/${roleId}/`,
+    url: `/roles/${roleId}/permissions/`,
+    method: 'get',
+  })
+}
+
+/* ==================== 配置角色操作权限 ==================== */
+
+/*
+ * 替换指定角色的全部操作权限。
+ *
+ * 只有根管理员可以访问。
+ *
+ * permissionIds 示例：
+ * [1, 2, 3]
+ */
+export const updateRolePermissionsApi = (
+  roleId,
+  permissionIds,
+) => {
+  return request({
+    url: `/roles/${roleId}/permissions/`,
     method: 'patch',
     data: {
-      is_active: true,
+      permission_ids: permissionIds,
     },
   })
 }

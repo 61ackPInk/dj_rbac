@@ -1,11 +1,14 @@
-/* ==================== 请求工具 ==================== */
+/* ==================== 公共请求工具 ==================== */
 
 import request from '@/utils/request'
 
 /* ==================== 获取当前用户可见页面 ==================== */
 
 /*
- * 登录后加载顶部导航和侧边栏时使用。
+ * 获取当前用户能够访问的页面。
+ *
+ * 用于：
+ * 顶部导航、侧边栏和路由权限判断。
  */
 export const getVisiblePagesApi = () => {
   return request({
@@ -17,10 +20,10 @@ export const getVisiblePagesApi = () => {
 /* ==================== 获取全部页面 ==================== */
 
 /*
- * 页面管理列表使用。
+ * 获取页面管理列表。
  *
- * 返回启用和停用的全部页面，
- * 只有根管理员可以访问。
+ * 所需操作权限：
+ * PAGE_LIST
  */
 export const getPagesApi = () => {
   return request({
@@ -32,17 +35,14 @@ export const getPagesApi = () => {
 /* ==================== 创建页面 ==================== */
 
 /*
- * data 可包含：
+ * 创建页面基础资料。
  *
- * name
- * code
- * path
- * component
- * icon
- * parent_id
- * visible_role_ids
- * sort_order
- * is_active
+ * 所需操作权限：
+ * PAGE_CREATE
+ *
+ * 注意：
+ * 不能再提交 visible_role_ids。
+ * 页面角色需要创建成功后单独配置。
  */
 export const createPageApi = (data) => {
   return request({
@@ -54,18 +54,32 @@ export const createPageApi = (data) => {
 
 /* ==================== 获取页面详情 ==================== */
 
-export const getPageDetailApi = (pageId) => {
+/*
+ * 获取指定页面的完整资料。
+ *
+ * 所需操作权限：
+ * PAGE_DETAIL
+ */
+export const getPageDetailApi = (
+  pageId,
+) => {
   return request({
     url: `/pages/${pageId}/`,
     method: 'get',
   })
 }
 
-/* ==================== 修改页面 ==================== */
+/* ==================== 修改页面资料 ==================== */
 
 /*
- * 使用 PATCH 局部修改页面，
- * 同时支持修改父页面和可见角色。
+ * 修改页面基础资料。
+ *
+ * 所需操作权限：
+ * PAGE_UPDATE
+ *
+ * 不能通过这个接口修改：
+ * is_active
+ * visible_role_ids
  */
 export const updatePageApi = (
   pageId,
@@ -78,31 +92,90 @@ export const updatePageApi = (
   })
 }
 
+/* ==================== 修改页面状态 ==================== */
+
+/*
+ * 启用或停用指定页面。
+ *
+ * 所需操作权限：
+ * PAGE_CHANGE_STATUS
+ */
+export const updatePageStatusApi = (
+  pageId,
+  isActive,
+) => {
+  return request({
+    url: `/pages/${pageId}/status/`,
+    method: 'patch',
+    data: {
+      is_active: isActive,
+    },
+  })
+}
+
 /* ==================== 停用页面 ==================== */
 
 /*
- * 后端不会真正删除页面，
- * 只会将 is_active 修改为 false。
+ * 暂时保留旧业务页面使用的函数名称，
+ * 内部改为调用新版状态接口。
  */
-export const disablePageApi = (pageId) => {
-  return request({
-    url: `/pages/${pageId}/`,
-    method: 'delete',
-  })
+export const disablePageApi = (
+  pageId,
+) => {
+  return updatePageStatusApi(
+    pageId,
+    false,
+  )
 }
 
 /* ==================== 启用页面 ==================== */
 
+export const enablePageApi = (
+  pageId,
+) => {
+  return updatePageStatusApi(
+    pageId,
+    true,
+  )
+}
+
+/* ==================== 查询页面可见角色 ==================== */
+
 /*
- * 后端没有独立的启用接口，
- * 使用 PATCH 恢复页面状态。
+ * 查询指定页面已经分配的角色。
+ *
+ * 所需操作权限：
+ * PAGE_DETAIL
  */
-export const enablePageApi = (pageId) => {
+export const getPageRolesApi = (
+  pageId,
+) => {
   return request({
-    url: `/pages/${pageId}/`,
+    url: `/pages/${pageId}/roles/`,
+    method: 'get',
+  })
+}
+
+/* ==================== 配置页面可见角色 ==================== */
+
+/*
+ * 替换指定页面的全部可见角色。
+ *
+ * 所需操作权限：
+ * PAGE_ASSIGN_ROLE
+ *
+ * roleIds 传入空数组时，
+ * 表示清除该页面的全部可见角色。
+ */
+export const updatePageRolesApi = (
+  pageId,
+  roleIds,
+) => {
+  return request({
+    url: `/pages/${pageId}/roles/`,
     method: 'patch',
     data: {
-      is_active: true,
+      role_ids: roleIds,
     },
   })
 }
