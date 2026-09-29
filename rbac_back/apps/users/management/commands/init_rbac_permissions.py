@@ -4,6 +4,8 @@
 @Author: 61ackPink
 @Time : 2026/9/29 11:05
 @Desc : 初始化 RBAC 系统操作权限
+
+python.exe manage.py init_rbac_permissions
 """
 from django.core.management.base import (
     BaseCommand,
