@@ -17,11 +17,10 @@ import AppSelect from '@/components/form/select/app-select.vue'
 
 import {
   createRoleApi,
-  disableRoleApi,
-  enableRoleApi,
   getRoleDetailApi,
   getRolesApi,
   updateRoleApi,
+  updateRoleStatusApi,
 } from '@/api/roles'
 
 /* ==================== 状态与消息 ==================== */
@@ -90,16 +89,48 @@ export default defineComponent({
   setup() {
     const authStore = useAuthStore()
 
-    /* ==================== 当前用户权限 ==================== */
+    /* ==================== 当前用户操作权限 ==================== */
 
     /*
-     * 所有登录用户都能查看角色。
+     * 角色管理中的每项操作使用独立权限。
      *
-     * 创建、编辑、启用和停用角色，
-     * 只有根管理员可以操作。
+     * 根管理员会在 Auth Store 中自动放行，
+     * 因此这里不需要重复判断 is_root。
      */
-    const canManageRoles = computed(() => {
-      return Boolean(authStore.user?.is_root)
+
+    // 查看角色列表
+    const canViewRoleList = computed(() => {
+      return authStore.hasPermission(
+        'ROLE_LIST',
+      )
+    })
+
+    // 查看角色详情
+    const canViewRoleDetail = computed(() => {
+      return authStore.hasPermission(
+        'ROLE_DETAIL',
+      )
+    })
+
+    // 创建角色
+    const canCreateRole = computed(() => {
+      return authStore.hasPermission(
+        'ROLE_CREATE',
+      )
+    })
+
+    // 修改角色资料
+    const canUpdateRole = computed(() => {
+      return authStore.hasPermission(
+        'ROLE_UPDATE',
+      )
+    })
+
+    // 启用或停用角色
+    const canChangeRoleStatus = computed(() => {
+      return authStore.hasPermission(
+        'ROLE_CHANGE_STATUS',
+      )
     })
 
     /* ==================== 角色数据 ==================== */
@@ -112,11 +143,26 @@ export default defineComponent({
 
     const loadRoles = async () => {
       errorMessage.value = ''
+
+      /*
+       * 没有角色列表权限时，
+       * 不发送必然返回403的请求。
+       */
+      if (!canViewRoleList.value) {
+        roles.value = []
+        errorMessage.value =
+          '当前用户没有查看角色列表的权限'
+
+        return
+      }
+
       loading.value = true
 
       try {
         roles.value = await getRolesApi()
       } catch (error) {
+        roles.value = []
+
         errorMessage.value =
           error.userMessage ||
           '角色列表加载失败'
@@ -124,6 +170,12 @@ export default defineComponent({
         loading.value = false
       }
     }
+
+    /* ==================== 页面初始化 ==================== */
+
+    onMounted(() => {
+      loadRoles()
+    })
 
     onMounted(loadRoles)
 
@@ -342,9 +394,9 @@ export default defineComponent({
     /* ==================== 打开创建弹出层 ==================== */
 
     const openCreateModal = () => {
-      if (!canManageRoles.value) {
+      if (!canCreateRole.value) {
         message.warning(
-          '当前用户无权创建角色',
+          '当前用户没有创建角色的权限',
         )
 
         return
@@ -359,9 +411,9 @@ export default defineComponent({
     /* ==================== 打开编辑弹出层 ==================== */
 
     const openEditModal = (role) => {
-      if (!canManageRoles.value) {
+      if (!canUpdateRole.value) {
         message.warning(
-          '当前用户无权编辑角色',
+          '当前用户没有修改角色的权限',
         )
 
         return
@@ -525,6 +577,13 @@ export default defineComponent({
         return
       }
 
+      /*
+      * 角色资料接口不能修改状态。
+      *
+      * 状态必须通过：
+      * PATCH /roles/{id}/status/
+      * 单独修改。
+      */
       await updateRoleApi(
         editingRole.value.id,
         {
@@ -533,8 +592,6 @@ export default defineComponent({
           rank: roleForm.rank,
           description:
             roleForm.description,
-          is_active:
-            roleForm.isActive,
         },
       )
 
@@ -584,6 +641,14 @@ export default defineComponent({
     const selectedRole = ref(null)
 
     const openDetailModal = async (role) => {
+      if (!canViewRoleDetail.value) {
+        message.warning(
+          '当前用户没有查看角色详情的权限',
+        )
+
+        return
+      }
+
       if (!role || detailLoading.value) {
         return
       }
@@ -635,9 +700,9 @@ export default defineComponent({
     const statusTargetRole = ref(null)
 
     const openStatusModal = (role) => {
-      if (!canManageRoles.value) {
+      if (!canChangeRoleStatus.value) {
         message.warning(
-          '当前用户无权修改角色状态',
+          '当前用户没有修改角色状态的权限',
         )
 
         return
@@ -690,11 +755,18 @@ export default defineComponent({
         !target.is_active
 
       try {
-        if (shouldEnable) {
-          await enableRoleApi(target.id)
-        } else {
-          await disableRoleApi(target.id)
-        }
+        /*
+         * 新版后端使用统一状态接口：
+         *
+         * PATCH /roles/{id}/status/
+         * {
+         *   is_active: true 或 false
+         * }
+         */
+        await updateRoleStatusApi(
+          target.id,
+          shouldEnable,
+        )
 
         await loadRoles()
 
@@ -722,7 +794,13 @@ export default defineComponent({
     /* ==================== 向模板暴露内容 ==================== */
 
     return {
-      canManageRoles,
+      /* ==================== 操作权限 ==================== */
+
+      canViewRoleList,
+      canViewRoleDetail,
+      canCreateRole,
+      canUpdateRole,
+      canChangeRoleStatus,
 
       roles,
       loading,

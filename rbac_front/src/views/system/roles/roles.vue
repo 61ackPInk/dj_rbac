@@ -15,10 +15,10 @@
                 </p>
             </div>
 
-            <!-- 只有根管理员可以创建角色 -->
-            <button v-if="canManageRoles" class="primary-button" type="button" @click="openCreateModal">
+            <!-- 根管理员可以创建角色 -->
+            <!-- 拥有创建角色权限时显示 -->
+            <button v-if="canCreateRole" class="primary-button" type="button" @click="openCreateModal">
                 <i class="bi bi-plus-lg" aria-hidden="true"></i>
-
                 <span>创建角色</span>
             </button>
         </header>
@@ -57,7 +57,7 @@
                             'is-active':
                                 viewMode === 'list',
                         }" type="button" aria-label="列表显示" :aria-pressed="viewMode === 'list'
-                " @click="setViewMode('list')">
+                            " @click="setViewMode('list')">
                             <i class="bi bi-list-ul" aria-hidden="true"></i>
                         </button>
 
@@ -65,7 +65,7 @@
                             'is-active':
                                 viewMode === 'card',
                         }" type="button" aria-label="卡片显示" :aria-pressed="viewMode === 'card'
-                " @click="setViewMode('card')">
+                            " @click="setViewMode('card')">
                             <i class="bi bi-grid" aria-hidden="true"></i>
                         </button>
                     </div>
@@ -182,24 +182,14 @@
                             <!-- 角色描述 -->
                             <td>
                                 <span class="description-text">
-                                    {{
-                                        role.description ||
-                                    '暂无描述'
-                                    }}
+                                    {{ role.description || '暂无描述' }}
                                 </span>
                             </td>
 
                             <!-- 角色状态 -->
                             <td>
-                                <span class="status-tag" :class="role.is_active
-                                        ? 'enabled'
-                                        : 'disabled'
-                                    ">
-                                    {{
-                                        role.is_active
-                                            ? '已启用'
-                                    : '已停用'
-                                    }}
+                                <span class="status-tag" :class="role.is_active ? 'enabled' : 'disabled'">
+                                    {{ role.is_active ? '已启用' : '已停用' }}
                                 </span>
                             </td>
 
@@ -211,29 +201,21 @@
                             <!-- 角色操作 -->
                             <td>
                                 <div class="action-group">
-                                    <button class="table-action" type="button" @click="
-                                        openDetailModal(role)
-                                        ">
+                                    <!-- 列表-查看角色详情 -->
+                                    <button v-if="canViewRoleDetail" class="table-action" type="button"
+                                        @click="openDetailModal(role)">
                                         查看
                                     </button>
-
-                                    <button v-if="canManageRoles" class="table-action" type="button" @click="
-                                        openEditModal(role)
-                                        ">
+                                    <!-- 列表-修改角色资料 -->
+                                    <button v-if="canUpdateRole" class="table-action" type="button"
+                                        @click="openEditModal(role)">
                                         编辑
                                     </button>
-
-                                    <button v-if="canManageRoles" class="table-action" :class="role.is_active
-                                            ? 'disable'
-                                            : 'enable'
-                                        " type="button" @click="
-                        openStatusModal(role)
-                        ">
-                                        {{
-                                            role.is_active
-                                                ? '停用'
-                                        : '启用'
-                                        }}
+                                    <!-- 列表-角色状态 -->
+                                    <button v-if="canChangeRoleStatus" class="table-action"
+                                        :class="role.is_active ? 'disable' : 'enable'" type="button"
+                                        @click="openStatusModal(role)">
+                                        {{ role.is_active ? '停用' : '启用' }}
                                     </button>
                                 </div>
                             </td>
@@ -259,15 +241,8 @@
                             </div>
                         </div>
 
-                        <span class="status-tag" :class="role.is_active
-                                ? 'enabled'
-                                : 'disabled'
-                            ">
-                            {{
-                                role.is_active
-                                    ? '已启用'
-                            : '已停用'
-                            }}
+                        <span class="status-tag" :class="role.is_active ? 'enabled' : 'disabled'">
+                            {{ role.is_active ? '已启用' : '已停用' }}
                         </span>
                     </header>
 
@@ -290,51 +265,35 @@
                         <div class="card-info-row">
                             <dt>角色描述</dt>
 
-                            <dd class="card-description" :title="role.description ||
-                                '暂无描述'
-                                ">
-                                {{
-                                    role.description ||
-                                '暂无描述'
-                                }}
+                            <dd class="card-description" :title="role.description || '暂无描述'">
+                                {{ role.description || '暂无描述' }}
                             </dd>
                         </div>
 
                         <div class="card-info-row">
                             <dt>更新时间</dt>
                             <dd>
-                                {{
-                                    formatTime(
-                                        role.update_time,
-                                )
-                                }}
+                                {{ formatTime(role.update_time,) }}
                             </dd>
                         </div>
                     </dl>
 
                     <!-- 卡片操作 -->
                     <footer class="role-card-footer">
-                        <button class="card-action" type="button" @click="
-                            openDetailModal(role)
-                            ">
+                        <!-- 卡片-查看角色详情 -->
+                        <button v-if="canViewRoleDetail" class="card-action" type="button"
+                            @click="openDetailModal(role)">
                             查看
                         </button>
-
-                        <button v-if="canManageRoles" class="card-action" type="button" @click="openEditModal(role)">
+                        <!-- 卡片-修改角色资料 -->
+                        <button v-if="canUpdateRole" class="card-action" type="button" @click="openEditModal(role)">
                             编辑
                         </button>
-
-                        <button v-if="canManageRoles" class="card-action" :class="{
-                            disable: role.is_active,
-                            enable: !role.is_active,
-                        }" type="button" @click="
-                openStatusModal(role)
-                ">
-                            {{
-                                role.is_active
-                                    ? '停用'
-                            : '启用'
-                            }}
+                        <!-- 卡片-角色状态 -->
+                        <button v-if="canChangeRoleStatus" class="card-action"
+                            :class="{ disable: role.is_active, enable: !role.is_active, }" type="button"
+                            @click="openStatusModal(role)">
+                            {{ role.is_active ? '停用' : '启用' }}
                         </button>
                     </footer>
                 </article>
@@ -343,8 +302,8 @@
 
         <!-- ==================== 创建与编辑角色弹出层 ==================== -->
 
-        <AppModal v-model="formModalVisible" scope-class="roles-modal-scope" :title="formModalTitle" :width="640" :closable="!submitting"
-            :close-on-overlay="!submitting" :close-on-escape="!submitting">
+        <AppModal v-model="formModalVisible" scope-class="roles-modal-scope" :title="formModalTitle" :width="640"
+            :closable="!submitting" :close-on-overlay="!submitting" :close-on-escape="!submitting">
             <form id="role-form" class="role-form" novalidate @submit.prevent="submitRoleForm">
                 <div class="form-grid">
                     <!-- 角色名称 -->
@@ -389,11 +348,15 @@
                     </label>
 
                     <!-- 角色状态 -->
-                    <label class="form-field">
+                    <!--
+                    创建角色时可以设置初始状态。
+                    编辑角色资料时不显示该字段，
+                    状态修改使用独立的启用/停用操作。
+                    -->
+                    <label v-if="isCreateMode" class="form-field">
                         <span class="field-label">
                             角色状态
                         </span>
-
                         <AppSelect v-model="roleForm.isActive" :options="roleStatusOptions" placeholder="请选择角色状态" />
                     </label>
 
@@ -431,7 +394,7 @@
                             ? '正在保存...'
                             : isCreateMode
                                 ? '创建角色'
-                    : '保存修改'
+                                : '保存修改'
                     }}
                 </button>
             </template>
@@ -439,9 +402,10 @@
 
         <!-- ==================== 角色详情弹出层 ==================== -->
 
-        <AppModal v-model="detailModalVisible" scope-class="roles-modal-scope" title="角色信息" :width="620" :closable="!detailLoading" :close-on-overlay="!detailLoading
-            " :close-on-escape="!detailLoading
-        ">
+        <AppModal v-model="detailModalVisible" scope-class="roles-modal-scope" title="角色信息" :width="620"
+            :closable="!detailLoading" :close-on-overlay="!detailLoading
+                " :close-on-escape="!detailLoading
+                    ">
             <!-- 详情加载状态 -->
             <div v-if="detailLoading" class="detail-loading">
                 <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
@@ -461,15 +425,8 @@
                         <p>{{ selectedRole.code }}</p>
                     </div>
 
-                    <span class="status-tag" :class="selectedRole.is_active
-                            ? 'enabled'
-                            : 'disabled'
-                        ">
-                        {{
-                            selectedRole.is_active
-                                ? '已启用'
-                        : '已停用'
-                        }}
+                    <span class="status-tag" :class="selectedRole.is_active ? 'enabled' : 'disabled'">
+                        {{ selectedRole.is_active ? '已启用' : '已停用' }}
                     </span>
                 </header>
 
@@ -492,43 +449,28 @@
                     <div>
                         <dt>角色状态</dt>
                         <dd>
-                            {{
-                                selectedRole.is_active
-                                    ? '已启用'
-                            : '已停用'
-                            }}
+                            {{ selectedRole.is_active ? '已启用' : '已停用' }}
                         </dd>
                     </div>
 
                     <div class="full">
                         <dt>角色描述</dt>
                         <dd>
-                            {{
-                                selectedRole.description ||
-                            '暂无描述'
-                            }}
+                            {{ selectedRole.description || '暂无描述' }}
                         </dd>
                     </div>
 
                     <div>
                         <dt>创建时间</dt>
                         <dd>
-                            {{
-                                formatTime(
-                                    selectedRole.create_time,
-                            )
-                            }}
+                            {{ formatTime(selectedRole.create_time,) }}
                         </dd>
                     </div>
 
                     <div>
                         <dt>更新时间</dt>
                         <dd>
-                            {{
-                                formatTime(
-                                    selectedRole.update_time,
-                            )
-                            }}
+                            {{ formatTime(selectedRole.update_time,) }}
                         </dd>
                     </div>
                 </dl>
@@ -539,11 +481,8 @@
                     关闭
                 </button>
 
-                <button v-if="canManageRoles" class="primary-button" type="button" :disabled="detailLoading ||
-                    !selectedRole
-                    " @click="editSelectedRole">
+                <button v-if="canUpdateRole" class="primary-button" type="button" :disabled="detailLoading || !selectedRole" @click="editSelectedRole">
                     <i class="bi bi-pencil" aria-hidden="true"></i>
-
                     编辑角色
                 </button>
             </template>
@@ -551,16 +490,16 @@
 
         <!-- ==================== 状态确认弹出层 ==================== -->
 
-        <AppModal v-model="statusModalVisible" scope-class="roles-modal-scope" :title="statusModalTitle" :width="430" :closable="!submitting"
-            :close-on-overlay="!submitting" :close-on-escape="!submitting">
+        <AppModal v-model="statusModalVisible" scope-class="roles-modal-scope" :title="statusModalTitle" :width="430"
+            :closable="!submitting" :close-on-overlay="!submitting" :close-on-escape="!submitting">
             <div v-if="statusTargetRole" class="status-confirm">
                 <div class="confirm-icon" :class="{
                     enable:
                         !statusTargetRole.is_active,
                 }" aria-hidden="true">
                     <i class="bi" :class="statusTargetRole.is_active
-                            ? 'bi-person-x'
-                            : 'bi-person-check'
+                        ? 'bi-person-x'
+                        : 'bi-person-check'
                         "></i>
                 </div>
 
