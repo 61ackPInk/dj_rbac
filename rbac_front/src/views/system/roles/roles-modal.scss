@@ -84,11 +84,9 @@
 
       &:hover:not(:disabled) {
         background:
-          color-mix(
-            in srgb,
+          color-mix(in srgb,
             var(--danger) 88%,
-            black
-          );
+            black);
       }
     }
 
@@ -97,11 +95,9 @@
 
       &:hover:not(:disabled) {
         background:
-          color-mix(
-            in srgb,
+          color-mix(in srgb,
             var(--success) 88%,
-            black
-          );
+            black);
       }
     }
   }
@@ -152,7 +148,7 @@
          * 不能使用普通的 input 后代选择器，
          * 否则会破坏公共下拉框样式。
          */
-        > input {
+        >input {
           box-sizing: border-box;
 
           width: 100%;
@@ -178,23 +174,18 @@
 
           &:hover:not(:disabled) {
             border-color:
-              color-mix(
-                in srgb,
+              color-mix(in srgb,
                 var(--primary) 45%,
-                var(--border)
-              );
+                var(--border));
           }
 
           &:focus {
             border-color: var(--primary);
 
             box-shadow:
-              0 0 0 3px
-              color-mix(
-                in srgb,
+              0 0 0 3px color-mix(in srgb,
                 var(--primary) 10%,
-                transparent
-              );
+                transparent);
           }
 
           &::placeholder {
@@ -208,7 +199,7 @@
         }
 
         /* 角色描述 */
-        > textarea {
+        >textarea {
           display: block;
           resize: vertical;
 
@@ -238,23 +229,18 @@
 
           &:hover:not(:disabled) {
             border-color:
-              color-mix(
-                in srgb,
+              color-mix(in srgb,
                 var(--primary) 45%,
-                var(--border)
-              );
+                var(--border));
           }
 
           &:focus {
             border-color: var(--primary);
 
             box-shadow:
-              0 0 0 3px
-              color-mix(
-                in srgb,
+              0 0 0 3px color-mix(in srgb,
                 var(--primary) 10%,
-                transparent
-              );
+                transparent);
           }
 
           &::placeholder {
@@ -306,14 +292,14 @@
       font-size: 20px;
 
       animation:
-        roles-modal-rotate
-        0.8s linear infinite;
+        roles-modal-rotate 0.8s linear infinite;
     }
   }
 
   /* ==================== 角色详情 ==================== */
 
   .role-detail {
+
     /* 详情头部 */
     .detail-profile {
       display: flex;
@@ -341,7 +327,7 @@
         font-weight: 650;
       }
 
-      > div {
+      >div {
         flex: 1;
         min-width: 0;
 
@@ -382,7 +368,7 @@
 
       margin: 8px 0 0;
 
-      > div {
+      >div {
         min-width: 0;
         padding: 15px 0;
 
@@ -452,6 +438,320 @@
     }
   }
 
+  /* ==================== 角色操作权限配置 ==================== */
+
+  /* 权限加载状态 */
+  .permission-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    min-height: 260px;
+
+    color: var(--text-sub);
+    font-size: var(--font-small);
+
+    i {
+      color: var(--primary);
+      font-size: 20px;
+
+      animation:
+        roles-modal-rotate 0.8s linear infinite;
+    }
+  }
+
+  /* 没有可配置权限 */
+  .permission-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding: 46px 20px;
+
+    color: var(--text-sub);
+    text-align: center;
+
+    .permission-empty-icon {
+      display: grid;
+      place-items: center;
+
+      width: 52px;
+      height: 52px;
+      margin-bottom: 16px;
+
+      border-radius: 14px;
+
+      color: var(--primary);
+      background: var(--primary-light);
+
+      i {
+        font-size: 23px;
+      }
+    }
+
+    strong {
+      color: var(--text-main);
+      font-size: 15px;
+      font-weight: 620;
+    }
+
+    p {
+      max-width: 440px;
+      margin: 9px 0 0;
+
+      font-size: var(--font-small);
+      line-height: 1.7;
+    }
+  }
+
+  /* 权限配置容器 */
+  .permission-config {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    max-height: min(580px, 65vh);
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  /* 权限配置说明 */
+  .permission-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+
+    padding: 11px 13px;
+
+    border: 1px solid color-mix(in srgb,
+        var(--primary) 18%,
+        var(--border));
+    border-radius: 8px;
+
+    color: var(--text-sub);
+    background: var(--primary-light);
+
+    font-size: var(--font-small);
+    line-height: 1.6;
+
+    i {
+      flex: 0 0 auto;
+      margin-top: 2px;
+
+      color: var(--primary);
+    }
+  }
+
+  /* 单个页面权限分组 */
+  .permission-group {
+    overflow: hidden;
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+
+    background: var(--bg-card);
+
+    .permission-group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+
+      padding: 13px 15px;
+
+      border-bottom: 1px solid var(--border);
+
+      background: var(--bg-hover);
+    }
+  }
+
+  /* 页面全选区域 */
+  .permission-group-check {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    min-width: 0;
+
+    cursor: pointer;
+
+    >input {
+      position: absolute;
+
+      width: 1px;
+      height: 1px;
+
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+
+  /* 公共勾选框 */
+  .permission-checkbox {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+
+    width: 18px;
+    height: 18px;
+
+    border: 1px solid var(--border);
+    border-radius: 5px;
+
+    color: transparent;
+    background: var(--bg-card);
+
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease,
+      background-color 0.2s ease;
+
+    i {
+      font-size: 11px;
+      line-height: 1;
+    }
+  }
+
+  .permission-group-check,
+  .permission-option {
+    >input:checked+.permission-checkbox {
+      border-color: var(--primary);
+
+      color: #ffffff;
+      background: var(--primary);
+    }
+
+    >input:indeterminate+.permission-checkbox {
+      border-color: var(--primary);
+
+      color: #ffffff;
+      background: var(--primary);
+
+      i::before {
+        content: "\f2ea";
+      }
+    }
+
+    >input:focus-visible+.permission-checkbox {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+  }
+
+  /* 页面名称和编码 */
+  .permission-page-info {
+    min-width: 0;
+
+    strong {
+      display: block;
+
+      color: var(--text-main);
+      font-size: var(--font-small);
+      font-weight: 620;
+    }
+
+    code {
+      display: block;
+      margin-top: 3px;
+
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+  }
+
+  .permission-count {
+    flex: 0 0 auto;
+
+    color: var(--text-muted);
+    font-size: 11px;
+  }
+
+  /* 权限选项列表 */
+  .permission-options {
+    display: grid;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+    gap: 10px;
+
+    padding: 13px;
+  }
+
+  /* 单个权限选项 */
+  .permission-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+
+    min-width: 0;
+    padding: 11px;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    transition:
+      border-color 0.2s ease,
+      background-color 0.2s ease;
+
+    &:hover {
+      border-color:
+        color-mix(in srgb,
+          var(--primary) 35%,
+          var(--border));
+
+      background: var(--primary-light);
+    }
+
+    >input {
+      position: absolute;
+
+      width: 1px;
+      height: 1px;
+
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .permission-checkbox {
+      margin-top: 1px;
+    }
+  }
+
+  /* 权限名称、编码和说明 */
+  .permission-option-info {
+    min-width: 0;
+
+    strong,
+    code,
+    small {
+      display: block;
+    }
+
+    strong {
+      color: var(--text-main);
+      font-size: var(--font-small);
+      font-weight: 580;
+    }
+
+    code {
+      margin-top: 4px;
+
+      color: var(--primary);
+      font-size: 11px;
+      overflow-wrap: anywhere;
+    }
+
+    small {
+      margin-top: 5px;
+
+      color: var(--text-muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+  }
+
   /* ==================== 状态修改确认 ==================== */
 
   .status-confirm {
@@ -512,13 +812,33 @@
 
   .button-loading {
     animation:
-      roles-modal-rotate
-      0.8s linear infinite;
+      roles-modal-rotate 0.8s linear infinite;
   }
 
   /* ==================== 平板与手机端 ==================== */
 
   @media (max-width: 600px) {
+
+    /* 角色权限配置在手机端使用单列 */
+    .permission-config {
+      max-height: 62vh;
+    }
+
+    .permission-options {
+      grid-template-columns: 1fr;
+      padding: 10px;
+    }
+
+    .permission-group {
+      .permission-group-header {
+        padding: 12px;
+      }
+    }
+
+    .permission-option {
+      padding: 10px;
+    }
+
     .role-form {
       .form-grid {
         grid-template-columns: 1fr;
@@ -531,8 +851,8 @@
           /*
            * 防止手机浏览器聚焦输入框时自动放大。
            */
-          > input,
-          > textarea {
+          >input,
+          >textarea {
             font-size: 16px;
           }
         }
@@ -551,7 +871,7 @@
       .detail-grid {
         grid-template-columns: 1fr;
 
-        > div {
+        >div {
           &.full {
             grid-column: auto;
           }
@@ -582,6 +902,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .app-modal-overlay.roles-modal-scope {
+
     .button-loading,
     .detail-loading i {
       animation: none;

@@ -21,7 +21,19 @@ import {
   getRolesApi,
   updateRoleApi,
   updateRoleStatusApi,
+  getRolePermissionsApi,
+  updateRolePermissionsApi,
 } from '@/api/roles'
+
+/* ==================== 权限与页面接口 ==================== */
+
+import {
+  getPermissionsApi,
+} from '@/api/permissions'
+
+import {
+  getPagesApi,
+} from '@/api/pages'
 
 /* ==================== 状态与消息 ==================== */
 
@@ -131,6 +143,18 @@ export default defineComponent({
       return authStore.hasPermission(
         'ROLE_CHANGE_STATUS',
       )
+    })
+
+    /* ==================== 高风险权限配置 ==================== */
+
+    /*
+     * 给角色配置操作权限只允许根管理员。
+     *
+     * 这里不能使用 ROLE_UPDATE 判断，
+     * 因为普通角色管理员不能给自己或其他角色提权。
+     */
+    const canConfigureRolePermissions = computed(() => {
+      return Boolean(authStore.isRoot)
     })
 
     /* ==================== 角色数据 ==================== */
@@ -694,6 +718,343 @@ export default defineComponent({
       openEditModal(selectedRole.value)
     }
 
+    /* ==================== 角色权限配置弹出层 ==================== */
+
+    /*
+     * 当前正在配置权限的角色。
+     */
+    const permissionTargetRole = ref(null)
+
+    /*
+     * 权限配置弹出层状态。
+     */
+    const permissionModalVisible = ref(false)
+    const permissionLoading = ref(false)
+    const permissionSaving = ref(false)
+
+    /*
+     * 后端返回的全部权限定义。
+     */
+    const permissionDefinitions = ref([])
+
+    /*
+     * 系统中的页面数据。
+     *
+     * 页面响应中包含 visible_roles，
+     * 可以判断当前角色拥有哪些页面。
+     */
+    const permissionPages = ref([])
+
+    /*
+     * 当前角色已经选中的权限 ID。
+     */
+    const selectedPermissionIds = ref([])
+
+    /* ==================== 当前角色拥有的页面 ==================== */
+
+    /*
+     * 角色只能获得自己可见页面下的操作权限。
+     *
+     * 页面与角色关系来自：
+     * page.visible_roles
+     */
+    const roleVisiblePageIds = computed(() => {
+      const roleId =
+        permissionTargetRole.value?.id
+
+      if (!roleId) {
+        return []
+      }
+
+      return permissionPages.value
+        .filter((page) => {
+          if (!page.is_active) {
+            return false
+          }
+
+          return (
+            page.visible_roles || []
+          ).some((role) => {
+            return role.id === roleId
+          })
+        })
+        .map((page) => page.id)
+    })
+
+    /* ==================== 按页面分组权限 ==================== */
+
+    /*
+     * 只显示以下权限：
+     *
+     * 1. 权限本身处于启用状态；
+     * 2. 权限所属页面处于启用状态；
+     * 3. 当前角色已经拥有该页面。
+     */
+    const permissionGroups = computed(() => {
+      const visiblePageIdSet = new Set(
+        roleVisiblePageIds.value,
+      )
+
+      const groupMap = new Map()
+
+      permissionDefinitions.value
+        .filter((permission) => {
+          return (
+            permission.is_active &&
+            permission.page &&
+            visiblePageIdSet.has(
+              permission.page.id,
+            )
+          )
+        })
+        .forEach((permission) => {
+          const pageId = permission.page.id
+
+          if (!groupMap.has(pageId)) {
+            groupMap.set(pageId, {
+              pageId,
+              pageName:
+                permission.page.name,
+              pageCode:
+                permission.page.code,
+              permissions: [],
+            })
+          }
+
+          groupMap
+            .get(pageId)
+            .permissions.push(permission)
+        })
+
+      return Array.from(
+        groupMap.values(),
+      )
+    })
+
+    /* ==================== 权限选择判断 ==================== */
+
+    const isPermissionChecked = (
+      permissionId,
+    ) => {
+      return selectedPermissionIds.value.includes(
+        permissionId,
+      )
+    }
+
+    /*
+     * 判断某个页面中的权限是否已经全部选中。
+     */
+    const isPermissionGroupChecked = (
+      group,
+    ) => {
+      if (!group.permissions.length) {
+        return false
+      }
+
+      return group.permissions.every(
+        (permission) => {
+          return isPermissionChecked(
+            permission.id,
+          )
+        },
+      )
+    }
+
+    /*
+     * 判断页面权限是否处于部分选中状态。
+     */
+    const isPermissionGroupIndeterminate = (
+      group,
+    ) => {
+      const checkedCount =
+        group.permissions.filter(
+          (permission) => {
+            return isPermissionChecked(
+              permission.id,
+            )
+          },
+        ).length
+
+      return (
+        checkedCount > 0 &&
+        checkedCount <
+        group.permissions.length
+      )
+    }
+
+    /* ==================== 切换单个操作权限 ==================== */
+
+    const togglePermission = (
+      permissionId,
+      checked,
+    ) => {
+      const permissionIdSet = new Set(
+        selectedPermissionIds.value,
+      )
+
+      if (checked) {
+        permissionIdSet.add(permissionId)
+      } else {
+        permissionIdSet.delete(permissionId)
+      }
+
+      selectedPermissionIds.value =
+        Array.from(permissionIdSet)
+    }
+
+    /* ==================== 切换页面全部权限 ==================== */
+
+    const togglePermissionGroup = (
+      group,
+      checked,
+    ) => {
+      const permissionIdSet = new Set(
+        selectedPermissionIds.value,
+      )
+
+      group.permissions.forEach(
+        (permission) => {
+          if (checked) {
+            permissionIdSet.add(
+              permission.id,
+            )
+          } else {
+            permissionIdSet.delete(
+              permission.id,
+            )
+          }
+        },
+      )
+
+      selectedPermissionIds.value =
+        Array.from(permissionIdSet)
+    }
+
+    /* ==================== 打开权限配置弹出层 ==================== */
+
+    const openPermissionModal = async (role) => {
+      if (!canConfigureRolePermissions.value) {
+        message.warning(
+          '只有根管理员可以配置角色权限',
+        )
+
+        return
+      }
+
+      if (
+        !role ||
+        permissionLoading.value
+      ) {
+        return
+      }
+
+      permissionTargetRole.value = role
+      permissionDefinitions.value = []
+      permissionPages.value = []
+      selectedPermissionIds.value = []
+
+      permissionModalVisible.value = true
+      permissionLoading.value = true
+
+      try {
+        /*
+         * 同时加载：
+         *
+         * 1. 系统全部权限定义；
+         * 2. 当前角色已有权限；
+         * 3. 页面与可见角色关系。
+         */
+        const [
+          permissions,
+          roleDetail,
+          pages,
+        ] = await Promise.all([
+          getPermissionsApi(),
+          getRolePermissionsApi(role.id),
+          getPagesApi(),
+        ])
+
+        permissionDefinitions.value =
+          Array.isArray(permissions)
+            ? permissions
+            : []
+
+        permissionPages.value =
+          Array.isArray(pages)
+            ? pages
+            : []
+
+        selectedPermissionIds.value =
+          (
+            roleDetail.permissions || []
+          ).map((permission) => {
+            return permission.id
+          })
+      } catch (error) {
+        permissionModalVisible.value = false
+
+        message.error(
+          getErrorMessage(
+            error,
+            '角色权限加载失败',
+          ),
+        )
+      } finally {
+        permissionLoading.value = false
+      }
+    }
+
+    /* ==================== 关闭权限配置弹出层 ==================== */
+
+    const closePermissionModal = () => {
+      if (
+        permissionLoading.value ||
+        permissionSaving.value
+      ) {
+        return
+      }
+
+      permissionModalVisible.value = false
+    }
+
+    /* ==================== 保存角色操作权限 ==================== */
+
+    const saveRolePermissions = async () => {
+      if (
+        !permissionTargetRole.value ||
+        permissionLoading.value ||
+        permissionSaving.value
+      ) {
+        return
+      }
+
+      permissionSaving.value = true
+
+      try {
+        await updateRolePermissionsApi(
+          permissionTargetRole.value.id,
+          selectedPermissionIds.value,
+        )
+
+        await loadRoles()
+
+        permissionModalVisible.value = false
+
+        message.success(
+          '角色操作权限配置成功',
+        )
+      } catch (error) {
+        message.error(
+          getErrorMessage(
+            error,
+            '角色操作权限配置失败',
+          ),
+        )
+      } finally {
+        permissionSaving.value = false
+      }
+    }
+
     /* ==================== 状态确认弹出层 ==================== */
 
     const statusModalVisible = ref(false)
@@ -801,6 +1162,7 @@ export default defineComponent({
       canCreateRole,
       canUpdateRole,
       canChangeRoleStatus,
+      canConfigureRolePermissions,
 
       roles,
       loading,
@@ -849,6 +1211,25 @@ export default defineComponent({
       openStatusModal,
       closeStatusModal,
       confirmRoleStatus,
+
+      /* ==================== 角色权限配置 ==================== */
+
+      permissionTargetRole,
+      permissionModalVisible,
+      permissionLoading,
+      permissionSaving,
+      permissionGroups,
+      selectedPermissionIds,
+
+      isPermissionChecked,
+      isPermissionGroupChecked,
+      isPermissionGroupIndeterminate,
+      togglePermission,
+      togglePermissionGroup,
+
+      openPermissionModal,
+      closePermissionModal,
+      saveRolePermissions,
     }
   },
 })

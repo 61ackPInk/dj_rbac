@@ -211,6 +211,11 @@
                                         @click="openEditModal(role)">
                                         编辑
                                     </button>
+                                    <!-- 列表-配置权限(只有根管理员可以配置角色操作权限) -->
+                                    <button v-if="canConfigureRolePermissions" class="table-action" type="button"
+                                        @click="openPermissionModal(role)">
+                                        配置权限
+                                    </button>
                                     <!-- 列表-角色状态 -->
                                     <button v-if="canChangeRoleStatus" class="table-action"
                                         :class="role.is_active ? 'disable' : 'enable'" type="button"
@@ -288,6 +293,11 @@
                         <!-- 卡片-修改角色资料 -->
                         <button v-if="canUpdateRole" class="card-action" type="button" @click="openEditModal(role)">
                             编辑
+                        </button>
+                        <!-- 卡片-配置权限(只有根管理员可以配置角色操作权限) -->
+                        <button v-if="canConfigureRolePermissions" class="card-action" type="button"
+                            @click="openPermissionModal(role)">
+                            配置权限
                         </button>
                         <!-- 卡片-角色状态 -->
                         <button v-if="canChangeRoleStatus" class="card-action"
@@ -481,9 +491,161 @@
                     关闭
                 </button>
 
-                <button v-if="canUpdateRole" class="primary-button" type="button" :disabled="detailLoading || !selectedRole" @click="editSelectedRole">
+                <button v-if="canUpdateRole" class="primary-button" type="button"
+                    :disabled="detailLoading || !selectedRole" @click="editSelectedRole">
                     <i class="bi bi-pencil" aria-hidden="true"></i>
                     编辑角色
+                </button>
+            </template>
+        </AppModal>
+
+        <!-- ==================== 角色操作权限配置弹出层 ==================== -->
+
+        <AppModal v-model="permissionModalVisible" scope-class="roles-modal-scope" :title="permissionTargetRole
+            ? `配置权限：${permissionTargetRole.name}`
+            : '配置角色权限'
+            " :width="760" :closable="!permissionLoading &&
+                !permissionSaving
+                " :close-on-overlay="!permissionLoading &&
+                    !permissionSaving
+                    " :close-on-escape="!permissionLoading &&
+            !permissionSaving
+            ">
+            <!-- 权限数据加载状态 -->
+            <div v-if="permissionLoading" class="permission-loading">
+                <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+
+                <span>正在加载角色权限...</span>
+            </div>
+
+            <!-- 角色尚未拥有任何可配置页面 -->
+            <div v-else-if="permissionGroups.length === 0" class="permission-empty">
+                <span class="permission-empty-icon">
+                    <i class="bi bi-shield-exclamation" aria-hidden="true"></i>
+                </span>
+
+                <strong>暂无可配置的操作权限</strong>
+
+                <p>
+                    请先在页面管理中，把需要访问的页面分配给该角色，
+                    然后再配置页面下的具体操作权限。
+                </p>
+            </div>
+
+            <!-- 按页面分组显示权限 -->
+            <div v-else class="permission-config">
+                <!-- 权限配置说明 -->
+                <div class="permission-notice">
+                    <i class="bi bi-info-circle" aria-hidden="true"></i>
+
+                    <span>
+                        页面权限决定能否进入页面，
+                        下方操作权限决定进入页面后可以执行什么操作。
+                    </span>
+                </div>
+
+                <!-- 页面权限分组 -->
+                <section v-for="group in permissionGroups" :key="group.pageId" class="permission-group">
+                    <!-- 页面分组标题 -->
+                    <header class="permission-group-header">
+                        <label class="permission-group-check">
+                            <input type="checkbox" :checked="isPermissionGroupChecked(group)
+                                " :indeterminate.prop="isPermissionGroupIndeterminate(
+                                    group,
+                                )
+                                    " @change="
+                                        togglePermissionGroup(
+                                            group,
+                                            $event.target.checked,
+                                        )
+                                        " />
+
+                            <span class="permission-checkbox">
+                                <i class="bi bi-check-lg" aria-hidden="true"></i>
+                            </span>
+
+                            <span class="permission-page-info">
+                                <strong>
+                                    {{ group.pageName }}
+                                </strong>
+
+                                <code>
+                            {{ group.pageCode }}
+                        </code>
+                            </span>
+                        </label>
+
+                        <span class="permission-count">
+                            {{
+                                group.permissions.filter(
+                                    (permission) =>
+                                        isPermissionChecked(
+                                            permission.id,
+                                        ),
+                                ).length
+                            }}/{{ group.permissions.length }}
+                        </span>
+                    </header>
+
+                    <!-- 当前页面的操作权限 -->
+                    <div class="permission-options">
+                        <label v-for="permission in group.permissions" :key="permission.id" class="permission-option">
+                            <input type="checkbox" :checked="isPermissionChecked(
+                                permission.id,
+                            )
+                                " @change="
+                                    togglePermission(
+                                        permission.id,
+                                        $event.target.checked,
+                                    )
+                                    " />
+
+                            <span class="permission-checkbox">
+                                <i class="bi bi-check-lg" aria-hidden="true"></i>
+                            </span>
+
+                            <span class="permission-option-info">
+                                <strong>
+                                    {{ permission.name }}
+                                </strong>
+
+                                <code>
+                            {{ permission.code }}
+                        </code>
+
+                                <small>
+                                    {{
+                                        permission.description ||
+                                        '暂无权限说明'
+                                    }}
+                                </small>
+                            </span>
+                        </label>
+                    </div>
+                </section>
+            </div>
+
+            <template #footer>
+                <button class="secondary-button" type="button" :disabled="permissionLoading ||
+                    permissionSaving
+                    " @click="closePermissionModal">
+                    取消
+                </button>
+
+                <button class="primary-button" type="button" :disabled="permissionLoading ||
+                    permissionSaving ||
+                    permissionGroups.length === 0
+                    " @click="saveRolePermissions">
+                    <i v-if="permissionSaving" class="
+          bi bi-arrow-clockwise
+          button-loading
+        " aria-hidden="true"></i>
+
+                    {{
+                        permissionSaving
+                            ? '正在保存...'
+                            : '保存权限'
+                    }}
                 </button>
             </template>
         </AppModal>
