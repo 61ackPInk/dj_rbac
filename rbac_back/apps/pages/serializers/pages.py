@@ -5,6 +5,7 @@
 @Time : 2026/9/16 15:14
 @Desc : 页面序列化器
 """
+from django.db import transaction
 from rest_framework import serializers
 
 from apps.pages.models import Page
@@ -271,9 +272,7 @@ class VisiblePageSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
-class PageStatusUpdateSerializer(
-    serializers.ModelSerializer
-):
+class PageStatusUpdateSerializer(serializers.ModelSerializer):
     """修改页面启用状态"""
 
     is_active = serializers.BooleanField(
@@ -345,17 +344,76 @@ class PageRoleAssignSerializer(
 
         return value
 
+    @transaction.atomic
     def update(self, instance, validated_data):
-        """替换页面当前的全部可见角色"""
+        """
+        替换页面当前的全部可见角色。
 
-        visible_roles = validated_data[
+        如果某个角色失去了当前页面，
+        同时清除该角色在当前页面下的操作权限。
+
+        transaction.atomic 保证页面分配和权限清理
+        要么全部成功，要么全部回滚。
+        """
+
+        new_visible_roles = validated_data[
             "visible_roles"
         ]
 
-        # set() 会将原来的角色关系替换成
-        # 本次提交的完整角色列表
-        instance.visible_roles.set(
-            visible_roles,
+        # 修改关系之前，先保存原来的角色 ID。
+        #
+        # 必须在 visible_roles.set() 前查询，
+        # 否则修改后无法知道哪些角色被移除了。
+        old_role_ids = set(
+            instance.visible_roles.values_list(
+                "id",
+                flat=True,
+            )
         )
+
+        new_role_ids = {
+            role.id
+            for role in new_visible_roles
+        }
+
+        # 计算本次被移除的角色
+        removed_role_ids = (
+                old_role_ids - new_role_ids
+        )
+
+        # 替换页面当前的全部可见角色
+        instance.visible_roles.set(
+            new_visible_roles,
+        )
+
+        # 没有角色被移除时，不需要继续清理
+        if not removed_role_ids:
+            return instance
+
+        # 查询当前页面下定义的全部操作权限。
+        #
+        # 这里包含启用和停用权限，
+        # 因为角色失去页面后，
+        # 两种状态的权限关系都应该清除。
+        page_permission_ids = list(
+            instance.permissions.values_list(
+                "id",
+                flat=True,
+            )
+        )
+
+        if not page_permission_ids:
+            return instance
+
+        # 直接删除角色和权限中间表中的对应关系。
+        #
+        # 等价于逐个执行：
+        # role.permissions.remove(permission)
+        #
+        # 但是一次 DELETE 查询效率更高。
+        Role.permissions.through.objects.filter(
+            role_id__in=removed_role_ids,
+            permission_id__in=page_permission_ids,
+        ).delete()
 
         return instance
