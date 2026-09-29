@@ -10,7 +10,7 @@
         <p>管理系统用户、角色和账号状态。</p>
       </div>
 
-      <button class="primary-button" type="button" @click="openCreateModal">
+      <button v-if="canCreateUser" class="primary-button" type="button" @click="openCreateModal">
         <i class="bi bi-plus-lg" aria-hidden="true"></i>
 
         <span>创建用户</span>
@@ -172,23 +172,17 @@
               <!-- 用户操作 -->
               <td>
                 <div class="action-group">
-                  <button class="table-action" type="button" @click="openDetailModal(user)">
+                  <button v-if="canViewUserDetail" class="table-action" type="button" @click="openDetailModal(user)">
                     查看
                   </button>
 
-                  <button class="table-action" type="button" @click="openEditModal(user)">
+                  <button v-if="canEditUser" class="table-action" type="button" @click="openEditModal(user)">
                     编辑
                   </button>
 
-                  <button class="table-action" :class="user.is_active
-                    ? 'disable'
-                    : 'enable'
-                    " type="button" @click="openStatusModal(user)">
-                    {{
-                      user.is_active
-                        ? '禁用'
-                        : '启用'
-                    }}
+                  <button v-if="canChangeUserStatus" class="table-action" :class="user.is_active ? 'disable' : 'enable'"
+                    type="button" @click="openStatusModal(user)">
+                    {{ user.is_active ? '禁用' : '启用' }}
                   </button>
                 </div>
               </td>
@@ -254,23 +248,18 @@
 
           <!-- 用户卡片操作 -->
           <footer class="user-card-footer">
-            <button class="card-action" type="button" @click="openDetailModal(user)">
+            <button v-if="canViewUserDetail" class="card-action" type="button" @click="openDetailModal(user)">
               查看
             </button>
 
-            <button class="card-action" type="button" @click="openEditModal(user)">
+            <button v-if="canEditUser" class="card-action" type="button" @click="openEditModal(user)">
               编辑
             </button>
 
-            <button class="card-action" :class="{
-              disable: user.is_active,
-              enable: !user.is_active,
-            }" type="button" @click="openStatusModal(user)">
-              {{
-                user.is_active
-                  ? '禁用'
-                  : '启用'
-              }}
+            <button v-if="canChangeUserStatus" class="card-action"
+              :class="{ disable: user.is_active, enable: !user.is_active, }" type="button"
+              @click="openStatusModal(user)">
+              {{ user.is_active ? '禁用' : '启用' }}
             </button>
           </footer>
         </article>
@@ -278,12 +267,12 @@
     </section>
 
     <!-- ==================== 创建与编辑用户弹出层 ==================== -->
-    <AppModal v-model="formModalVisible" scope-class="users-modal-scope" :title="formModalTitle" :width="620" :closable="!submitting"
-      :close-on-overlay="!submitting" :close-on-escape="!submitting">
+    <AppModal v-model="formModalVisible" scope-class="users-modal-scope" :title="formModalTitle" :width="620"
+      :closable="!submitting" :close-on-overlay="!submitting" :close-on-escape="!submitting">
       <form id="user-form" class="user-form" novalidate @submit.prevent="submitUserForm">
         <div class="form-grid">
           <!-- 用户名 -->
-          <label class="form-field full">
+          <label v-if="isCreateMode || canUpdateUser" class="form-field full">
             <span class="field-label">
               用户名
               <i aria-hidden="true">*</i>
@@ -294,7 +283,7 @@
           </label>
 
           <!-- 邮箱 -->
-          <label class="form-field full">
+          <label v-if="isCreateMode || canUpdateUser" class="form-field full">
             <span class="field-label">
               电子邮箱
             </span>
@@ -325,7 +314,8 @@
           </template>
 
           <!-- 用户角色 -->
-          <label class="form-field">
+          <!-- 拥有分配角色权限时显示 -->
+          <label v-if="canAssignUserRole" class="form-field">
             <span class="field-label">
               用户角色
             </span>
@@ -334,7 +324,13 @@
           </label>
 
           <!-- 用户状态 -->
-          <label class="form-field">
+          <!--
+            创建用户时可以设置初始状态。
+
+            编辑已有用户时，
+            状态通过独立的启用/禁用按钮修改。
+          -->
+          <label v-if="isCreateMode && canChangeUserStatus " class="form-field">
             <span class="field-label">
               账号状态
             </span>
@@ -364,8 +360,8 @@
     </AppModal>
 
     <!-- ==================== 用户详情弹出层 ==================== -->
-    <AppModal v-model="detailModalVisible" scope-class="users-modal-scope" title="用户信息" :width="620" :closable="!detailLoading"
-      :close-on-overlay="!detailLoading" :close-on-escape="!detailLoading">
+    <AppModal v-model="detailModalVisible" scope-class="users-modal-scope" title="用户信息" :width="620"
+      :closable="!detailLoading" :close-on-overlay="!detailLoading" :close-on-escape="!detailLoading">
       <!-- 详情加载状态 -->
       <div v-if="detailLoading" class="detail-loading">
         <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
@@ -447,7 +443,7 @@
           关闭
         </button>
 
-        <button class="primary-button" type="button" :disabled="detailLoading || !selectedUser
+        <button v-if="canEditUser" class="primary-button" type="button" :disabled="detailLoading || !selectedUser
           " @click="editSelectedUser">
           <i class="bi bi-pencil" aria-hidden="true"></i>
 
@@ -457,8 +453,8 @@
     </AppModal>
 
     <!-- ==================== 状态确认弹出层 ==================== -->
-    <AppModal v-model="statusModalVisible" scope-class="users-modal-scope" :title="statusModalTitle" :width="430" :closable="!submitting"
-      :close-on-overlay="!submitting" :close-on-escape="!submitting">
+    <AppModal v-model="statusModalVisible" scope-class="users-modal-scope" :title="statusModalTitle" :width="430"
+      :closable="!submitting" :close-on-overlay="!submitting" :close-on-escape="!submitting">
       <div v-if="statusTargetUser" class="status-confirm">
         <div class="confirm-icon" :class="{
           enable: !statusTargetUser.is_active,

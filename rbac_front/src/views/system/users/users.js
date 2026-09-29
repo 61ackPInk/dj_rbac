@@ -98,11 +98,76 @@ export default defineComponent({
     const loading = ref(false)
     const errorMessage = ref('')
 
+    /* ==================== 当前用户操作权限 ==================== */
+
     /*
-     * 只有根管理员能够调用用户管理接口。
+     * 根管理员会由 Auth Store 自动放行，
+     * 这里不需要重复判断 is_root。
      */
-    const isRoot = computed(() => {
-      return Boolean(authStore.user?.is_root)
+
+    // 查看用户列表
+    const canViewUserList = computed(() => {
+      return authStore.hasPermission(
+        'USER_LIST',
+      )
+    })
+
+    // 查看用户详情
+    const canViewUserDetail = computed(() => {
+      return authStore.hasPermission(
+        'USER_DETAIL',
+      )
+    })
+
+    // 创建用户
+    const canCreateUser = computed(() => {
+      return authStore.hasPermission(
+        'USER_CREATE',
+      )
+    })
+
+    // 修改用户名和邮箱
+    const canUpdateUser = computed(() => {
+      return authStore.hasPermission(
+        'USER_UPDATE',
+      )
+    })
+
+    // 启用或停用用户
+    const canChangeUserStatus = computed(() => {
+      return authStore.hasPermission(
+        'USER_CHANGE_STATUS',
+      )
+    })
+
+    // 给用户分配或取消角色
+    const canAssignUserRole = computed(() => {
+      return authStore.hasPermission(
+        'USER_ASSIGN_ROLE',
+      )
+    })
+
+    // 重置普通用户密码
+    const canResetUserPassword = computed(() => {
+      return authStore.hasPermission(
+        'USER_RESET_PASSWORD',
+      )
+    })
+
+    /*
+     * 编辑弹出层同时承担：
+     *
+     * 1. 修改基础资料；
+     * 2. 分配用户角色。
+     *
+     * 拥有其中任意一个权限时，
+     * 就可以显示编辑入口。
+     */
+    const canEditUser = computed(() => {
+      return (
+        canUpdateUser.value ||
+        canAssignUserRole.value
+      )
     })
 
     /*
@@ -168,10 +233,14 @@ export default defineComponent({
     /* ==================== 加载用户列表 ==================== */
 
     const loadUsers = async () => {
-      if (!isRoot.value) {
+      /*
+       * 没有列表权限时，
+       * 不发送必然返回403的请求。
+       */
+      if (!canViewUserList.value) {
         users.value = []
         errorMessage.value =
-          '当前用户无权查看用户列表'
+          '当前用户没有查看用户列表的权限'
 
         return
       }
@@ -179,9 +248,22 @@ export default defineComponent({
       users.value = await getUsersApi()
     }
 
-    /* ==================== 加载角色列表 ==================== */
+    /* ==================== 加载角色选项 ==================== */
 
     const loadRoles = async () => {
+      /*
+       * 获取完整角色列表需要 ROLE_LIST。
+       *
+       * 没有角色列表权限时不请求接口，
+       * 避免用户管理页面整体因为403而无法加载。
+       */
+      if (
+        !authStore.hasPermission('ROLE_LIST')
+      ) {
+        roles.value = []
+        return
+      }
+
       roles.value = await getRolesApi()
     }
 
@@ -422,6 +504,14 @@ export default defineComponent({
     /* ==================== 打开创建弹出层 ==================== */
 
     const openCreateModal = () => {
+      if (!canCreateUser.value) {
+        message.warning(
+          '当前用户没有创建用户的权限',
+        )
+
+        return
+      }
+
       resetUserForm()
 
       formMode.value = 'create'
@@ -431,6 +521,14 @@ export default defineComponent({
     /* ==================== 打开编辑弹出层 ==================== */
 
     const openEditModal = (user) => {
+      if (!canEditUser.value) {
+        message.warning(
+          '当前用户没有修改用户的权限',
+        )
+
+        return
+      }
+
       if (!user) {
         return
       }
@@ -549,7 +647,7 @@ export default defineComponent({
        *
        * 用户没有选择角色时保持 role = null。
        */
-      if (userForm.roleId != null) {
+      if (canAssignUserRole.value && userForm.roleId != null) {
         try {
           await assignUserRoleApi(
             createdUser.id,
@@ -568,7 +666,7 @@ export default defineComponent({
        * 如果管理员选择停用状态，
        * 创建完成后再单独修改状态。
        */
-      if (!userForm.isActive) {
+      if (canChangeUserStatus.value && !userForm.isActive) {
         try {
           await updateUserStatusApi(
             createdUser.id,
@@ -606,58 +704,79 @@ export default defineComponent({
       const userId =
         editingUser.value.id
 
-      /*
-       * 基础资料和状态通过用户详情接口修改。
-       */
-      await updateUserApi(
-        userId,
-        {
-          username:
-            userForm.username.trim(),
-          email:
-            userForm.email.trim() || null,
-          is_active:
-            userForm.isActive,
-        },
-      )
-
-      const oldRoleId =
-        editingUser.value.role?.id ?? null
-
-      const newRoleId =
-        userForm.roleId ?? null
-
-      let roleUpdateFailed = false
+      const followUpErrors = []
 
       /*
-       * 角色发生变化时，
-       * 调用独立的角色分配接口。
+       * 拥有 USER_UPDATE 时，
+       * 才修改用户名和邮箱。
        */
-      if (
-        String(oldRoleId) !==
-        String(newRoleId)
-      ) {
+      if (canUpdateUser.value) {
         try {
-          await assignUserRoleApi(
+          await updateUserApi(
             userId,
-            newRoleId,
+            {
+              username:
+                userForm.username.trim(),
+              email:
+                userForm.email.trim() || null,
+            },
           )
         } catch (error) {
-          roleUpdateFailed = true
+          followUpErrors.push(
+            getErrorMessage(
+              error,
+              '用户资料修改失败',
+            ),
+          )
+        }
+      }
+
+      /*
+       * 拥有 USER_ASSIGN_ROLE 时，
+       * 才检查和修改用户角色。
+       */
+      if (canAssignUserRole.value) {
+        const oldRoleId =
+          editingUser.value.role?.id ?? null
+
+        const newRoleId =
+          userForm.roleId ?? null
+
+        if (
+          String(oldRoleId) !==
+          String(newRoleId)
+        ) {
+          try {
+            await assignUserRoleApi(
+              userId,
+              newRoleId,
+            )
+          } catch (error) {
+            followUpErrors.push(
+              getErrorMessage(
+                error,
+                '用户角色修改失败',
+              ),
+            )
+          }
         }
       }
 
       await loadUsers()
 
-      formModalVisible.value = false
-
-      if (roleUpdateFailed) {
+      /*
+       * 有任意操作失败时保留弹出层，
+       * 方便管理员检查后重新提交。
+       */
+      if (followUpErrors.length) {
         message.warning(
-          '用户资料已保存，但角色修改失败',
+          followUpErrors.join('；'),
         )
 
         return
       }
+
+      formModalVisible.value = false
 
       message.success('用户信息修改成功')
     }
@@ -701,6 +820,14 @@ export default defineComponent({
     const selectedUser = ref(null)
 
     const openDetailModal = async (user) => {
+      if (!canViewUserDetail.value) {
+        message.warning(
+          '当前用户没有查看用户详情的权限',
+        )
+
+        return
+      }
+
       if (!user || detailLoading.value) {
         return
       }
@@ -752,6 +879,14 @@ export default defineComponent({
     const statusTargetUser = ref(null)
 
     const openStatusModal = (user) => {
+      if (!canChangeUserStatus.value) {
+        message.warning(
+          '当前用户没有修改用户状态的权限',
+        )
+
+        return
+      }
+
       if (!user) {
         return
       }
@@ -850,6 +985,18 @@ export default defineComponent({
     /* ==================== 向模板暴露内容 ==================== */
 
     return {
+
+      /* ==================== 操作权限 ==================== */
+
+      canViewUserList,
+      canViewUserDetail,
+      canCreateUser,
+      canUpdateUser,
+      canChangeUserStatus,
+      canAssignUserRole,
+      canResetUserPassword,
+      canEditUser,
+
       users,
       roles,
       activeRoles,
