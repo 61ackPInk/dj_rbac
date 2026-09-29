@@ -14,3 +14,30 @@ media/
 # 虚拟环境
 venv/
 env/
+
+# ========= Python后端 =========
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.env
+.env
+logs/
+*.log
+db.sqlite3
+media/
+
+# ========= 前端 =========
+rbac_front/node_modules/
+rbac_front/dist/
+rbac_front/dist-ssr/
+rbac_front/.vite/
+rbac_front/.cache/
+rbac_front/.env.local
+rbac_front/.env.*.local
+
+# ========= 通用 =========
+.vscode/
+.idea/
+*.DS_Store
+Thumbs.db
