@@ -19,6 +19,7 @@ import {
   getUsersApi,
   updateUserApi,
   updateUserStatusApi,
+  resetUserPasswordApi,
 } from '@/api/users'
 
 import { getRolesApi } from '@/api/roles'
@@ -37,6 +38,15 @@ const createInitialForm = () => {
     passwordConfirm: '',
     roleId: null,
     isActive: true,
+  }
+}
+
+/* ==================== 密码重置表单初始值 ==================== */
+
+const createInitialPasswordResetForm = () => {
+  return {
+    newPassword: '',
+    newPasswordConfirm: '',
   }
 }
 
@@ -873,6 +883,164 @@ export default defineComponent({
       openEditModal(selectedUser.value)
     }
 
+    /* ==================== 密码重置弹出层 ==================== */
+
+    /*
+     * 当前准备重置密码的用户。
+     */
+    const passwordTargetUser = ref(null)
+
+    /*
+     * 密码重置弹出层状态。
+     */
+    const passwordModalVisible = ref(false)
+    const passwordResetting = ref(false)
+
+    /*
+     * 密码重置表单。
+     */
+    const passwordResetForm = reactive(
+      createInitialPasswordResetForm(),
+    )
+
+    /* ==================== 重置密码表单 ==================== */
+
+    const clearPasswordResetForm = () => {
+      Object.assign(
+        passwordResetForm,
+        createInitialPasswordResetForm(),
+      )
+
+      passwordTargetUser.value = null
+    }
+
+    /* ==================== 打开密码重置弹出层 ==================== */
+
+    const openPasswordModal = (user) => {
+      if (!canResetUserPassword.value) {
+        message.warning(
+          '当前用户没有重置密码的权限',
+        )
+
+        return
+      }
+
+      if (!user) {
+        return
+      }
+
+      /*
+       * 后端禁止通过用户管理接口
+       * 重置根管理员密码。
+       */
+      if (user.is_root) {
+        message.warning(
+          '不能通过用户管理重置根管理员密码',
+        )
+
+        return
+      }
+
+      clearPasswordResetForm()
+
+      passwordTargetUser.value = user
+      passwordModalVisible.value = true
+    }
+
+    /* ==================== 关闭密码重置弹出层 ==================== */
+
+    const closePasswordModal = () => {
+      if (passwordResetting.value) {
+        return
+      }
+
+      passwordModalVisible.value = false
+    }
+
+    /* ==================== 验证密码重置表单 ==================== */
+
+    const validatePasswordResetForm = () => {
+      const newPassword =
+        passwordResetForm.newPassword
+
+      const newPasswordConfirm =
+        passwordResetForm.newPasswordConfirm
+
+      if (!newPassword) {
+        message.warning('请输入新密码')
+        return false
+      }
+
+      if (/\s/.test(newPassword)) {
+        message.warning(
+          '新密码不能包含空白字符',
+        )
+
+        return false
+      }
+
+      if (!newPasswordConfirm) {
+        message.warning('请再次输入新密码')
+        return false
+      }
+
+      if (
+        newPassword !==
+        newPasswordConfirm
+      ) {
+        message.warning(
+          '两次输入的新密码不一致',
+        )
+
+        return false
+      }
+
+      return true
+    }
+
+    /* ==================== 提交密码重置 ==================== */
+
+    const submitPasswordReset = async () => {
+      if (
+        passwordResetting.value ||
+        !passwordTargetUser.value ||
+        !validatePasswordResetForm()
+      ) {
+        return
+      }
+
+      passwordResetting.value = true
+
+      try {
+        await resetUserPasswordApi(
+          passwordTargetUser.value.id,
+          {
+            new_password:
+              passwordResetForm.newPassword,
+
+            new_password_confirm:
+              passwordResetForm
+                .newPasswordConfirm,
+          },
+        )
+
+        passwordModalVisible.value = false
+
+        message.success(
+          '用户密码重置成功',
+        )
+      } catch (error) {
+        message.error(
+          getErrorMessage(
+            error,
+            '用户密码重置失败',
+          ),
+        )
+      } finally {
+        passwordResetting.value = false
+      }
+    }
+
     /* ==================== 状态确认弹出层 ==================== */
 
     const statusModalVisible = ref(false)
@@ -1051,6 +1219,17 @@ export default defineComponent({
       confirmUserStatus,
 
       loadPageData,
+
+      /* ==================== 密码重置 ==================== */
+
+      passwordTargetUser,
+      passwordModalVisible,
+      passwordResetting,
+      passwordResetForm,
+
+      openPasswordModal,
+      closePasswordModal,
+      submitPasswordReset,
     }
   },
 })

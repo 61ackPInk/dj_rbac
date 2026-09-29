@@ -172,14 +172,20 @@
               <!-- 用户操作 -->
               <td>
                 <div class="action-group">
+                  <!-- 列表-查看 -->
                   <button v-if="canViewUserDetail" class="table-action" type="button" @click="openDetailModal(user)">
                     查看
                   </button>
-
+                  <!-- 列表-编辑 -->
                   <button v-if="canEditUser" class="table-action" type="button" @click="openEditModal(user)">
                     编辑
                   </button>
-
+                  <!-- 列表-重置密码 -->
+                  <button v-if="canResetUserPassword && !user.is_root" class="table-action" type="button"
+                    @click="openPasswordModal(user)">
+                    重置密码
+                  </button>
+                  <!-- 列表-状态 -->
                   <button v-if="canChangeUserStatus" class="table-action" :class="user.is_active ? 'disable' : 'enable'"
                     type="button" @click="openStatusModal(user)">
                     {{ user.is_active ? '禁用' : '启用' }}
@@ -248,14 +254,20 @@
 
           <!-- 用户卡片操作 -->
           <footer class="user-card-footer">
+            <!-- 卡片-查看 -->
             <button v-if="canViewUserDetail" class="card-action" type="button" @click="openDetailModal(user)">
               查看
             </button>
-
+            <!-- 卡片-编辑 -->
             <button v-if="canEditUser" class="card-action" type="button" @click="openEditModal(user)">
               编辑
             </button>
-
+            <!-- 卡片-重置密码 -->
+            <button v-if="canResetUserPassword && !user.is_root" class="card-action" type="button"
+              @click="openPasswordModal(user)">
+              重置密码
+            </button>
+            <!-- 卡片-状态 -->
             <button v-if="canChangeUserStatus" class="card-action"
               :class="{ disable: user.is_active, enable: !user.is_active, }" type="button"
               @click="openStatusModal(user)">
@@ -330,7 +342,7 @@
             编辑已有用户时，
             状态通过独立的启用/禁用按钮修改。
           -->
-          <label v-if="isCreateMode && canChangeUserStatus " class="form-field">
+          <label v-if="isCreateMode && canChangeUserStatus" class="form-field">
             <span class="field-label">
               账号状态
             </span>
@@ -443,11 +455,82 @@
           关闭
         </button>
 
+        <button v-if="canResetUserPassword && selectedUser && !selectedUser.is_root" class="secondary-button"
+          type="button" :disabled="detailLoading || !selectedUser"
+          @click="closeDetailModal(); openPasswordModal(selectedUser);">
+          <i class="bi bi-key" aria-hidden="true"></i>
+          重置密码
+        </button>
+
         <button v-if="canEditUser" class="primary-button" type="button" :disabled="detailLoading || !selectedUser
           " @click="editSelectedUser">
           <i class="bi bi-pencil" aria-hidden="true"></i>
 
           编辑用户
+        </button>
+      </template>
+    </AppModal>
+
+    <!-- ==================== 用户密码重置弹出层 ==================== -->
+
+    <AppModal v-model="passwordModalVisible" scope-class="users-modal-scope" :title="passwordTargetUser
+        ? `重置密码：${passwordTargetUser.username}`
+        : '重置用户密码'
+      " :width="480" :closable="!passwordResetting" :close-on-overlay="!passwordResetting"
+      :close-on-escape="!passwordResetting">
+      <form id="password-reset-form" class="user-form password-reset-form" novalidate
+        @submit.prevent="submitPasswordReset">
+        <!-- 密码重置说明 -->
+        <div class="password-reset-notice">
+          <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+
+          <span>
+            密码重置成功后，该用户之前签发的登录凭证会立即失效，需要使用新密码重新登录。
+          </span>
+        </div>
+
+        <div class="form-grid">
+          <!-- 新密码 -->
+          <label class="form-field full">
+            <span class="field-label">
+              新密码
+              <i aria-hidden="true">*</i>
+            </span>
+
+            <input v-model="passwordResetForm.newPassword
+              " type="password" maxlength="128" autocomplete="new-password" placeholder="请输入新密码" />
+          </label>
+
+          <!-- 确认新密码 -->
+          <label class="form-field full">
+            <span class="field-label">
+              确认新密码
+              <i aria-hidden="true">*</i>
+            </span>
+
+            <input v-model="passwordResetForm
+                .newPasswordConfirm
+              " type="password" maxlength="128" autocomplete="new-password" placeholder="请再次输入新密码" />
+          </label>
+        </div>
+      </form>
+
+      <template #footer>
+        <button class="secondary-button" type="button" :disabled="passwordResetting" @click="closePasswordModal">
+          取消
+        </button>
+
+        <button class="primary-button" type="submit" form="password-reset-form" :disabled="passwordResetting">
+          <i v-if="passwordResetting" class="
+          bi bi-arrow-clockwise
+          button-loading
+        " aria-hidden="true"></i>
+
+          {{
+            passwordResetting
+              ? '正在重置...'
+              : '确认重置'
+          }}
         </button>
       </template>
     </AppModal>

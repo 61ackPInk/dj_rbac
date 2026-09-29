@@ -183,6 +183,46 @@
     }
   }
 
+  /* ==================== 密码重置表单 ==================== */
+
+  .password-reset-form {
+
+    /*
+   * 密码重置说明占据整行，
+   * 与下方密码输入框保持间距。
+   */
+    .password-reset-notice {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+
+      margin-bottom: 18px;
+      padding: 12px 13px;
+
+      border: 1px solid color-mix(in srgb,
+          var(--warning) 25%,
+          var(--border));
+      border-radius: 8px;
+
+      color: var(--text-sub);
+      background:
+        color-mix(in srgb,
+          var(--warning) 8%,
+          var(--bg-card));
+
+      font-size: var(--font-small);
+      line-height: 1.65;
+
+      >i {
+        flex: 0 0 auto;
+        margin-top: 2px;
+
+        color: var(--warning);
+        font-size: 16px;
+      }
+    }
+  }
+
   /* ==================== 用户详情加载状态 ==================== */
 
   .detail-loading {
