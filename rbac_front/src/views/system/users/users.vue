@@ -114,7 +114,7 @@
               <th>角色</th>
               <th>最后登录</th>
               <th>状态</th>
-              <th>操作</th>
+              <th class="action-column">操作</th>
             </tr>
           </thead>
 
@@ -169,27 +169,14 @@
                 </span>
               </td>
 
-              <!-- 用户操作 -->
-              <td>
+              <!-- ==================== 用户操作 ==================== -->
+              <td class="action-column">
                 <div class="action-group">
-                  <!-- 列表-查看 -->
-                  <button v-if="canViewUserDetail" class="table-action" type="button" @click="openDetailModal(user)">
-                    查看
-                  </button>
-                  <!-- 列表-编辑 -->
-                  <button v-if="canEditUser" class="table-action" type="button" @click="openEditModal(user)">
-                    编辑
-                  </button>
-                  <!-- 列表-重置密码 -->
-                  <button v-if="canResetUserPassword && !user.is_root" class="table-action" type="button"
-                    @click="openPasswordModal(user)">
-                    重置密码
-                  </button>
-                  <!-- 列表-状态 -->
-                  <button v-if="canChangeUserStatus" class="table-action" :class="user.is_active ? 'disable' : 'enable'"
-                    type="button" @click="openStatusModal(user)">
-                    {{ user.is_active ? '禁用' : '启用' }}
-                  </button>
+                  <AppActionMenu
+                    :items="getUserActionItems(user)"
+                    :aria-label="`打开用户 ${user.username} 的操作菜单`"
+                    @select="handleUserAction($event, user)"
+                  />
                 </div>
               </td>
             </tr>
@@ -252,27 +239,17 @@
             </div>
           </dl>
 
-          <!-- 用户卡片操作 -->
-          <footer class="user-card-footer">
-            <!-- 卡片-查看 -->
-            <button v-if="canViewUserDetail" class="card-action" type="button" @click="openDetailModal(user)">
-              查看
-            </button>
-            <!-- 卡片-编辑 -->
-            <button v-if="canEditUser" class="card-action" type="button" @click="openEditModal(user)">
-              编辑
-            </button>
-            <!-- 卡片-重置密码 -->
-            <button v-if="canResetUserPassword && !user.is_root" class="card-action" type="button"
-              @click="openPasswordModal(user)">
-              重置密码
-            </button>
-            <!-- 卡片-状态 -->
-            <button v-if="canChangeUserStatus" class="card-action"
-              :class="{ disable: user.is_active, enable: !user.is_active, }" type="button"
-              @click="openStatusModal(user)">
-              {{ user.is_active ? '禁用' : '启用' }}
-            </button>
+          <!-- ==================== 用户卡片操作 ==================== -->
+          <footer v-if="hasUserActions" class="user-card-footer">
+            <span class="card-action-label">
+              用户操作
+            </span>
+
+            <AppActionMenu
+              :items="getUserActionItems(user)"
+              :aria-label="`打开用户 ${user.username} 的操作菜单`"
+              @select="handleUserAction($event, user)"
+            />
           </footer>
         </article>
       </div>

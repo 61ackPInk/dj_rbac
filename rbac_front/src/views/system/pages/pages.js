@@ -12,6 +12,7 @@ import {
 
 import AppModal from '@/components/feedback/modal/app-modal.vue'
 import AppSelect from '@/components/form/select/app-select.vue'
+import AppActionMenu from '@/components/common/action-menu/action-menu.vue'
 
 /* ==================== 页面与角色接口 ==================== */
 
@@ -95,6 +96,7 @@ export default defineComponent({
     components: {
         AppModal,
         AppSelect,
+        AppActionMenu,
     },
 
     setup() {
@@ -160,6 +162,67 @@ export default defineComponent({
                 canAssignPageRole.value
             )
         })
+
+        /* ==================== 页面行操作菜单 ==================== */
+
+        /* 是否至少拥有一项页面操作权限 */
+        const hasPageActions = computed(() => {
+            return (
+                canViewPageDetail.value ||
+                canEditPage.value ||
+                canChangePageStatus.value
+            )
+        })
+
+        /* 根据当前页面生成可见的操作选项 */
+        const getPageActionItems = (page) => {
+            return [
+                {
+                    key: 'detail',
+                    label: '查看详情',
+                    icon: 'bi bi-eye',
+                    visible: canViewPageDetail.value,
+                },
+                {
+                    key: 'edit',
+                    label: '编辑页面',
+                    icon: 'bi bi-pencil',
+                    visible: canEditPage.value,
+                },
+                {
+                    key: 'status',
+                    label: page.is_active
+                        ? '停用页面'
+                        : '启用页面',
+                    icon: page.is_active
+                        ? 'bi bi-slash-circle'
+                        : 'bi bi-check-circle',
+                    danger: page.is_active,
+                    visible: canChangePageStatus.value,
+                },
+            ]
+        }
+
+        /* 执行页面菜单操作 */
+        const handlePageAction = (action, page) => {
+            if (!page) {
+                return
+            }
+
+            switch (action) {
+                case 'detail':
+                    openDetailModal(page)
+                    break
+                case 'edit':
+                    openEditModal(page)
+                    break
+                case 'status':
+                    openStatusModal(page)
+                    break
+                default:
+                    break
+            }
+        }
 
         /* ==================== 页面与角色数据 ==================== */
 
@@ -1117,6 +1180,12 @@ export default defineComponent({
             canChangePageStatus,
             canAssignPageRole,
             canEditPage,
+
+            /* ==================== 页面操作菜单 ==================== */
+
+            hasPageActions,
+            getPageActionItems,
+            handlePageAction,
 
             pages,
             roles,

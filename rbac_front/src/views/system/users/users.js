@@ -10,6 +10,7 @@ import {
 /* ==================== 公共组件 ==================== */
 import AppModal from '@/components/feedback/modal/app-modal.vue'
 import AppSelect from '@/components/form/select/app-select.vue'
+import AppActionMenu from '@/components/common/action-menu/action-menu.vue'
 
 /* ==================== 用户与角色接口 ==================== */
 import {
@@ -95,6 +96,7 @@ export default defineComponent({
   components: {
     AppModal,
     AppSelect,
+    AppActionMenu,
   },
 
   setup() {
@@ -179,6 +181,79 @@ export default defineComponent({
         canAssignUserRole.value
       )
     })
+
+    /* ==================== 用户行操作菜单 ==================== */
+
+    /* 是否至少拥有一项用户操作权限 */
+    const hasUserActions = computed(() => {
+      return (
+        canViewUserDetail.value ||
+        canEditUser.value ||
+        canResetUserPassword.value ||
+        canChangeUserStatus.value
+      )
+    })
+
+    /* 根据当前用户生成可见的操作选项 */
+    const getUserActionItems = (user) => {
+      return [
+        {
+          key: 'detail',
+          label: '查看详情',
+          icon: 'bi bi-eye',
+          visible: canViewUserDetail.value,
+        },
+        {
+          key: 'edit',
+          label: '编辑用户',
+          icon: 'bi bi-pencil',
+          visible: canEditUser.value,
+        },
+        {
+          key: 'reset-password',
+          label: '重置密码',
+          icon: 'bi bi-key',
+          visible:
+            canResetUserPassword.value &&
+            !user.is_root,
+        },
+        {
+          key: 'status',
+          label: user.is_active
+            ? '禁用用户'
+            : '启用用户',
+          icon: user.is_active
+            ? 'bi bi-slash-circle'
+            : 'bi bi-check-circle',
+          danger: user.is_active,
+          visible: canChangeUserStatus.value,
+        },
+      ]
+    }
+
+    /* 执行用户菜单操作 */
+    const handleUserAction = (action, user) => {
+      if (!user) {
+        return
+      }
+
+      switch (action) {
+        case 'detail':
+          openDetailModal(user)
+          break
+        case 'edit':
+          openEditModal(user)
+          break
+        case 'reset-password':
+          openPasswordModal(user)
+          break
+        case 'status':
+          openStatusModal(user)
+          break
+        default:
+          break
+      }
+    }
 
     /*
      * 创建和编辑用户时，
@@ -1164,6 +1239,12 @@ export default defineComponent({
       canAssignUserRole,
       canResetUserPassword,
       canEditUser,
+
+      /* ==================== 用户操作菜单 ==================== */
+
+      hasUserActions,
+      getUserActionItems,
+      handleUserAction,
 
       users,
       roles,

@@ -484,39 +484,19 @@
           }
         }
 
-        /* 操作按钮 */
+        /* ==================== 列表操作菜单 ==================== */
+
+        .action-column {
+          width: 76px;
+
+          text-align: center;
+          white-space: nowrap;
+        }
+
         .action-group {
           display: flex;
           align-items: center;
-          gap: 4px;
-
-          .table-action {
-            height: 30px;
-            padding: 0 8px;
-
-            border: 0;
-            border-radius: 6px;
-
-            color: var(--text-sub);
-            background: transparent;
-
-            font-size: 12px;
-
-            &:hover {
-              color: var(--primary);
-              background: var(--primary-light);
-            }
-
-            &.disable:hover {
-              color: var(--danger);
-              background: var(--danger-light);
-            }
-
-            &.enable:hover {
-              color: var(--success);
-              background: var(--success-light);
-            }
-          }
+          justify-content: center;
         }
       }
     }
@@ -658,46 +638,25 @@
           }
         }
 
-        /* 卡片底部操作 */
+        /* ==================== 卡片操作菜单 ==================== */
+
         .user-card-footer {
           display: flex;
           align-items: center;
-          gap: 5px;
+          justify-content: space-between;
+          gap: 12px;
 
-          padding: 11px 14px;
+          min-height: 54px;
+          padding: 9px 12px 9px 16px;
 
           border-top: 1px solid var(--border);
 
           background: var(--bg-sidebar);
 
-          .card-action {
-            flex: 1;
+          .card-action-label {
+            color: var(--text-muted);
 
-            height: 31px;
-            padding: 0 7px;
-
-            border: 0;
-            border-radius: 6px;
-
-            color: var(--text-sub);
-            background: transparent;
-
-            font-size: 12px;
-
-            &:hover {
-              color: var(--primary);
-              background: var(--primary-light);
-            }
-
-            &.disable:hover {
-              color: var(--danger);
-              background: var(--danger-light);
-            }
-
-            &.enable:hover {
-              color: var(--success);
-              background: var(--success-light);
-            }
+            font-size: var(--font-small);
           }
         }
       }

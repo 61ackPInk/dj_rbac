@@ -136,7 +136,7 @@
                             <th>可见角色</th>
                             <th>排序</th>
                             <th>状态</th>
-                            <th>操作</th>
+                            <th class="action-column">操作</th>
                         </tr>
                     </thead>
 
@@ -207,25 +207,14 @@
                                 </span>
                             </td>
 
-                            <!-- 操作 -->
-                            <td>
+                            <!-- ==================== 页面操作 ==================== -->
+                            <td class="action-column">
                                 <div class="action-group">
-                                    <!-- 列表-查看 -->
-                                    <button v-if="canViewPageDetail" class="table-action" type="button"
-                                        @click="openDetailModal(page)">
-                                        查看
-                                    </button>
-                                    <!-- 列表-编辑 -->
-                                    <button v-if="canEditPage" class="table-action" type="button"
-                                        @click="openEditModal(page)">
-                                        编辑
-                                    </button>
-                                    <!-- 列表-状态 -->
-                                    <button v-if="canChangePageStatus" class="table-action"
-                                        :class="page.is_active ? 'disable' : 'enable'" type="button"
-                                        @click="openStatusModal(page)">
-                                        {{ page.is_active ? '停用' : '启用' }}
-                                    </button>
+                                    <AppActionMenu
+                                        :items="getPageActionItems(page)"
+                                        :aria-label="`打开页面 ${page.name} 的操作菜单`"
+                                        @select="handlePageAction($event, page)"
+                                    />
                                 </div>
                             </td>
                         </tr>
@@ -289,23 +278,17 @@
                         </div>
                     </dl>
 
-                    <!-- 卡片操作 -->
-                    <footer class="page-card-footer">
-                        <!-- 卡片-查看 -->
-                        <button v-if="canViewPageDetail" class="card-action" type="button"
-                            @click="openDetailModal(page)">
-                            查看
-                        </button>
-                        <!-- 卡片-编辑 -->
-                        <button v-if="canEditPage" class="card-action" type="button" @click="openEditModal(page)">
-                            编辑
-                        </button>
-                        <!-- 卡片-状态 -->
-                        <button v-if="canChangePageStatus" class="card-action"
-                            :class="{ disable: page.is_active, enable: !page.is_active, }" type="button"
-                            @click="openStatusModal(page)">
-                            {{ page.is_active ? '停用' : '启用' }}
-                        </button>
+                    <!-- ==================== 页面卡片操作 ==================== -->
+                    <footer v-if="hasPageActions" class="page-card-footer">
+                        <span class="card-action-label">
+                            页面操作
+                        </span>
+
+                        <AppActionMenu
+                            :items="getPageActionItems(page)"
+                            :aria-label="`打开页面 ${page.name} 的操作菜单`"
+                            @select="handlePageAction($event, page)"
+                        />
                     </footer>
                 </article>
             </div>
