@@ -678,33 +678,38 @@
     }
   }
 
-  /* 页面名称和编码 */
+  /* ==================== 权限分组名称 ==================== */
+
   .permission-page-info {
     min-width: 0;
 
+    /* 页面名称 */
     strong {
       display: block;
 
       color: var(--text-main);
-      font-size: var(--font-small);
-      font-weight: 620;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.5;
     }
 
+    /* 页面编码 */
     code {
       display: block;
       margin-top: 2px;
 
       color: var(--text-muted);
-      font-size: 10px;
-      line-height: 1.3;
+      font-size: 11px;
+      line-height: 1.4;
     }
   }
 
+  /* 已选择权限数量 */
   .permission-count {
     flex: 0 0 auto;
 
     color: var(--text-muted);
-    font-size: 11px;
+    font-size: 12px;
   }
 
   /* ==================== 权限选项列表 ==================== */
@@ -733,8 +738,8 @@
     gap: 9px;
 
     min-width: 0;
-    min-height: 68px;
-    padding: 9px 10px;
+    min-height: 78px;
+    padding: 11px 12px;
 
     border: 1px solid var(--border);
     border-radius: 7px;
@@ -785,10 +790,10 @@
       overflow: hidden;
 
       color: var(--text-main);
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.5;
 
-      font-size: var(--font-small);
-      font-weight: 580;
-      line-height: 1.35;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
@@ -799,9 +804,9 @@
       overflow: hidden;
 
       color: var(--primary);
+      font-size: 11px;
+      line-height: 1.4;
 
-      font-size: 10px;
-      line-height: 1.35;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
@@ -812,10 +817,9 @@
       margin-top: 4px;
       overflow: hidden;
 
-      color: var(--text-muted);
-
-      font-size: 10px;
-      line-height: 1.4;
+      color: var(--text-sub);
+      font-size: 12px;
+      line-height: 1.5;
 
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
