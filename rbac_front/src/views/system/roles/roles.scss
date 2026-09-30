@@ -16,7 +16,7 @@
 
     margin-bottom: 24px;
 
-    > div {
+    >div {
       min-width: 0;
     }
 
@@ -111,11 +111,9 @@
 
       &:hover:not(:disabled) {
         background:
-          color-mix(
-            in srgb,
+          color-mix(in srgb,
             var(--danger) 88%,
-            black
-          );
+            black);
       }
     }
 
@@ -124,11 +122,9 @@
 
       &:hover:not(:disabled) {
         background:
-          color-mix(
-            in srgb,
+          color-mix(in srgb,
             var(--success) 88%,
-            black
-          );
+            black);
       }
     }
   }
@@ -196,15 +192,12 @@
           border-color: var(--primary);
 
           box-shadow:
-            0 0 0 3px
-            color-mix(
-              in srgb,
+            0 0 0 3px color-mix(in srgb,
               var(--primary) 10%,
-              transparent
-            );
+              transparent);
         }
 
-        > i {
+        >i {
           flex: 0 0 auto;
 
           color: var(--text-muted);
@@ -329,12 +322,9 @@
             background: var(--bg-card);
 
             box-shadow:
-              0 2px 5px
-              color-mix(
-                in srgb,
+              0 2px 5px color-mix(in srgb,
                 var(--text-main) 8%,
-                transparent
-              );
+                transparent);
           }
         }
       }
@@ -380,7 +370,7 @@
       color: var(--text-muted);
       text-align: center;
 
-      > i {
+      >i {
         margin-bottom: 14px;
 
         color: var(--primary);
@@ -407,7 +397,7 @@
       }
 
       &.error {
-        > i {
+        >i {
           color: var(--danger);
         }
       }
@@ -563,42 +553,19 @@
           white-space: nowrap;
         }
 
-        /* 操作按钮 */
+        /* ==================== 列表操作菜单 ==================== */
+
+        .action-column {
+          width: 76px;
+
+          text-align: center;
+          white-space: nowrap;
+        }
+
         .action-group {
           display: flex;
           align-items: center;
-          gap: 4px;
-
-          .table-action {
-            height: 30px;
-            padding: 0 8px;
-
-            border: 0;
-            border-radius: 6px;
-
-            color: var(--text-sub);
-            background: transparent;
-
-            font-family: inherit;
-            font-size: 12px;
-
-            cursor: pointer;
-
-            &:hover {
-              color: var(--primary);
-              background: var(--primary-light);
-            }
-
-            &.disable:hover {
-              color: var(--danger);
-              background: var(--danger-light);
-            }
-
-            &.enable:hover {
-              color: var(--success);
-              background: var(--success-light);
-            }
-          }
+          justify-content: center;
         }
       }
     }
@@ -631,19 +598,14 @@
 
         &:hover {
           border-color:
-            color-mix(
-              in srgb,
+            color-mix(in srgb,
               var(--text-muted) 35%,
-              var(--border)
-            );
+              var(--border));
 
           box-shadow:
-            0 9px 24px
-            color-mix(
-              in srgb,
+            0 9px 24px color-mix(in srgb,
               var(--text-main) 6%,
-              transparent
-            );
+              transparent);
 
           transform: translateY(-1px);
         }
@@ -774,49 +736,26 @@
           }
         }
 
-        /* 卡片操作 */
+        /* ==================== 卡片操作菜单 ==================== */
+
         .role-card-footer {
           display: flex;
           align-items: center;
-          gap: 5px;
+          justify-content: space-between;
+          gap: 12px;
 
-          padding: 11px 14px;
+          min-height: 54px;
+          padding: 9px 12px 9px 16px;
 
           border-top: 1px solid var(--border);
 
           background: var(--bg-sidebar);
 
-          .card-action {
-            flex: 1;
+          /* 左侧辅助文字 */
+          .card-action-label {
+            color: var(--text-muted);
 
-            height: 31px;
-            padding: 0 7px;
-
-            border: 0;
-            border-radius: 6px;
-
-            color: var(--text-sub);
-            background: transparent;
-
-            font-family: inherit;
-            font-size: 12px;
-
-            cursor: pointer;
-
-            &:hover {
-              color: var(--primary);
-              background: var(--primary-light);
-            }
-
-            &.disable:hover {
-              color: var(--danger);
-              background: var(--danger-light);
-            }
-
-            &.enable:hover {
-              color: var(--success);
-              background: var(--success-light);
-            }
+            font-size: var(--font-small);
           }
         }
       }
@@ -864,8 +803,7 @@
   .state-loading,
   .refresh-button .is-rotating {
     animation:
-      roles-page-rotate
-      0.8s linear infinite;
+      roles-page-rotate 0.8s linear infinite;
   }
 
   @keyframes roles-page-rotate {
@@ -971,6 +909,7 @@
   /* ==================== 减少动态效果 ==================== */
 
   @media (prefers-reduced-motion: reduce) {
+
     .state-loading,
     .refresh-button .is-rotating {
       animation: none;

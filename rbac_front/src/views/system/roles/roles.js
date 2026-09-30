@@ -12,6 +12,7 @@ import {
 
 import AppModal from '@/components/feedback/modal/app-modal.vue'
 import AppSelect from '@/components/form/select/app-select.vue'
+import AppActionMenu from '@/components/common/action-menu/action-menu.vue'
 
 /* ==================== 角色接口 ==================== */
 
@@ -96,6 +97,7 @@ export default defineComponent({
   components: {
     AppModal,
     AppSelect,
+    AppActionMenu,
   },
 
   setup() {
@@ -156,6 +158,98 @@ export default defineComponent({
     const canConfigureRolePermissions = computed(() => {
       return Boolean(authStore.isRoot)
     })
+
+    /* ==================== 角色行操作菜单 ==================== */
+
+    /*
+     * 是否至少拥有一项角色操作权限。
+     *
+     * 卡片模式会使用它判断是否显示底部操作区域，
+     * 避免没有权限时留下空白区域。
+     */
+    const hasRoleActions = computed(() => {
+      return (
+        canViewRoleDetail.value ||
+        canUpdateRole.value ||
+        canConfigureRolePermissions.value ||
+        canChangeRoleStatus.value
+      )
+    })
+
+    /*
+     * 根据当前角色生成操作菜单。
+     *
+     * visible 用于控制权限，
+     * danger 用于标记停用等危险操作。
+     */
+    const getRoleActionItems = (role) => {
+      return [
+        {
+          key: 'detail',
+          label: '查看详情',
+          icon: 'bi bi-eye',
+          visible: canViewRoleDetail.value,
+        },
+        {
+          key: 'edit',
+          label: '编辑角色',
+          icon: 'bi bi-pencil',
+          visible: canUpdateRole.value,
+        },
+        {
+          key: 'permission',
+          label: '配置权限',
+          icon: 'bi bi-shield-check',
+          visible:
+            canConfigureRolePermissions.value,
+        },
+        {
+          key: 'status',
+          label: role.is_active
+            ? '停用角色'
+            : '启用角色',
+          icon: role.is_active
+            ? 'bi bi-slash-circle'
+            : 'bi bi-check-circle',
+          danger: role.is_active,
+          visible:
+            canChangeRoleStatus.value,
+        },
+      ]
+    }
+
+    /* ==================== 执行角色菜单操作 ==================== */
+
+    /*
+     * 公共操作菜单只负责返回操作标识。
+     * 具体打开哪个弹出层，仍然由角色页面处理。
+     */
+    const handleRoleAction = (action, role) => {
+      if (!role) {
+        return
+      }
+
+      switch (action) {
+        case 'detail':
+          openDetailModal(role)
+          break
+
+        case 'edit':
+          openEditModal(role)
+          break
+
+        case 'permission':
+          openPermissionModal(role)
+          break
+
+        case 'status':
+          openStatusModal(role)
+          break
+
+        default:
+          break
+      }
+    }
 
     /* ==================== 角色数据 ==================== */
 
@@ -1163,6 +1257,12 @@ export default defineComponent({
       canUpdateRole,
       canChangeRoleStatus,
       canConfigureRolePermissions,
+
+      /* ==================== 角色操作菜单 ==================== */
+
+      hasRoleActions,
+      getRoleActionItems,
+      handleRoleAction,
 
       roles,
       loading,

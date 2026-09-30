@@ -140,7 +140,7 @@
                             <th>角色描述</th>
                             <th>状态</th>
                             <th>更新时间</th>
-                            <th>操作</th>
+                            <th class="action-column">操作</th>
                         </tr>
                     </thead>
 
@@ -199,29 +199,11 @@
                             </td>
 
                             <!-- 角色操作 -->
-                            <td>
+                            <td class="action-column">
                                 <div class="action-group">
-                                    <!-- 列表-查看角色详情 -->
-                                    <button v-if="canViewRoleDetail" class="table-action" type="button"
-                                        @click="openDetailModal(role)">
-                                        查看
-                                    </button>
-                                    <!-- 列表-修改角色资料 -->
-                                    <button v-if="canUpdateRole" class="table-action" type="button"
-                                        @click="openEditModal(role)">
-                                        编辑
-                                    </button>
-                                    <!-- 列表-配置权限(只有根管理员可以配置角色操作权限) -->
-                                    <button v-if="canConfigureRolePermissions" class="table-action" type="button"
-                                        @click="openPermissionModal(role)">
-                                        配置权限
-                                    </button>
-                                    <!-- 列表-角色状态 -->
-                                    <button v-if="canChangeRoleStatus" class="table-action"
-                                        :class="role.is_active ? 'disable' : 'enable'" type="button"
-                                        @click="openStatusModal(role)">
-                                        {{ role.is_active ? '停用' : '启用' }}
-                                    </button>
+                                    <AppActionMenu :items="getRoleActionItems(role)"
+                                        :aria-label="`打开角色 ${role.name} 的操作菜单`"
+                                        @select="handleRoleAction($event, role)" />
                                 </div>
                             </td>
                         </tr>
@@ -284,27 +266,13 @@
                     </dl>
 
                     <!-- 卡片操作 -->
-                    <footer class="role-card-footer">
-                        <!-- 卡片-查看角色详情 -->
-                        <button v-if="canViewRoleDetail" class="card-action" type="button"
-                            @click="openDetailModal(role)">
-                            查看
-                        </button>
-                        <!-- 卡片-修改角色资料 -->
-                        <button v-if="canUpdateRole" class="card-action" type="button" @click="openEditModal(role)">
-                            编辑
-                        </button>
-                        <!-- 卡片-配置权限(只有根管理员可以配置角色操作权限) -->
-                        <button v-if="canConfigureRolePermissions" class="card-action" type="button"
-                            @click="openPermissionModal(role)">
-                            配置权限
-                        </button>
-                        <!-- 卡片-角色状态 -->
-                        <button v-if="canChangeRoleStatus" class="card-action"
-                            :class="{ disable: role.is_active, enable: !role.is_active, }" type="button"
-                            @click="openStatusModal(role)">
-                            {{ role.is_active ? '停用' : '启用' }}
-                        </button>
+                    <footer v-if="hasRoleActions" class="role-card-footer">
+                        <span class="card-action-label">
+                            角色操作
+                        </span>
+
+                        <AppActionMenu :items="getRoleActionItems(role)" :aria-label="`打开角色 ${role.name} 的操作菜单`"
+                            @select="handleRoleAction($event, role)" />
                     </footer>
                 </article>
             </div>
@@ -509,8 +477,8 @@
                 " :close-on-overlay="!permissionLoading &&
                     !permissionSaving
                     " :close-on-escape="!permissionLoading &&
-            !permissionSaving
-            ">
+                        !permissionSaving
+                        ">
             <!-- 权限数据加载状态 -->
             <div v-if="permissionLoading" class="permission-loading">
                 <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
