@@ -504,7 +504,7 @@
         <AppModal v-model="permissionModalVisible" scope-class="roles-modal-scope" :title="permissionTargetRole
             ? `配置权限：${permissionTargetRole.name}`
             : '配置角色权限'
-            " :width="760" :closable="!permissionLoading &&
+            " :width="980" :closable="!permissionLoading &&
                 !permissionSaving
                 " :close-on-overlay="!permissionLoading &&
                     !permissionSaving

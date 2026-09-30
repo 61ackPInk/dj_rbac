@@ -7,6 +7,38 @@
  * 不会覆盖用户管理或其他页面的弹出层样式。
  */
 .app-modal-overlay.roles-modal-scope {
+
+  /* ==================== 权限弹出层滚动提示 ==================== */
+
+  /*
+  * 公共弹出层内容区负责滚动。
+  *
+  * 显示细滚动条，让用户能够明确知道
+  * 下方还有更多权限内容。
+  */
+  .app-modal-body {
+    scrollbar-width: thin;
+    scrollbar-color:
+      var(--border) transparent;
+
+    &::-webkit-scrollbar {
+      width: 7px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 10px;
+      background: var(--border);
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+  }
+
   /* ==================== 弹出层公共按钮 ==================== */
 
   .primary-button,
@@ -505,15 +537,22 @@
     }
   }
 
-  /* 权限配置容器 */
+  /* ==================== 权限配置容器 ==================== */
+
+  /*
+  * 公共 AppModal 的 .app-modal-body
+  * 本身已经负责纵向滚动。
+  *
+  * 这里不能再次设置 max-height 和 overflow，
+  * 否则会形成两层滚动区域，
+  * 导致后面的权限分组不容易被发现。
+  */
   .permission-config {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
 
-    max-height: min(580px, 65vh);
-    overflow-y: auto;
-    padding-right: 4px;
+    min-width: 0;
   }
 
   /* 权限配置说明 */
@@ -558,7 +597,7 @@
       justify-content: space-between;
       gap: 14px;
 
-      padding: 13px 15px;
+      padding: 10px 12px;
 
       border-bottom: 1px solid var(--border);
 
@@ -653,10 +692,11 @@
 
     code {
       display: block;
-      margin-top: 3px;
+      margin-top: 2px;
 
       color: var(--text-muted);
-      font-size: 11px;
+      font-size: 10px;
+      line-height: 1.3;
     }
   }
 
@@ -667,27 +707,37 @@
     font-size: 11px;
   }
 
-  /* 权限选项列表 */
+  /* ==================== 权限选项列表 ==================== */
+
+  /*
+  * 权限弹出层宽度为980px，
+  * 桌面端使用三列展示。
+  *
+  * 用户管理的7项权限只需要三行，
+  * 能明显降低整个弹出层的内容高度。
+  */
   .permission-options {
     display: grid;
     grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-    gap: 10px;
+      repeat(3, minmax(0, 1fr));
+    gap: 8px;
 
-    padding: 13px;
+    padding: 10px;
   }
 
-  /* 单个权限选项 */
+  /* ==================== 单个权限选项 ==================== */
+
   .permission-option {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
+    gap: 9px;
 
     min-width: 0;
-    padding: 11px;
+    min-height: 68px;
+    padding: 9px 10px;
 
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 7px;
 
     cursor: pointer;
 
@@ -719,7 +769,8 @@
     }
   }
 
-  /* 权限名称、编码和说明 */
+  /* ==================== 权限名称、编码和说明 ==================== */
+
   .permission-option-info {
     min-width: 0;
 
@@ -729,26 +780,45 @@
       display: block;
     }
 
+    /* 权限名称 */
     strong {
+      overflow: hidden;
+
       color: var(--text-main);
+
       font-size: var(--font-small);
       font-weight: 580;
+      line-height: 1.35;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
+    /* 权限编码 */
     code {
-      margin-top: 4px;
+      margin-top: 3px;
+      overflow: hidden;
 
       color: var(--primary);
-      font-size: 11px;
-      overflow-wrap: anywhere;
+
+      font-size: 10px;
+      line-height: 1.35;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
+    /* 权限说明 */
     small {
-      margin-top: 5px;
+      display: -webkit-box;
+      margin-top: 4px;
+      overflow: hidden;
 
       color: var(--text-muted);
-      font-size: 11px;
-      line-height: 1.5;
+
+      font-size: 10px;
+      line-height: 1.4;
+
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
     }
   }
 
@@ -815,15 +885,25 @@
       roles-modal-rotate 0.8s linear infinite;
   }
 
+  /* ==================== 中等屏幕适配 ==================== */
+
+  @media (max-width: 900px) {
+
+    /*
+     * 中等宽度下由三列改为两列，
+     * 避免卡片文字被严重压缩。
+     */
+    .permission-options {
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    }
+  }
+
   /* ==================== 平板与手机端 ==================== */
 
   @media (max-width: 600px) {
 
     /* 角色权限配置在手机端使用单列 */
-    .permission-config {
-      max-height: 62vh;
-    }
-
     .permission-options {
       grid-template-columns: 1fr;
       padding: 10px;
@@ -831,7 +911,7 @@
 
     .permission-group {
       .permission-group-header {
-        padding: 12px;
+        padding: 10px;
       }
     }
 
