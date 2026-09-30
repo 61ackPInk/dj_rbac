@@ -400,7 +400,7 @@
 
             .page-table {
                 width: 100%;
-                min-width: 1040px;
+                min-width: 960px;
 
                 border-collapse: collapse;
                 white-space: nowrap;
@@ -444,6 +444,18 @@
                             background: var(--bg-sidebar);
                         }
 
+                        /* 顶级页面使用轻微背景区分 */
+                        &.is-root-row {
+                            background:
+                                color-mix(in srgb,
+                                    var(--bg-sidebar) 72%,
+                                    var(--bg-card));
+
+                            &:hover {
+                                background: var(--bg-hover);
+                            }
+                        }
+
                         &:last-child {
                             td {
                                 border-bottom: 0;
@@ -457,6 +469,8 @@
                     display: flex;
                     align-items: center;
                     gap: 11px;
+
+                    min-width: 290px;
 
                     .page-avatar {
                         display: grid;
@@ -504,6 +518,84 @@
                     }
                 }
 
+                /* ==================== 树形页面层级 ==================== */
+
+                .tree-page-cell {
+                    position: relative;
+
+                    padding-left: var(--tree-indent);
+
+                    .tree-branch {
+                        position: absolute;
+                        top: -16px;
+                        left: var(--tree-branch-offset);
+
+                        width: 18px;
+                        height: 37px;
+
+                        border-bottom: 1px solid var(--border);
+                        border-left: 1px solid var(--border);
+                        border-radius: 0 0 0 6px;
+
+                        pointer-events: none;
+                    }
+
+                    .tree-toggle,
+                    .tree-toggle-placeholder {
+                        flex: 0 0 auto;
+
+                        width: 24px;
+                        height: 24px;
+                    }
+
+                    .tree-toggle {
+                        display: grid;
+                        place-items: center;
+                        padding: 0;
+
+                        border: 0;
+                        border-radius: 6px;
+
+                        color: var(--text-muted);
+                        background: transparent;
+
+                        cursor: pointer;
+
+                        transition:
+                            color 0.2s ease,
+                            background-color 0.2s ease;
+
+                        &:hover:not(:disabled) {
+                            color: var(--primary);
+                            background: var(--primary-light);
+                        }
+
+                        &:disabled {
+                            cursor: default;
+                        }
+
+                        i {
+                            font-size: var(--font-caption);
+
+                            transition: transform 0.2s ease;
+
+                            &.is-expanded {
+                                transform: rotate(90deg);
+                            }
+                        }
+                    }
+
+                    .child-count {
+                        display: block;
+                        margin-top: 3px;
+
+                        color: var(--text-sub);
+
+                        font-size: var(--font-caption);
+                        line-height: 1.4;
+                    }
+                }
+
                 /* 页面路由 */
                 .path-tag {
                     display: inline-flex;
@@ -525,26 +617,6 @@
                     font-size: var(--font-caption);
                     text-overflow: ellipsis;
                     white-space: nowrap;
-                }
-
-                /* 父页面 */
-                .parent-tag {
-                    display: inline-flex;
-                    align-items: center;
-
-                    padding: 5px 9px;
-
-                    border-radius: 20px;
-
-                    color: var(--text-sub);
-                    background: var(--bg-hover);
-
-                    font-size: var(--font-caption);
-
-                    &.root {
-                        color: var(--primary);
-                        background: var(--primary-light);
-                    }
                 }
 
                 /* 可见角色 */
@@ -599,14 +671,131 @@
         /* ==================== 卡片显示 ==================== */
 
         .card-view {
-            display: grid;
-            grid-template-columns:
-                repeat(3, minmax(0, 1fr));
+            display: flex;
+            flex-direction: column;
             gap: 16px;
 
             padding: 18px;
 
             background: var(--bg-sidebar);
+
+            /* ==================== 顶级页面卡片分组 ==================== */
+
+            .page-card-group {
+                overflow: hidden;
+
+                border: 1px solid var(--border);
+                border-radius: var(--radius-card);
+
+                background: var(--bg-card);
+
+                .page-group-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 18px;
+
+                    min-height: 76px;
+                    padding: 14px 16px;
+
+                    border-bottom: 1px solid var(--border);
+
+                    background: var(--bg-sidebar);
+                }
+
+                .page-group-main,
+                .page-group-actions {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+
+                    min-width: 0;
+                }
+
+                .group-icon {
+                    display: grid;
+                    place-items: center;
+                    flex: 0 0 auto;
+
+                    width: 42px;
+                    height: 42px;
+
+                    border-radius: 10px;
+
+                    color: var(--primary);
+                    background: var(--primary-light);
+
+                    i {
+                        font-size: 18px;
+                        line-height: 1;
+                    }
+                }
+
+                .group-title {
+                    min-width: 0;
+
+                    strong,
+                    span {
+                        display: block;
+                        overflow: hidden;
+
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
+
+                    strong {
+                        color: var(--text-title);
+
+                        font-size: var(--font-card-title);
+                        font-weight: var(--font-weight-heading);
+                    }
+
+                    span {
+                        margin-top: 5px;
+
+                        color: var(--text-muted);
+
+                        font-family:
+                            Consolas,
+                            "Courier New",
+                            monospace;
+                        font-size: var(--font-caption);
+                    }
+                }
+
+                .child-total {
+                    color: var(--text-sub);
+
+                    font-size: var(--font-small);
+                    white-space: nowrap;
+                }
+
+                .page-group-grid {
+                    display: grid;
+                    grid-template-columns:
+                        repeat(3, minmax(0, 1fr));
+                    gap: 14px;
+
+                    padding: 16px;
+
+                    background: var(--bg-sidebar);
+                }
+
+                .group-empty {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+
+                    min-height: 82px;
+                    padding: 18px;
+
+                    color: var(--text-muted);
+                    background: var(--bg-card);
+
+                    font-size: var(--font-small);
+                }
+            }
 
             .page-card {
                 min-width: 0;
@@ -703,6 +892,25 @@
                             }
                         }
                     }
+                }
+
+                .level-tag {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex: 0 0 auto;
+
+                    min-width: 30px;
+                    height: 24px;
+                    padding: 0 7px;
+
+                    border-radius: 12px;
+
+                    color: var(--text-sub);
+                    background: var(--bg-hover);
+
+                    font-size: var(--font-caption);
+                    font-weight: var(--font-weight-medium);
                 }
 
                 /* 卡片信息 */
@@ -822,8 +1030,12 @@
     @media (max-width: 1100px) {
         .page-panel {
             .card-view {
-                grid-template-columns:
-                    repeat(2, minmax(0, 1fr));
+                .page-card-group {
+                    .page-group-grid {
+                        grid-template-columns:
+                            repeat(2, minmax(0, 1fr));
+                    }
+                }
             }
 
             .toolbar {
@@ -903,10 +1115,27 @@
             }
 
             .card-view {
-                grid-template-columns: 1fr;
                 gap: 14px;
 
                 padding: 14px;
+
+                .page-card-group {
+                    .page-group-header {
+                        align-items: flex-start;
+                        flex-direction: column;
+
+                        .page-group-actions {
+                            justify-content: space-between;
+
+                            width: 100%;
+                        }
+                    }
+
+                    .page-group-grid {
+                        grid-template-columns: 1fr;
+                        padding: 12px;
+                    }
+                }
             }
         }
     }

@@ -130,32 +130,88 @@
                 <table class="page-table">
                     <thead>
                         <tr>
-                            <th>页面</th>
+                            <th>页面结构</th>
                             <th>页面路由</th>
-                            <th>父页面</th>
                             <th>可见角色</th>
-                            <th>排序</th>
+                            <th>同级排序</th>
                             <th>状态</th>
                             <th class="action-column">操作</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        <tr v-for="page in filteredPages" :key="page.id">
-                            <!-- 页面图标与名称 -->
+                        <tr
+                            v-for="row in treeRows"
+                            :key="row.page.id"
+                            :class="{
+                                'is-root-row': row.depth === 0,
+                            }"
+                        >
+                            <!-- ==================== 树形页面名称 ==================== -->
                             <td>
-                                <div class="page-cell">
+                                <div
+                                    class="page-cell tree-page-cell"
+                                    :style="{
+                                        '--tree-indent': `${row.depth * 30}px`,
+                                        '--tree-branch-offset': `${row.depth * 30 - 18}px`,
+                                    }"
+                                >
+                                    <!-- 子页面层级连接线 -->
+                                    <span
+                                        v-if="row.depth > 0"
+                                        class="tree-branch"
+                                        aria-hidden="true"
+                                    ></span>
+
+                                    <!-- 展开或收起子页面 -->
+                                    <button
+                                        v-if="row.childCount > 0"
+                                        class="tree-toggle"
+                                        type="button"
+                                        :disabled="isFilteringTree"
+                                        :aria-label="isPageExpanded(row.page.id)
+                                            ? `收起 ${row.page.name}`
+                                            : `展开 ${row.page.name}`"
+                                        :aria-expanded="isFilteringTree || isPageExpanded(row.page.id)"
+                                        @click="togglePageExpanded(row.page.id)"
+                                    >
+                                        <i
+                                            class="bi bi-chevron-right"
+                                            :class="{
+                                                'is-expanded': isFilteringTree || isPageExpanded(row.page.id),
+                                            }"
+                                            aria-hidden="true"
+                                        ></i>
+                                    </button>
+
+                                    <span
+                                        v-else
+                                        class="tree-toggle-placeholder"
+                                        aria-hidden="true"
+                                    ></span>
+
                                     <span class="page-avatar">
-                                        <i :class="getPageIcon(page)
-                                            " aria-hidden="true"></i>
+                                        <i
+                                            :class="getPageIcon(row.page)"
+                                            aria-hidden="true"
+                                        ></i>
                                     </span>
 
                                     <div class="page-basic">
                                         <strong>
-                                            {{ page.name }}
+                                            {{ row.page.name }}
                                         </strong>
 
-                                        <span>{{ page.code }}</span>
+                                        <span>
+                                            {{ row.page.code }}
+                                        </span>
+
+                                        <small
+                                            v-if="row.childCount > 0"
+                                            class="child-count"
+                                        >
+                                            {{ row.childCount }} 个直接子页面
+                                        </small>
                                     </div>
                                 </div>
                             </td>
@@ -163,47 +219,38 @@
                             <!-- 页面路由 -->
                             <td>
                                 <code class="path-tag">
-                  {{ page.path }}
-                </code>
-                            </td>
-
-                            <!-- 父页面 -->
-                            <td>
-                                <span class="parent-tag" :class="{
-                                    root: !page.parent,
-                                }">
-                                    {{ getParentName(page) }}
-                                </span>
+                                    {{ row.page.path }}
+                                </code>
                             </td>
 
                             <!-- 可见角色 -->
                             <td>
-                                <span class="roles-text" :title="getVisibleRoleNames(page)
-                                    ">
-                                    {{
-                                        getVisibleRoleNames(page)
-                                    }}
+                                <span
+                                    class="roles-text"
+                                    :title="getVisibleRoleNames(row.page)"
+                                >
+                                    {{ getVisibleRoleNames(row.page) }}
                                 </span>
                             </td>
 
-                            <!-- 排序 -->
+                            <!-- 同级排序 -->
                             <td>
                                 <span class="sort-value">
-                                    {{ page.sort_order }}
+                                    {{ row.page.sort_order }}
                                 </span>
                             </td>
 
                             <!-- 状态 -->
                             <td>
-                                <span class="status-tag" :class="page.is_active
-                                    ? 'enabled'
-                                    : 'disabled'
-                                    ">
-                                    {{
-                                        page.is_active
-                                            ? '已启用'
-                                            : '已停用'
-                                    }}
+                                <span
+                                    class="status-tag"
+                                    :class="row.page.is_active
+                                        ? 'enabled'
+                                        : 'disabled'"
+                                >
+                                    {{ row.page.is_active
+                                        ? '已启用'
+                                        : '已停用' }}
                                 </span>
                             </td>
 
@@ -211,9 +258,9 @@
                             <td class="action-column">
                                 <div class="action-group">
                                     <AppActionMenu
-                                        :items="getPageActionItems(page)"
-                                        :aria-label="`打开页面 ${page.name} 的操作菜单`"
-                                        @select="handlePageAction($event, page)"
+                                        :items="getPageActionItems(row.page)"
+                                        :aria-label="`打开页面 ${row.page.name} 的操作菜单`"
+                                        @select="handlePageAction($event, row.page)"
                                     />
                                 </div>
                             </td>
@@ -224,73 +271,141 @@
 
             <!-- ==================== 卡片显示 ==================== -->
 
-            <div v-else class="card-view">
-                <article v-for="page in filteredPages" :key="page.id" class="page-card">
-                    <!-- 卡片头部 -->
-                    <header class="page-card-header">
-                        <div class="page-card-person">
-                            <span class="card-avatar">
-                                <i :class="getPageIcon(page)" aria-hidden="true"></i>
+            <div v-else class="card-view grouped-card-view">
+                <section
+                    v-for="group in cardGroups"
+                    :key="group.root.id"
+                    class="page-card-group"
+                >
+                    <!-- ==================== 顶级页面分组 ==================== -->
+                    <header class="page-group-header">
+                        <div class="page-group-main">
+                            <span class="group-icon">
+                                <i
+                                    :class="getPageIcon(group.root)"
+                                    aria-hidden="true"
+                                ></i>
                             </span>
 
-                            <div class="card-page-info">
-                                <strong>{{ page.name }}</strong>
-                                <span>{{ page.code }}</span>
+                            <div class="group-title">
+                                <strong>{{ group.root.name }}</strong>
+
+                                <span>
+                                    {{ group.root.code }} · {{ group.root.path }}
+                                </span>
                             </div>
                         </div>
 
-                        <span class="status-tag" :class="page.is_active
-                            ? 'enabled'
-                            : 'disabled'
-                            ">
-                            {{
-                                page.is_active
+                        <div class="page-group-actions">
+                            <span class="child-total">
+                                {{ group.items.length }} 个子页面
+                            </span>
+
+                            <span
+                                class="status-tag"
+                                :class="group.root.is_active
+                                    ? 'enabled'
+                                    : 'disabled'"
+                            >
+                                {{ group.root.is_active
                                     ? '已启用'
-                                    : '已停用'
-                            }}
-                        </span>
+                                    : '已停用' }}
+                            </span>
+
+                            <AppActionMenu
+                                :items="getPageActionItems(group.root)"
+                                :aria-label="`打开页面 ${group.root.name} 的操作菜单`"
+                                @select="handlePageAction($event, group.root)"
+                            />
+                        </div>
                     </header>
 
-                    <!-- 卡片资料 -->
-                    <dl class="page-card-body">
-                        <div class="card-info-row">
-                            <dt>页面路由</dt>
-                            <dd>{{ page.path }}</dd>
-                        </div>
+                    <!-- ==================== 分组中的子页面 ==================== -->
+                    <div
+                        v-if="group.items.length"
+                        class="page-group-grid"
+                    >
+                        <article
+                            v-for="item in group.items"
+                            :key="item.page.id"
+                            class="page-card"
+                        >
+                            <!-- 卡片头部 -->
+                            <header class="page-card-header">
+                                <div class="page-card-person">
+                                    <span class="card-avatar">
+                                        <i
+                                            :class="getPageIcon(item.page)"
+                                            aria-hidden="true"
+                                        ></i>
+                                    </span>
 
-                        <div class="card-info-row">
-                            <dt>父页面</dt>
-                            <dd>{{ getParentName(page) }}</dd>
-                        </div>
+                                    <div class="card-page-info">
+                                        <strong>{{ item.page.name }}</strong>
+                                        <span>{{ item.page.code }}</span>
+                                    </div>
+                                </div>
 
-                        <div class="card-info-row">
-                            <dt>可见角色</dt>
+                                <span
+                                    class="level-tag"
+                                    :title="`第 ${item.depth} 层页面`"
+                                >
+                                    L{{ item.depth }}
+                                </span>
+                            </header>
 
-                            <dd :title="getVisibleRoleNames(page)
-                                ">
-                                {{ getVisibleRoleNames(page) }}
-                            </dd>
-                        </div>
+                            <!-- 卡片资料 -->
+                            <dl class="page-card-body">
+                                <div class="card-info-row">
+                                    <dt>页面路由</dt>
+                                    <dd>{{ item.page.path }}</dd>
+                                </div>
 
-                        <div class="card-info-row">
-                            <dt>排序</dt>
-                            <dd>{{ page.sort_order }}</dd>
-                        </div>
-                    </dl>
+                                <div class="card-info-row">
+                                    <dt>上级页面</dt>
+                                    <dd>{{ getParentName(item.page) }}</dd>
+                                </div>
 
-                    <!-- ==================== 页面卡片操作 ==================== -->
-                    <footer v-if="hasPageActions" class="page-card-footer">
-                        <span class="card-action-label">
-                            页面操作
-                        </span>
+                                <div class="card-info-row">
+                                    <dt>可见角色</dt>
+                                    <dd :title="getVisibleRoleNames(item.page)">
+                                        {{ getVisibleRoleNames(item.page) }}
+                                    </dd>
+                                </div>
 
-                        <AppActionMenu
-                            :items="getPageActionItems(page)"
-                            :aria-label="`打开页面 ${page.name} 的操作菜单`"
-                            @select="handlePageAction($event, page)"
-                        />
-                    </footer>
-                </article>
+                                <div class="card-info-row">
+                                    <dt>同级排序</dt>
+                                    <dd>{{ item.page.sort_order }}</dd>
+                                </div>
+                            </dl>
+
+                            <!-- ==================== 页面卡片操作 ==================== -->
+                            <footer
+                                v-if="hasPageActions"
+                                class="page-card-footer"
+                            >
+                                <span class="status-tag" :class="item.page.is_active
+                                    ? 'enabled'
+                                    : 'disabled'">
+                                    {{ item.page.is_active
+                                        ? '已启用'
+                                        : '已停用' }}
+                                </span>
+
+                                <AppActionMenu
+                                    :items="getPageActionItems(item.page)"
+                                    :aria-label="`打开页面 ${item.page.name} 的操作菜单`"
+                                    @select="handlePageAction($event, item.page)"
+                                />
+                            </footer>
+                        </article>
+                    </div>
+
+                    <div v-else class="group-empty">
+                        <i class="bi bi-diagram-2" aria-hidden="true"></i>
+                        <span>该顶级页面暂时没有子页面</span>
+                    </div>
+                </section>
             </div>
         </section>
 

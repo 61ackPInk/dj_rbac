@@ -229,6 +229,9 @@ export default defineComponent({
         const pages = ref([])
         const roles = ref([])
 
+        /* 当前处于展开状态的页面 ID */
+        const expandedPageIds = ref(new Set())
+
         const loading = ref(false)
         const errorMessage = ref('')
 
@@ -243,7 +246,28 @@ export default defineComponent({
                 return
             }
 
-            pages.value = await getPagesApi()
+            const pageList = await getPagesApi()
+
+            pages.value = pageList
+
+            /*
+             * 顶级页面默认展开。
+             * 刷新数据时保留用户已经展开的其他页面。
+             */
+            const nextExpandedIds = new Set(
+                expandedPageIds.value,
+            )
+
+            pageList
+                .filter((page) => !page.parent)
+                .forEach((page) => {
+                    nextExpandedIds.add(
+                        String(page.id),
+                    )
+                })
+
+            expandedPageIds.value =
+                nextExpandedIds
         }
 
         /* ==================== 加载角色列表 ==================== */
@@ -314,45 +338,306 @@ export default defineComponent({
         const keyword = ref('')
         const statusFilter = ref('all')
 
-        const filteredPages = computed(() => {
+        /* 页面是否符合当前搜索和状态条件 */
+        const matchesPageFilters = (page) => {
             const search =
                 keyword.value.trim().toLowerCase()
 
-            return pages.value.filter((page) => {
+            /*
+             * 搜索范围：页面名称、编码、路由、组件
+             * 以及直接父页面名称。
+             */
+            const searchContent = [
+                page.name,
+                page.code,
+                page.path,
+                page.component,
+                page.parent?.name,
+            ]
+                .filter(Boolean)
+                .join(' ')
+                .toLowerCase()
+
+            const matchesKeyword =
+                !search ||
+                searchContent.includes(search)
+
+            const matchesStatus =
+                statusFilter.value === 'all' ||
+                (
+                    statusFilter.value === 'active' &&
+                    page.is_active
+                ) ||
+                (
+                    statusFilter.value === 'disabled' &&
+                    !page.is_active
+                )
+
+            return matchesKeyword && matchesStatus
+        }
+
+        /* 真正符合搜索和筛选条件的页面 */
+        const filteredPages = computed(() => {
+            return pages.value.filter(
+                matchesPageFilters,
+            )
+        })
+
+        /* ==================== 页面树结构 ==================== */
+
+        /*
+         * 搜索或筛选时，除了匹配页面本身，
+         * 还要显示它的全部祖先页面，避免子页面失去上下文。
+         */
+        const displayedPageIds = computed(() => {
+            const displayedIds = new Set()
+            const pageMap = new Map(
+                pages.value.map((page) => [
+                    String(page.id),
+                    page,
+                ]),
+            )
+
+            const childrenMap = new Map()
+
+            pages.value.forEach((page) => {
+                const parentId = page.parent?.id
+
+                if (parentId == null) {
+                    return
+                }
+
+                const parentKey = String(parentId)
+                const children =
+                    childrenMap.get(parentKey) || []
+
+                children.push(page)
+                childrenMap.set(parentKey, children)
+            })
+
+            filteredPages.value.forEach((page) => {
+                let currentPage = page
+                const visitedIds = new Set()
+
+                while (currentPage) {
+                    const currentId =
+                        String(currentPage.id)
+
+                    if (visitedIds.has(currentId)) {
+                        break
+                    }
+
+                    visitedIds.add(currentId)
+                    displayedIds.add(currentId)
+
+                    const parentId =
+                        currentPage.parent?.id
+
+                    currentPage = parentId == null
+                        ? null
+                        : pageMap.get(
+                            String(parentId),
+                        )
+                }
+
                 /*
-                 * 搜索范围：
-                 * 页面名称、编码、路由、组件和父页面名称。
+                 * 搜索命中父页面时，显示它的全部子孙页面。
+                 * 这样可以直接查看该页面下面的完整结构。
                  */
-                const searchContent = [
-                    page.name,
-                    page.code,
-                    page.path,
-                    page.component,
-                    page.parent?.name,
-                ]
-                    .filter(Boolean)
-                    .join(' ')
-                    .toLowerCase()
+                if (keyword.value.trim()) {
+                    const pendingIds = [
+                        String(page.id),
+                    ]
 
-                const matchesKeyword =
-                    !search ||
-                    searchContent.includes(search)
+                    while (pendingIds.length > 0) {
+                        const currentId =
+                            pendingIds.shift()
 
-                const matchesStatus =
-                    statusFilter.value === 'all' ||
-                    (
-                        statusFilter.value === 'active' &&
-                        page.is_active
-                    ) ||
-                    (
-                        statusFilter.value === 'disabled' &&
-                        !page.is_active
+                        const children =
+                            childrenMap.get(currentId) || []
+
+                        children.forEach((child) => {
+                            const childId =
+                                String(child.id)
+
+                            if (displayedIds.has(childId)) {
+                                return
+                            }
+
+                            displayedIds.add(childId)
+                            pendingIds.push(childId)
+                        })
+                    }
+                }
+            })
+
+            return displayedIds
+        })
+
+        /* 同一父页面下按照 sort_order 和 id 排序 */
+        const sortSiblingPages = (pageList) => {
+            return [...pageList].sort((left, right) => {
+                const sortDifference =
+                    Number(left.sort_order || 0) -
+                    Number(right.sort_order || 0)
+
+                if (sortDifference !== 0) {
+                    return sortDifference
+                }
+
+                return Number(left.id) - Number(right.id)
+            })
+        }
+
+        /* 构建支持任意深度的页面树 */
+        const pageTree = computed(() => {
+            const nodeMap = new Map()
+            const rootNodes = []
+
+            pages.value.forEach((page) => {
+                const pageId = String(page.id)
+
+                if (!displayedPageIds.value.has(pageId)) {
+                    return
+                }
+
+                nodeMap.set(pageId, {
+                    page,
+                    children: [],
+                })
+            })
+
+            nodeMap.forEach((node) => {
+                const parentId = node.page.parent?.id
+                const parentNode = parentId == null
+                    ? null
+                    : nodeMap.get(String(parentId))
+
+                if (parentNode) {
+                    parentNode.children.push(node)
+                } else {
+                    /*
+                     * 没有父页面或父页面不存在的数据，
+                     * 都作为根节点展示，避免页面丢失。
+                     */
+                    rootNodes.push(node)
+                }
+            })
+
+            const sortNodes = (nodes) => {
+                const sortedPages = sortSiblingPages(
+                    nodes.map((node) => node.page),
+                )
+
+                return sortedPages.map((page) => {
+                    const node = nodeMap.get(
+                        String(page.id),
                     )
 
-                return (
-                    matchesKeyword &&
-                    matchesStatus
-                )
+                    node.children = sortNodes(
+                        node.children,
+                    )
+
+                    return node
+                })
+            }
+
+            return sortNodes(rootNodes)
+        })
+
+        const isFilteringTree = computed(() => {
+            return (
+                Boolean(keyword.value.trim()) ||
+                statusFilter.value !== 'all'
+            )
+        })
+
+        const isPageExpanded = (pageId) => {
+            return expandedPageIds.value.has(
+                String(pageId),
+            )
+        }
+
+        const togglePageExpanded = (pageId) => {
+            const pageKey = String(pageId)
+            const nextExpandedIds = new Set(
+                expandedPageIds.value,
+            )
+
+            if (nextExpandedIds.has(pageKey)) {
+                nextExpandedIds.delete(pageKey)
+            } else {
+                nextExpandedIds.add(pageKey)
+            }
+
+            expandedPageIds.value = nextExpandedIds
+        }
+
+        /* 把树结构转换为表格需要的可见行 */
+        const treeRows = computed(() => {
+            const rows = []
+
+            const appendNodes = (nodes, depth = 0) => {
+                nodes.forEach((node) => {
+                    rows.push({
+                        page: node.page,
+                        depth,
+                        childCount: node.children.length,
+                    })
+
+                    const shouldShowChildren =
+                        isFilteringTree.value ||
+                        isPageExpanded(node.page.id)
+
+                    if (
+                        node.children.length > 0 &&
+                        shouldShowChildren
+                    ) {
+                        appendNodes(
+                            node.children,
+                            depth + 1,
+                        )
+                    }
+                })
+            }
+
+            appendNodes(pageTree.value)
+
+            return rows
+        })
+
+        /* 卡片模式按照顶级页面进行分组 */
+        const cardGroups = computed(() => {
+            const flattenChildren = (
+                nodes,
+                depth = 1,
+            ) => {
+                const items = []
+
+                nodes.forEach((node) => {
+                    items.push({
+                        page: node.page,
+                        depth,
+                    })
+
+                    items.push(
+                        ...flattenChildren(
+                            node.children,
+                            depth + 1,
+                        ),
+                    )
+                })
+
+                return items
+            }
+
+            return pageTree.value.map((rootNode) => {
+                return {
+                    root: rootNode.page,
+                    items: flattenChildren(
+                        rootNode.children,
+                    ),
+                }
             })
         })
 
@@ -1197,6 +1482,14 @@ export default defineComponent({
             statusFilter,
             statusFilterOptions,
             filteredPages,
+
+            /* ==================== 页面树展示 ==================== */
+
+            treeRows,
+            cardGroups,
+            isFilteringTree,
+            isPageExpanded,
+            togglePageExpanded,
 
             activeCount,
             disabledCount,
