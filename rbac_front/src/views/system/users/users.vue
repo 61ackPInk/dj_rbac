@@ -146,7 +146,8 @@
                 </span>
 
                 <span v-else class="role-tag empty">
-                  未分配角色
+                  <!-- 未分配角色 -->
+                  {{ user.is_root ? '根管理员' : '普通用户' }}
                 </span>
               </td>
 
@@ -172,11 +173,8 @@
               <!-- ==================== 用户操作 ==================== -->
               <td class="action-column">
                 <div class="action-group">
-                  <AppActionMenu
-                    :items="getUserActionItems(user)"
-                    :aria-label="`打开用户 ${user.username} 的操作菜单`"
-                    @select="handleUserAction($event, user)"
-                  />
+                  <AppActionMenu :items="getUserActionItems(user)" :aria-label="`打开用户 ${user.username} 的操作菜单`"
+                    @select="handleUserAction($event, user)" />
                 </div>
               </td>
             </tr>
@@ -245,11 +243,8 @@
               用户操作
             </span>
 
-            <AppActionMenu
-              :items="getUserActionItems(user)"
-              :aria-label="`打开用户 ${user.username} 的操作菜单`"
-              @select="handleUserAction($event, user)"
-            />
+            <AppActionMenu :items="getUserActionItems(user)" :aria-label="`打开用户 ${user.username} 的操作菜单`"
+              @select="handleUserAction($event, user)" />
           </footer>
         </article>
       </div>
@@ -451,8 +446,8 @@
     <!-- ==================== 用户密码重置弹出层 ==================== -->
 
     <AppModal v-model="passwordModalVisible" scope-class="users-modal-scope" :title="passwordTargetUser
-        ? `重置密码：${passwordTargetUser.username}`
-        : '重置用户密码'
+      ? `重置密码：${passwordTargetUser.username}`
+      : '重置用户密码'
       " :width="480" :closable="!passwordResetting" :close-on-overlay="!passwordResetting"
       :close-on-escape="!passwordResetting">
       <form id="password-reset-form" class="user-form password-reset-form" novalidate
@@ -486,7 +481,7 @@
             </span>
 
             <input v-model="passwordResetForm
-                .newPasswordConfirm
+              .newPasswordConfirm
               " type="password" maxlength="128" autocomplete="new-password" placeholder="请再次输入新密码" />
           </label>
         </div>
