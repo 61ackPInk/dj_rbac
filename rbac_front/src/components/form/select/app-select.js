@@ -36,12 +36,16 @@ const SelectChevronIcon = defineComponent({
  * 但 RBAC 项目中的 null 有明确业务含义：
  * 例如“暂不分配角色”。
  *
- * 因此在 AppSelect 内部使用一个唯一对象代替 null，
+ * 因此在 AppSelect 内部使用专用字符串代替 null，
  * 对外仍然保持 null，不影响接口提交。
+ *
+ * 这里不能使用对象作为占位值。
+ * Element Plus 会通过 value-key 比较对象选项，
+ * 没有对应 value 字段的对象可能被错误识别为同一项，
+ * 从而出现两个选项同时选中的情况。
  */
-const NULL_OPTION_VALUE = Object.freeze({
-    __appSelectNullValue: true,
-})
+const NULL_OPTION_VALUE =
+    '__APP_SELECT_INTERNAL_NULL_OPTION__'
 
 /* ==================== 公共下拉框组件 ==================== */
 
@@ -205,7 +209,9 @@ export default defineComponent({
                          * 模板循环使用的稳定标识。
                          */
                         appSelectKey:
-                            `${index}-${String(option.value)}`,
+                            option.value === null
+                                ? `null-option-${index}`
+                                : `${index}-${String(option.value)}`,
 
                         /*
                          * Element Plus 实际接收的值。
@@ -292,15 +298,32 @@ export default defineComponent({
 
         /* ==================== 数据更新 ==================== */
 
+        const toBusinessValue = (value) => {
+            /*
+             * 多选模式下也逐项还原业务值，
+             * 防止公共组件未来包含 null 多选项时
+             * 将内部占位值泄漏给业务页面。
+             */
+            if (Array.isArray(value)) {
+                return value.map((item) => {
+                    return item === NULL_OPTION_VALUE
+                        ? null
+                        : item
+                })
+            }
+
+            return value === NULL_OPTION_VALUE
+                ? null
+                : value
+        }
+
         const handleUpdate = (value) => {
             /*
              * 用户选择内部 null 占位选项时，
              * 对外重新发送真正的 null。
              */
             const businessValue =
-                value === NULL_OPTION_VALUE
-                    ? null
-                    : value
+                toBusinessValue(value)
 
             emit(
                 'update:modelValue',
@@ -309,7 +332,11 @@ export default defineComponent({
         }
 
         const handleChange = (value) => {
-            emit('change', value)
+            /* change 事件也只能向外发送业务值 */
+            emit(
+                'change',
+                toBusinessValue(value),
+            )
         }
 
         const handleClear = () => {

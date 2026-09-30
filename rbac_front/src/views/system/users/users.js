@@ -309,7 +309,11 @@ export default defineComponent({
         ...activeRoles.value.map((role) => {
           return {
             label: role.name,
-            value: role.id,
+            /*
+             * 表单角色值统一为 Number，
+             * 避免接口返回字符串 ID 时出现选中项错位。
+             */
+            value: Number(role.id),
           }
         }),
       ]
@@ -629,8 +633,17 @@ export default defineComponent({
       userForm.email =
         user.email || ''
 
+      /*
+       * 没有角色时明确写入 null；
+       * 有角色时统一转换成 Number，
+       * 与 userRoleOptions 中的 value 类型保持一致。
+       */
+      const currentRoleId = user.role?.id
+
       userForm.roleId =
-        user.role?.id ?? null
+        currentRoleId == null
+          ? null
+          : Number(currentRoleId)
 
       userForm.isActive =
         Boolean(user.is_active)
