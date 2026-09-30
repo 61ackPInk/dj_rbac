@@ -345,10 +345,11 @@
 
       color: var(--text-sub);
       font-size: var(--font-small);
+      font-weight: var(--font-weight-main);
 
       strong {
         color: var(--text-main);
-        font-weight: 600;
+        font-weight: var(--font-weight-medium);
       }
 
       .summary-status {
@@ -380,10 +381,10 @@
       }
 
       strong {
-        color: var(--text-main);
+        color: var(--text-title);
 
         font-size: var(--font-main);
-        font-weight: 600;
+        font-weight: var(--font-weight-heading);
       }
 
       span {
@@ -427,17 +428,24 @@
           vertical-align: middle;
         }
 
+        /* ==================== 表格表头 ==================== */
+
         th {
           color: var(--text-sub);
           background: var(--bg-sidebar);
 
-          font-size: 12px;
-          font-weight: 550;
+          font-size: var(--font-small);
+          font-weight: var(--font-weight-medium);
+          line-height: 1.5;
         }
 
+        /* ==================== 表格内容 ==================== */
+
         td {
-          color: var(--text-sub);
+          color: var(--text-main);
+
           font-size: var(--font-small);
+          font-weight: var(--font-weight-main);
         }
 
         tbody {
@@ -477,7 +485,7 @@
             background: var(--primary-light);
 
             font-size: 13px;
-            font-weight: 650;
+            font-weight: var(--font-weight-medium);
           }
 
           .role-basic {
@@ -486,10 +494,10 @@
             strong {
               display: block;
 
-              color: var(--text-main);
+              color: var(--text-title);
 
               font-size: var(--font-small);
-              font-weight: 600;
+              font-weight: var(--font-weight-heading);
             }
 
             span {
@@ -537,7 +545,7 @@
           background: var(--warning-light);
 
           font-size: 11px;
-          font-weight: 650;
+          font-weight: var(--font-weight-medium);
         }
 
         /* 描述 */
@@ -640,7 +648,7 @@
               background: var(--primary-light);
 
               font-size: 14px;
-              font-weight: 650;
+              font-weight: var(--font-weight-medium);
             }
 
             .card-role-info {
@@ -656,10 +664,10 @@
               }
 
               strong {
-                color: var(--text-main);
+                color: var(--text-title);
 
                 font-size: 14px;
-                font-weight: 620;
+                font-weight: var(--font-weight-heading);
               }
 
               span {
@@ -727,7 +735,7 @@
               background: var(--warning-light);
 
               font-size: 11px;
-              font-weight: 650;
+              font-weight: var(--font-weight-medium);
             }
 
             .card-description {
