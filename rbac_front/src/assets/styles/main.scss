@@ -31,12 +31,13 @@ body,
 
 body {
   color: var(--text-main);
+  background: var(--bg-page);
+
   font-family: var(--font-family);
   font-size: var(--font-main);
-  font-weight: 400;
+  font-weight: var(--font-weight-main);
   line-height: 1.5;
 
-  /* 让文字边缘显示得更平滑 */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
