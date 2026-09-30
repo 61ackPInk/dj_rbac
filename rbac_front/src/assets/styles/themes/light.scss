@@ -11,11 +11,6 @@
   --bg-sidebar: #fbfcfd;
   --bg-hover: #f0f2f6;
 
-  /* ==================== 文字色 ==================== */
-  --text-main: #20242c;
-  --text-sub: #727987;
-  --text-muted: #a0a6b1;
-
   /* ==================== 字体体系 ==================== */
 
   /*
@@ -32,6 +27,7 @@
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
+    "Microsoft YaHei UI",
     "PingFang SC",
     "Hiragino Sans GB",
     "Microsoft YaHei",
@@ -49,15 +45,18 @@
   */
   --text-title: #1d2129;
   --text-main: #4e5969;
-  --text-sub: #86909c;
-  --text-muted: #c9cdd4;
+  --text-sub: #6b7280;
+  --text-muted: #8f96a3;
+  --text-disabled: #c9cdd4;
 
   /* ==================== 字体大小 ==================== */
 
-  --font-main: 15px;
+  --font-caption: 12px;
   --font-small: 14px;
-  --font-title: 24px;
+  --font-main: 15px;
   --font-card-title: 16px;
+  --font-section-title: 18px;
+  --font-title: 24px;
 
   /* ==================== 字体字重 ==================== */
 
@@ -66,9 +65,9 @@
  * 避免页面文字显得又黑又重。
  */
   --font-weight-title: 600;
-  --font-weight-heading: 500;
   --font-weight-main: 400;
   --font-weight-medium: 500;
+  --font-weight-heading: 500;
 
   /* ==================== Element Plus 文字变量 ==================== */
 

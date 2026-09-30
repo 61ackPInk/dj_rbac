@@ -23,7 +23,7 @@
 
         font-family: inherit;
         font-size: var(--font-small);
-        font-weight: 550;
+        font-weight: var(--font-weight-medium);
         line-height: 1;
 
         cursor: pointer;
@@ -127,7 +127,7 @@
                     color: var(--text-main);
 
                     font-size: var(--font-small);
-                    font-weight: 550;
+                    font-weight: var(--font-weight-medium);
 
                     i {
                         color: var(--danger);
@@ -198,7 +198,7 @@
 
                     color: var(--text-muted);
 
-                    font-size: 11px;
+                    font-size: var(--font-caption);
                     line-height: 1.55;
                 }
             }
@@ -310,7 +310,7 @@
                     color: var(--text-main);
 
                     font-size: 17px;
-                    font-weight: 620;
+                    font-weight: var(--font-weight-heading);
                     text-overflow: ellipsis;
                     white-space: nowrap;
                 }
@@ -325,7 +325,7 @@
                         Consolas,
                         "Courier New",
                         monospace;
-                    font-size: 12px;
+                    font-size: var(--font-caption);
                     text-overflow: ellipsis;
                     white-space: nowrap;
                 }
@@ -355,7 +355,7 @@
                     margin-bottom: 7px;
 
                     color: var(--text-muted);
-                    font-size: 11px;
+                    font-size: var(--font-caption);
                 }
 
                 dd {
@@ -365,7 +365,7 @@
                     color: var(--text-main);
 
                     font-size: var(--font-small);
-                    font-weight: 550;
+                    font-weight: var(--font-weight-medium);
                     line-height: 1.6;
 
                     /*
@@ -392,7 +392,7 @@
                             Consolas,
                             "Courier New",
                             monospace;
-                        font-size: 12px;
+                        font-size: var(--font-caption);
                     }
                 }
             }
@@ -411,7 +411,7 @@
 
         border-radius: 20px;
 
-        font-size: 11px;
+        font-size: var(--font-caption);
         white-space: nowrap;
 
         &::before {
@@ -474,7 +474,7 @@
             color: var(--text-main);
 
             font-size: 15px;
-            font-weight: 620;
+            font-weight: var(--font-weight-heading);
             line-height: 1.5;
         }
 

@@ -77,7 +77,7 @@
           overflow: hidden;
 
           font-size: 17px;
-          font-weight: 620;
+          font-weight: var(--font-weight-heading);
           line-height: 1.4;
           text-overflow: ellipsis;
           white-space: nowrap;

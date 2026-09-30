@@ -22,17 +22,20 @@
       h1 {
         margin-bottom: 7px;
 
+        color: var(--text-title);
+
         font-size: var(--font-title);
-        font-weight: 650;
-        line-height: 1.3;
-        letter-spacing: -0.5px;
+        font-weight: var(--font-weight-title);
+        line-height: 1.4;
+        letter-spacing: 0;
       }
 
       p {
         color: var(--text-sub);
 
-        font-size: var(--font-main);
-        line-height: 1.7;
+        font-size: var(--font-small);
+        font-weight: var(--font-weight-main);
+        line-height: 1.6;
       }
     }
 
@@ -146,7 +149,7 @@
           color: var(--text-sub);
 
           font-size: var(--font-main);
-          font-weight: 550;
+          font-weight: var(--font-weight-medium);
         }
 
         .overview-en {
@@ -154,8 +157,8 @@
 
           color: var(--text-muted);
 
-          font-size: 10px;
-          font-weight: 600;
+          font-size: var(--font-caption);
+          font-weight: var(--font-weight-title);
           letter-spacing: 1px;
         }
 
@@ -187,7 +190,7 @@
         margin-top: 20px;
 
         font-size: 34px;
-        font-weight: 680;
+        font-weight: var(--font-weight-title);
         line-height: 1;
         letter-spacing: -1px;
       }
@@ -227,7 +230,7 @@
           font-size: var(--font-small);
 
           i {
-            font-size: 12px;
+            font-size: var(--font-caption);
             line-height: 1;
           }
 
@@ -266,7 +269,7 @@
 
         h2 {
           font-size: var(--font-card-title);
-          font-weight: 620;
+          font-weight: var(--font-weight-heading);
         }
 
         p {
@@ -274,7 +277,7 @@
 
           color: var(--text-muted);
 
-          font-size: 12px;
+          font-size: var(--font-caption);
         }
       }
 
@@ -365,7 +368,7 @@
             display: block;
 
             font-size: 25px;
-            font-weight: 650;
+            font-weight: var(--font-weight-title);
           }
 
           span {
@@ -373,7 +376,7 @@
             margin-top: 4px;
 
             color: var(--text-muted);
-            font-size: 11px;
+            font-size: var(--font-caption);
           }
         }
       }
@@ -425,7 +428,7 @@
 
           .status-value {
             font-size: var(--font-small);
-            font-weight: 600;
+            font-weight: var(--font-weight-title);
           }
         }
 
@@ -497,8 +500,8 @@
         color: var(--primary);
         background: var(--primary-light);
 
-        font-size: 13px;
-        font-weight: 650;
+        font-size: var(--font-small);
+        font-weight: var(--font-weight-title);
       }
 
       .role-info {
@@ -509,8 +512,8 @@
           display: block;
           overflow: hidden;
 
-          font-size: 13px;
-          font-weight: 600;
+          font-size: var(--font-small);
+          font-weight: var(--font-weight-title);
           text-overflow: ellipsis;
           white-space: nowrap;
         }
@@ -520,7 +523,7 @@
           margin-top: 4px;
 
           color: var(--text-muted);
-          font-size: 11px;
+          font-size: var(--font-caption);
         }
       }
 
@@ -531,7 +534,7 @@
 
         color: var(--text-sub);
 
-        font-size: 12px;
+        font-size: var(--font-caption);
         white-space: nowrap;
       }
     }
@@ -593,8 +596,8 @@
         strong {
           display: block;
 
-          font-size: 13px;
-          font-weight: 600;
+          font-size: var(--font-small);
+          font-weight: var(--font-weight-title);
         }
 
         span {
@@ -604,7 +607,7 @@
 
           color: var(--text-muted);
 
-          font-size: 11px;
+          font-size: var(--font-caption);
           text-overflow: ellipsis;
           white-space: nowrap;
         }
@@ -617,7 +620,7 @@
         padding-left: 12px;
 
         font-size: 19px;
-        font-weight: 650;
+        font-weight: var(--font-weight-title);
       }
     }
   }
@@ -646,13 +649,13 @@
         color: var(--text-sub);
         background: var(--bg-sidebar);
 
-        font-size: 12px;
-        font-weight: 550;
+        font-size: var(--font-caption);
+        font-weight: var(--font-weight-medium);
       }
 
       td {
         color: var(--text-sub);
-        font-size: 13px;
+        font-size: var(--font-small);
       }
 
       tbody {
@@ -690,15 +693,15 @@
           color: var(--primary);
           background: var(--primary-light);
 
-          font-size: 11px;
-          font-weight: 650;
+          font-size: var(--font-caption);
+          font-weight: var(--font-weight-title);
         }
 
         strong {
           color: var(--text-main);
 
-          font-size: 13px;
-          font-weight: 550;
+          font-size: var(--font-small);
+          font-weight: var(--font-weight-medium);
         }
       }
 
@@ -712,7 +715,7 @@
 
         border-radius: 20px;
 
-        font-size: 11px;
+        font-size: var(--font-caption);
 
         &::before {
           width: 5px;

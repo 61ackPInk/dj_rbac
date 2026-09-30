@@ -103,7 +103,7 @@
     .app-select__chevron {
         color: var(--text-muted);
 
-        font-size: 12px;
+        font-size: var(--font-caption);
         line-height: 1;
 
         transition:
@@ -208,7 +208,7 @@
             color: var(--primary);
             background: var(--primary-light);
 
-            font-weight: 600;
+            font-weight: var(--font-weight-title);
         }
 
         &.is-disabled {
@@ -243,7 +243,7 @@
             background: var(--primary-light);
 
             i {
-                font-size: 14px;
+                font-size: var(--font-small);
                 line-height: 1;
             }
         }
@@ -268,7 +268,7 @@
                 Consolas,
                 "Courier New",
                 monospace;
-            font-size: 10px;
+            font-size: var(--font-caption);
         }
     }
 

@@ -23,17 +23,20 @@
     h1 {
       margin-bottom: 7px;
 
+      color: var(--text-title);
+
       font-size: var(--font-title);
-      font-weight: 650;
-      line-height: 1.3;
-      letter-spacing: -0.5px;
+      font-weight: var(--font-weight-title);
+      line-height: 1.4;
+      letter-spacing: 0;
     }
 
     p {
       color: var(--text-sub);
 
-      font-size: var(--font-main);
-      line-height: 1.7;
+      font-size: var(--font-small);
+      font-weight: var(--font-weight-main);
+      line-height: 1.6;
     }
   }
 
@@ -56,7 +59,7 @@
     border-radius: 7px;
 
     font-size: var(--font-small);
-    font-weight: 550;
+    font-weight: var(--font-weight-medium);
 
     cursor: pointer;
 
@@ -484,7 +487,7 @@
             color: var(--primary);
             background: var(--primary-light);
 
-            font-size: 13px;
+            font-size: var(--font-small);
             font-weight: var(--font-weight-medium);
           }
 
@@ -505,7 +508,7 @@
               margin-top: 3px;
 
               color: var(--text-muted);
-              font-size: 11px;
+              font-size: var(--font-caption);
             }
           }
         }
@@ -526,7 +529,7 @@
             Consolas,
             "Courier New",
             monospace;
-          font-size: 11px;
+          font-size: var(--font-caption);
         }
 
         /* 权重 */
@@ -544,7 +547,7 @@
           color: var(--warning);
           background: var(--warning-light);
 
-          font-size: 11px;
+          font-size: var(--font-caption);
           font-weight: var(--font-weight-medium);
         }
 
@@ -647,7 +650,7 @@
               color: var(--primary);
               background: var(--primary-light);
 
-              font-size: 14px;
+              font-size: var(--font-small);
               font-weight: var(--font-weight-medium);
             }
 
@@ -666,7 +669,7 @@
               strong {
                 color: var(--text-title);
 
-                font-size: 14px;
+                font-size: var(--font-small);
                 font-weight: var(--font-weight-heading);
               }
 
@@ -679,7 +682,7 @@
                   Consolas,
                   "Courier New",
                   monospace;
-                font-size: 11px;
+                font-size: var(--font-caption);
               }
             }
           }
@@ -701,7 +704,7 @@
 
             min-width: 0;
 
-            font-size: 12px;
+            font-size: var(--font-caption);
 
             dt {
               flex: 0 0 auto;
@@ -734,7 +737,7 @@
               color: var(--warning);
               background: var(--warning-light);
 
-              font-size: 11px;
+              font-size: var(--font-caption);
               font-weight: var(--font-weight-medium);
             }
 
@@ -782,7 +785,7 @@
 
     border-radius: 20px;
 
-    font-size: 11px;
+    font-size: var(--font-caption);
     white-space: nowrap;
 
     &::before {
