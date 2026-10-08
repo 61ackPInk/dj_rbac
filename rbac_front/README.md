@@ -1,5 +1,9 @@
 # rbac_front
 
+项目的实际开发方式、RBAC 权限约定、公共组件和 AI 协作规范，请先阅读：
+
+- [RBAC 前端开发与 AI 协作规范](./docs/FRONTEND_AI_DEVELOPMENT_GUIDE.md)
+
 This template should help get you started developing with Vue 3 in Vite.
 
 ## Recommended IDE Setup
