@@ -23,3 +23,25 @@ Desktop.ini
 # ===== 临时文件 =====
 *.tmp
 *.temp
+
+# ===== Python 后端 =====
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+env/
+*.env
+.env
+logs/
+db.sqlite3
+media/
+
+# ===== Vue 前端 =====
+rbac_front/node_modules/
+rbac_front/dist/
+rbac_front/dist-ssr/
+rbac_front/.vite/
+rbac_front/.cache/
+rbac_front/.env.local
+rbac_front/.env.*.local

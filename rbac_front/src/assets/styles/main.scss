@@ -27,8 +27,46 @@ body,
   margin: 0;
 }
 
+/* ==================== 全站基础字体 ==================== */
+
 body {
-  font-family: 'Microsoft YaHei', Arial, sans-serif;
+  color: var(--text-main);
+  background: var(--bg-page);
+
+  font-family: var(--font-family);
+  font-size: var(--font-main);
+  font-weight: var(--font-weight-main);
+  line-height: 1.5;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==================== 表单控件继承字体 ==================== */
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+/* ==================== 全站标题文字 ==================== */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--text-title);
+
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-heading);
+}
+
+h1 {
+  font-weight: var(--font-weight-title);
 }
 
 a {

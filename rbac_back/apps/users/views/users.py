@@ -6,35 +6,52 @@
 @Desc : 用户视图
 """
 from django.shortcuts import get_object_or_404
+from rest_framework import status
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
 from apps.users.models import User
 from apps.users.serializers import (
-    UserInfoSerializer,
     UserAdminUpdateSerializer,
+    UserInfoSerializer,
+    UserRegisterSerializer,
+    UserStatusUpdateSerializer,
 )
-from common.permissions import IsRootUser
+from common.permissions import (
+    HasOperationPermission,
+)
 
 
 class UserListAPIView(GenericAPIView):
-    """获取系统用户列表"""
-    serializer_class = UserInfoSerializer
+    """用户列表和管理员创建用户接口"""
 
-    # 用户列表包含邮箱、角色等信息，
-    # 暂时只允许根管理员查看
-    permission_classes = [IsRootUser]
+    permission_classes = [
+        HasOperationPermission,
+    ]
+
+    required_permissions = {
+        "GET": "USER_LIST",
+        "POST": "USER_CREATE",
+    }
+
+    def get_serializer_class(self):
+        """根据请求方法选择序列化器"""
+
+        if self.request.method == "POST":
+            return UserRegisterSerializer
+
+        return UserInfoSerializer
 
     def get(self, request, *args, **kwargs):
-        """获取所有用户及其角色"""
+        """获取全部用户及其角色"""
 
-        # select_related("role") 会通过联表查询
-        # 一次性获得用户及其角色，避免逐个查询角色
-        users = User.objects.select_related("role").order_by(
-            "id"
+        users = User.objects.select_related(
+            "role",
+        ).order_by(
+            "id",
         )
 
-        # many=True 表示当前序列化的是多个用户
         serializer = self.get_serializer(
             users,
             many=True,
@@ -42,59 +59,174 @@ class UserListAPIView(GenericAPIView):
 
         return Response(serializer.data)
 
-class UserDetailAPIView(GenericAPIView):
-    """用户详情与用户信息管理接口"""
+    def post(self, request, *args, **kwargs):
+        """
+        管理员创建普通用户。
 
-    serializer_class = UserAdminUpdateSerializer
-    permission_classes = [IsRootUser]
+        创建结果不会成为根管理员，
+        角色需要通过角色分配接口单独设置。
+        """
 
-    def get_object(self):
-        """根据路由中的 user_id 查询用户"""
-
-        user_id = self.kwargs["user_id"]
-
-        return get_object_or_404(
-            User.objects.select_related("role"),
-            id=user_id,
+        serializer = self.get_serializer(
+            data=request.data,
         )
 
+        serializer.is_valid(
+            raise_exception=True,
+        )
+
+        user = serializer.save()
+
+        user = User.objects.select_related(
+            "role",
+        ).get(
+            id=user.id,
+        )
+
+        response_serializer = UserInfoSerializer(
+            user,
+        )
+
+        return Response(
+            response_serializer.data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class UserDetailAPIView(GenericAPIView):
+    """用户详情和用户资料修改接口"""
+
+    permission_classes = [
+        HasOperationPermission,
+    ]
+
+    required_permissions = {
+        "GET": "USER_DETAIL",
+        "PATCH": "USER_UPDATE",
+    }
+
     def get_serializer_class(self):
-        """
-        GET 使用只读用户信息序列化器；
-        PATCH 使用管理员修改序列化器。
-        """
+        """根据请求方法选择序列化器"""
 
         if self.request.method == "GET":
             return UserInfoSerializer
 
         return UserAdminUpdateSerializer
 
+    def get_object(self):
+        """根据 user_id 查询用户"""
+
+        user_id = self.kwargs["user_id"]
+
+        return get_object_or_404(
+            User.objects.select_related(
+                "role",
+            ),
+            id=user_id,
+        )
+
     def get(self, request, *args, **kwargs):
         """获取指定用户详情"""
-
-        user = self.get_object()
-        serializer = self.get_serializer(user)
-
-        return Response(serializer.data)
-
-    def patch(self, request, *args, **kwargs):
-        """修改指定用户的基本信息"""
 
         user = self.get_object()
 
         serializer = self.get_serializer(
             user,
-            data=request.data,
+        )
 
-            # 允许只提交需要修改的字段
+        return Response(serializer.data)
+
+    def patch(self, request, *args, **kwargs):
+        """修改指定用户的用户名或邮箱"""
+
+        user = self.get_object()
+
+        # 普通权限管理员不能修改根管理员资料
+        if (
+            user.is_root
+            and not request.user.is_root
+        ):
+            raise PermissionDenied(
+                "不能修改根管理员资料"
+            )
+
+        serializer = self.get_serializer(
+            user,
+            data=request.data,
             partial=True,
         )
 
-        serializer.is_valid(raise_exception=True)
+        serializer.is_valid(
+            raise_exception=True,
+        )
+
         user = serializer.save()
 
-        # 使用只读序列化器返回完整用户信息
-        response_serializer = UserInfoSerializer(user)
+        user = User.objects.select_related(
+            "role",
+        ).get(
+            id=user.id,
+        )
 
-        return Response(response_serializer.data)
+        return Response(
+            UserInfoSerializer(user).data,
+        )
+
+
+class UserStatusUpdateAPIView(GenericAPIView):
+    """修改指定用户的启用状态"""
+
+    serializer_class = UserStatusUpdateSerializer
+
+    permission_classes = [
+        HasOperationPermission,
+    ]
+
+    required_permissions = {
+        "PATCH": "USER_CHANGE_STATUS",
+    }
+
+    def get_object(self):
+        """根据 user_id 查询用户"""
+
+        user_id = self.kwargs["user_id"]
+
+        return get_object_or_404(
+            User.objects.select_related(
+                "role",
+            ),
+            id=user_id,
+        )
+
+    def patch(self, request, *args, **kwargs):
+        """启用或停用指定用户"""
+
+        user = self.get_object()
+
+        # 非根管理员不能修改根管理员状态
+        if (
+            user.is_root
+            and not request.user.is_root
+        ):
+            raise PermissionDenied(
+                "不能修改根管理员状态"
+            )
+
+        serializer = self.get_serializer(
+            user,
+            data=request.data,
+
+            # is_active 必须提交，所以不使用 partial=True
+            partial=False,
+        )
+
+        serializer.is_valid(
+            raise_exception=True,
+        )
+
+        user = serializer.save()
+
+        return Response(
+            UserInfoSerializer(user).data,
+        )
 

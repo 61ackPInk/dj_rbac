@@ -16,7 +16,9 @@ from apps.users.serializers import (
     UserPasswordChangeSerializer,
     UserPasswordResetSerializer,
 )
-from common.permissions import IsRootUser
+from common.permissions import (
+    HasOperationPermission,
+)
 from common.utils.jwt import (
     create_access_token,
     create_refresh_token,
@@ -64,7 +66,14 @@ class UserPasswordResetAPIView(GenericAPIView):
     """根管理员重置指定用户密码"""
 
     serializer_class = UserPasswordResetSerializer
-    permission_classes = [IsRootUser]
+    # permission_classes = [IsRootUser]
+    permission_classes = [
+        HasOperationPermission,
+    ]
+
+    required_permissions = {
+        "PATCH": "USER_RESET_PASSWORD",
+    }
 
     def get_object(self):
         """根据路由中的 user_id 查询用户"""

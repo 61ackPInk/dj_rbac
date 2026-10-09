@@ -10,11 +10,16 @@ from .login import UserLoginSerializer
 from .refresh_token import RefreshTokenSerializer
 
 from .users import (
-    UserInfoSerializer,
+    CurrentUserInfoSerializer,
     UserAdminUpdateSerializer,
-    UserProfileUpdateSerializer
+    UserInfoSerializer,
+    UserProfileUpdateSerializer,
+    UserStatusUpdateSerializer,
 )
-from .roles import RoleSerializer
+from .roles import (
+    RoleSerializer,
+    RoleStatusUpdateSerializer,
+)
 
 from .user_roles import UserRoleAssignSerializer
 
@@ -23,15 +28,26 @@ from .passwords import (
     UserPasswordResetSerializer,
 )
 
+from .permissions import PermissionSerializer
+
+from .role_permissions import (
+    RolePermissionAssignSerializer,
+)
+
 __all__ = [
     "UserRegisterSerializer",
     "UserLoginSerializer",
     "RefreshTokenSerializer",
+    "CurrentUserInfoSerializer",
     "UserInfoSerializer",
     "UserAdminUpdateSerializer",
     "UserProfileUpdateSerializer",
+    "UserStatusUpdateSerializer",
     "RoleSerializer",
+    "RoleStatusUpdateSerializer",
     "UserRoleAssignSerializer",
     "UserPasswordChangeSerializer",
     "UserPasswordResetSerializer",
+    "PermissionSerializer",
+    "RolePermissionAssignSerializer",
 ]

@@ -5,6 +5,7 @@
 @Time : 2026/9/16 15:14
 @Desc : 页面序列化器
 """
+from django.db import transaction
 from rest_framework import serializers
 
 from apps.pages.models import Page
@@ -77,17 +78,17 @@ class PageSerializer(serializers.ModelSerializer):
     )
 
     # 用于请求，接收角色 ID 数组
-    visible_role_ids = serializers.PrimaryKeyRelatedField(
-        queryset=Role.objects.filter(is_active=True),
-        source="visible_roles",
-        many=True,
-        write_only=True,
-        required=False,
-        error_messages={
-            "does_not_exist": "角色不存在或已被停用",
-            "incorrect_type": "角色ID格式错误",
-        },
-    )
+    # visible_role_ids = serializers.PrimaryKeyRelatedField(
+    #     queryset=Role.objects.filter(is_active=True),
+    #     source="visible_roles",
+    #     many=True,
+    #     write_only=True,
+    #     required=False,
+    #     error_messages={
+    #         "does_not_exist": "角色不存在或已被停用",
+    #         "incorrect_type": "角色ID格式错误",
+    #     },
+    # )
 
     code = serializers.RegexField(
         # 页面编码必须以字母开头，
@@ -125,7 +126,7 @@ class PageSerializer(serializers.ModelSerializer):
             "parent",
             "parent_id",
             "visible_roles",
-            "visible_role_ids",
+            # "visible_role_ids",
             "sort_order",
             "is_active",
             "create_time",
@@ -134,6 +135,7 @@ class PageSerializer(serializers.ModelSerializer):
 
         read_only_fields = [
             "id",
+            "is_active",
             "create_time",
             "update_time",
         ]
@@ -269,3 +271,149 @@ class VisiblePageSerializer(serializers.ModelSerializer):
 
         read_only_fields = fields
 
+
+class PageStatusUpdateSerializer(serializers.ModelSerializer):
+    """修改页面启用状态"""
+
+    is_active = serializers.BooleanField(
+        required=True,
+        error_messages={
+            "required": "必须提交页面状态",
+            "invalid": "页面状态必须是布尔值",
+        },
+    )
+
+    class Meta:
+        model = Page
+
+        fields = [
+            "is_active",
+        ]
+
+
+class PageRoleAssignSerializer(
+    serializers.ModelSerializer
+):
+    """给页面分配可见角色"""
+
+    role_ids = serializers.PrimaryKeyRelatedField(
+        # 只能把页面分配给启用状态的角色
+        queryset=Role.objects.filter(
+            is_active=True,
+        ),
+
+        # 前端提交 role_ids，
+        # 实际修改 Page.visible_roles
+        source="visible_roles",
+
+        many=True,
+        write_only=True,
+        required=True,
+
+        error_messages={
+            "required": "请提交角色ID列表",
+            "does_not_exist": (
+                "角色不存在或已经停用"
+            ),
+            "incorrect_type": "角色ID格式错误",
+            "not_a_list": "角色ID必须使用数组格式",
+        },
+    )
+
+    class Meta:
+        model = Page
+
+        fields = [
+            "role_ids",
+        ]
+
+    def validate_role_ids(self, value):
+        """禁止提交重复角色 ID"""
+
+        role_ids = [
+            role.id
+            for role in value
+        ]
+
+        if len(role_ids) != len(
+            set(role_ids)
+        ):
+            raise serializers.ValidationError(
+                "角色ID不能重复"
+            )
+
+        return value
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        """
+        替换页面当前的全部可见角色。
+
+        如果某个角色失去了当前页面，
+        同时清除该角色在当前页面下的操作权限。
+
+        transaction.atomic 保证页面分配和权限清理
+        要么全部成功，要么全部回滚。
+        """
+
+        new_visible_roles = validated_data[
+            "visible_roles"
+        ]
+
+        # 修改关系之前，先保存原来的角色 ID。
+        #
+        # 必须在 visible_roles.set() 前查询，
+        # 否则修改后无法知道哪些角色被移除了。
+        old_role_ids = set(
+            instance.visible_roles.values_list(
+                "id",
+                flat=True,
+            )
+        )
+
+        new_role_ids = {
+            role.id
+            for role in new_visible_roles
+        }
+
+        # 计算本次被移除的角色
+        removed_role_ids = (
+                old_role_ids - new_role_ids
+        )
+
+        # 替换页面当前的全部可见角色
+        instance.visible_roles.set(
+            new_visible_roles,
+        )
+
+        # 没有角色被移除时，不需要继续清理
+        if not removed_role_ids:
+            return instance
+
+        # 查询当前页面下定义的全部操作权限。
+        #
+        # 这里包含启用和停用权限，
+        # 因为角色失去页面后，
+        # 两种状态的权限关系都应该清除。
+        page_permission_ids = list(
+            instance.permissions.values_list(
+                "id",
+                flat=True,
+            )
+        )
+
+        if not page_permission_ids:
+            return instance
+
+        # 直接删除角色和权限中间表中的对应关系。
+        #
+        # 等价于逐个执行：
+        # role.permissions.remove(permission)
+        #
+        # 但是一次 DELETE 查询效率更高。
+        Role.permissions.through.objects.filter(
+            role_id__in=removed_role_ids,
+            permission_id__in=page_permission_ids,
+        ).delete()
+
+        return instance

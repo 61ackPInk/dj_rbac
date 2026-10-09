@@ -32,9 +32,9 @@
   max-width: min(480px, 100%);
   padding: 14px 16px;
 
-  color: #1f1f1f;
-  background-color: #ffffff;
-  border: 1px solid #e8e8ed;
+  color: var(--text-title);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: 0 12px 36px rgb(0 0 0 / 12%);
 
@@ -72,8 +72,8 @@
   flex: 1;
   min-width: 0;
 
-  color: #333333;
-  font-size: 14px;
+  color: var(--text-main);
+  font-size: var(--font-small);
   line-height: 1.6;
 
   // 长文字、连续英文或网址允许自动换行
@@ -90,7 +90,7 @@
   height: 26px;
   padding: 0;
 
-  color: #8a8a8a;
+  color: var(--text-muted);
   background-color: transparent;
   border: none;
   border-radius: 4px;
@@ -102,8 +102,8 @@
     background-color 0.2s ease;
 
   &:hover {
-    color: #1f1f1f;
-    background-color: #f0f0f2;
+    color: var(--text-title);
+    background-color: var(--bg-hover);
   }
 
   // 不显示鼠标点击或 Tab 选中时的外框
@@ -163,7 +163,7 @@
 
   /* 消息文字 */
   .app-message-text {
-    font-size: 13px;
+    font-size: var(--font-small);
     line-height: 1.5;
   }
 }

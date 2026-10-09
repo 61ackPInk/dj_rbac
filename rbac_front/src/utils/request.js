@@ -35,6 +35,17 @@ const PUBLIC_URLS = [
 // 多个接口同时返回 401 时，只刷新一次 Token
 let refreshPromise = null
 
+/* ==================== 权限变化事件 ==================== */
+
+/*
+ * 后端返回403时触发该事件。
+ *
+ * App.vue 会监听这个事件，
+ * 然后刷新当前用户权限和可见菜单。
+ */
+const PERMISSION_DENIED_EVENT =
+  'rbac:permission-denied'
+
 const isPublicRequest = (url = '') => {
   return PUBLIC_URLS.includes(url)
 }
@@ -114,6 +125,34 @@ const redirectToLogin = () => {
    * 这里刷新一次页面，同时清空 Pinia 内存状态。
    */
   window.location.replace(loginUrl)
+}
+
+/* ==================== 通知权限已经变化 ==================== */
+
+const notifyPermissionDenied = (
+  error,
+) => {
+  /*
+   * 服务端渲染环境不存在 window，
+   * 因此先进行保护判断。
+   */
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  window.dispatchEvent(
+    new CustomEvent(
+      PERMISSION_DENIED_EVENT,
+      {
+        detail: {
+          status: 403,
+          message:
+            error.userMessage ||
+            '当前操作权限不足',
+        },
+      },
+    ),
+  )
 }
 
 // 请求拦截器：自动添加 access_token
@@ -196,15 +235,36 @@ request.interceptors.response.use(
       const detail =
         error.validationErrors?.detail
 
+      /*
+       * DRF 权限异常通常返回：
+       *
+       * {
+       *   errors: {
+       *     detail: "你没有执行此操作的权限"
+       *   }
+       * }
+       */
       error.userMessage =
         typeof detail === 'string'
           ? detail
-          : `请求失败（HTTP ${status}），请检查提交内容`
+          : status === 403
+            ? '当前用户没有执行此操作的权限'
+            : `请求失败（HTTP ${status}），请检查提交内容`
     } else if (error.code === 'ECONNABORTED') {
       error.userMessage = '请求超时，请稍后重试'
     } else {
       error.userMessage =
         '无法连接服务，请检查网络和后端运行状态'
+    }
+
+    /*
+    * 403表示登录仍然有效，
+    * 但当前页面或操作权限可能已经变化。
+    *
+    * 不能刷新 Token，也不能退出登录。
+    */
+    if (status === 403) {
+      notifyPermissionDenied(error)
     }
 
     return Promise.reject(error)
