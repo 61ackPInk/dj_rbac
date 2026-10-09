@@ -5,7 +5,8 @@ import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
 export default defineConfig({
-  plugins: [vue(), vueDevTools()],
+  // plugins: [vue(), vueDevTools()],
+  plugins: [vue()],
 
   resolve: {
     alias: {
@@ -15,6 +16,10 @@ export default defineConfig({
   },
 
   server: {
+    // 允许局域网设备访问 Vite
+    host: '0.0.0.0',
+    port: 5174,
+
     proxy: {
       // 浏览器请求 /api/... 时，由 Vite 转发给 Django
       // 保留 /api 前缀，因为后端路由本身就包含 /api/
