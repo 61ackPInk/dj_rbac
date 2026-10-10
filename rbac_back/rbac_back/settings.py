@@ -24,7 +24,8 @@ INSTALLED_APPS = [
     'apps.example',
     'apps.users',
     'apps.pages',
-    'apps.dashboards'
+    'apps.dashboards',
+    'apps.products',
 ]
 
 # 中间件
@@ -57,7 +58,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'rbac_back.wsgi.application'
 
-
 # Database
 DATABASES = {
     'default': {
@@ -76,7 +76,6 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -92,7 +91,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 LANGUAGE_CODE = 'zh-hans'

@@ -6,6 +6,11 @@ urlpatterns = [
         'example/',
         include('apps.example.urls')
     ),
+    # 仪表盘【数据概览】
+    path(
+        "api/dashboards/",
+        include("apps.dashboards.urls"),
+    ),
     # 用户模块API
     path(
         'api/',
@@ -16,9 +21,9 @@ urlpatterns = [
         "api/pages/",
         include("apps.pages.urls"),
     ),
-    # 仪表盘【数据概览】
+    # 商品系统统一接口
     path(
-        "api/dashboards/",
-        include("apps.dashboards.urls"),
+        "api/products/",
+        include("apps.products.urls"),
     ),
 ]
