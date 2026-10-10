@@ -96,10 +96,10 @@ class ProductListQuerySerializer(
         )
 
         if (
-            created_at_from
-            and created_at_to
-            and created_at_from
-            > created_at_to
+                created_at_from
+                and created_at_to
+                and created_at_from
+                > created_at_to
         ):
             raise serializers.ValidationError({
                 "created_at_to": (
@@ -189,6 +189,57 @@ class ProductSpecificationsSerializer(
     )
 
 
+# ==================== 商品库存信息 ====================
+
+
+class ProductInventorySerializer(
+    serializers.Serializer
+):
+    """统一商品实时库存结构。"""
+
+    found = serializers.BooleanField()
+
+    warehouse_code = serializers.CharField(
+        allow_blank=True,
+        allow_null=True,
+    )
+    site_code = serializers.CharField(
+        allow_blank=True,
+        allow_null=True,
+    )
+
+    preparing = serializers.IntegerField(
+        allow_null=True
+    )
+    transferring = serializers.IntegerField(
+        allow_null=True
+    )
+    waiting_for_shelf = serializers.IntegerField(
+        allow_null=True
+    )
+    total = serializers.IntegerField(
+        allow_null=True
+    )
+    occupied = serializers.IntegerField(
+        allow_null=True
+    )
+    unshipped = serializers.IntegerField(
+        allow_null=True
+    )
+    available = serializers.IntegerField(
+        allow_null=True
+    )
+
+    status_name = serializers.CharField(
+        allow_blank=True,
+        allow_null=True,
+    )
+    lock_status_name = serializers.CharField(
+        allow_blank=True,
+        allow_null=True,
+    )
+
+
 # ==================== 商品列表项 ====================
 
 
@@ -257,6 +308,8 @@ class ProductListItemSerializer(
     specifications = (
         ProductSpecificationsSerializer()
     )
+
+    inventory = ProductInventorySerializer()
 
     created_at = serializers.CharField(
         allow_blank=True,

@@ -12,10 +12,11 @@ from .config import YuanCangConfig
 from .products import (
     YuanCangProductProvider,
 )
-
+from .stocks import YuanCangStockProvider
 
 __all__ = [
     "YuanCangClient",
     "YuanCangConfig",
     "YuanCangProductProvider",
+    "YuanCangStockProvider",
 ]

@@ -10,6 +10,7 @@
 from .base import (
     BaseBundleProvider,
     BaseProductProvider,
+    BaseStockProvider
 )
 from .exceptions import (
     ProductProviderConfigurationError,
@@ -18,10 +19,10 @@ from .exceptions import (
     ProductProviderResponseError,
 )
 
-
 __all__ = [
     "BaseBundleProvider",
     "BaseProductProvider",
+    "BaseStockProvider",
     "ProductProviderConfigurationError",
     "ProductProviderError",
     "ProductProviderRequestError",

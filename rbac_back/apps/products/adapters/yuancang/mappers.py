@@ -22,7 +22,7 @@ def _string_id(value: Any) -> str | None:
 
 
 def _map_product_specs(
-    source: Any,
+        source: Any,
 ) -> dict[str, Any]:
     """转换商品及包装尺寸信息。"""
 
@@ -50,7 +50,7 @@ def _map_product_specs(
 
 
 def _map_main_warehouse(
-    source: dict[str, Any],
+        source: dict[str, Any],
 ) -> dict[str, Any]:
     """转换商品主仓库信息。"""
 
@@ -68,7 +68,7 @@ def _map_main_warehouse(
 
 
 def map_product_common(
-    source: dict[str, Any],
+        source: dict[str, Any],
 ) -> dict[str, Any]:
     """转换商品列表和详情共用字段。"""
 
@@ -135,7 +135,7 @@ def map_product_common(
 
 
 def map_product_list_item(
-    source: dict[str, Any],
+        source: dict[str, Any],
 ) -> dict[str, Any]:
     """将元仓商品列表项转换为统一结构。"""
 
@@ -146,7 +146,7 @@ def map_product_list_item(
 
 
 def _map_customs_items(
-    source: Any,
+        source: Any,
 ) -> list[dict[str, Any]]:
     """转换多条报关信息。"""
 
@@ -164,7 +164,7 @@ def _map_customs_items(
 
 
 def _map_outbound_customs(
-    source: Any,
+        source: Any,
 ) -> dict[str, Any] | None:
     """转换出口报关信息。"""
 
@@ -178,7 +178,7 @@ def _map_outbound_customs(
 
 
 def _map_warehouse_items(
-    source: Any,
+        source: Any,
 ) -> list[dict[str, Any]]:
     """转换商品仓库价格信息。"""
 
@@ -209,7 +209,7 @@ def _map_warehouse_items(
 
 
 def map_product_detail(
-    source: dict[str, Any],
+        source: dict[str, Any],
 ) -> dict[str, Any]:
     """将元仓商品详情转换为统一结构。"""
 
@@ -275,7 +275,7 @@ def map_product_detail(
 
 
 def map_product_list_query(
-    query: dict[str, Any],
+        query: dict[str, Any],
 ) -> dict[str, Any]:
     """将统一查询参数转换为元仓参数。"""
 
@@ -291,7 +291,7 @@ def map_product_list_query(
     result = {}
 
     for source_name, target_name in (
-        field_mapping.items()
+            field_mapping.items()
     ):
         value = query.get(source_name)
 
@@ -300,3 +300,52 @@ def map_product_list_query(
             result[target_name] = value
 
     return result
+
+
+# ==================== 商品库存字段 ====================
+
+
+def map_stock_item(
+        source: dict[str, Any],
+) -> dict[str, Any]:
+    """将元仓库存记录转换为统一结构。"""
+
+    return {
+        "found": True,
+        "warehouse_code": source.get(
+            "warehouseCode"
+        ),
+        "site_code": source.get(
+            "siteCode"
+        ),
+        "customer_sku": source.get(
+            "customerSku"
+        ),
+        "preparing": source.get(
+            "prepare"
+        ),
+        "transferring": source.get(
+            "transfer"
+        ),
+        "waiting_for_shelf": source.get(
+            "waitShelf"
+        ),
+        "total": source.get(
+            "inventory"
+        ),
+        "occupied": source.get(
+            "occupy"
+        ),
+        "unshipped": source.get(
+            "unshipped"
+        ),
+        "available": source.get(
+            "available"
+        ),
+        "status_name": source.get(
+            "statusDes"
+        ),
+        "lock_status_name": source.get(
+            "isLockDes"
+        ),
+    }

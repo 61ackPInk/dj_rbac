@@ -18,6 +18,7 @@ from apps.products.adapters.exceptions import (
 )
 from apps.products.adapters.factory import (
     get_product_provider,
+    get_stock_provider,
 )
 from apps.products.serializers import (
     ProductListQuerySerializer,
@@ -98,8 +99,14 @@ class ProductListAPIView(GenericAPIView):
 
         try:
             service = ProductService(
-                get_product_provider()
+                product_provider=(
+                    get_product_provider()
+                ),
+                stock_provider=(
+                    get_stock_provider()
+                ),
             )
+
             result = service.get_product_list(
                 query
             )

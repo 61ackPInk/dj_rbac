@@ -11,12 +11,14 @@ from functools import lru_cache
 
 from apps.products.adapters.base import (
     BaseProductProvider,
+    BaseStockProvider,
 )
 from apps.products.adapters.exceptions import (
     ProductProviderConfigurationError,
 )
 from apps.products.adapters.yuancang import (
     YuanCangProductProvider,
+    YuanCangStockProvider,
 )
 
 # 导入元仓配置模块时会加载商品应用目录下的 .env
@@ -48,6 +50,33 @@ def get_product_provider() -> BaseProductProvider:
 
     if provider_code == "yuancang":
         return YuanCangProductProvider()
+
+    if not provider_code:
+        raise ProductProviderConfigurationError(
+            "未配置商品 ERP 提供方"
+        )
+
+    raise ProductProviderConfigurationError(
+        f"不支持的商品 ERP 提供方：{provider_code}"
+    )
+
+
+# ==================== 商品库存 Provider 工厂 ====================
+
+
+@lru_cache(maxsize=1)
+def get_stock_provider() -> BaseStockProvider:
+    """获取当前启用的商品库存 Provider。"""
+
+    _ = PRODUCTS_ENV_FILE
+
+    provider_code = os.getenv(
+        "PRODUCT_ERP_PROVIDER",
+        "",
+    ).strip().lower()
+
+    if provider_code == "yuancang":
+        return YuanCangStockProvider()
 
     if not provider_code:
         raise ProductProviderConfigurationError(

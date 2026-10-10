@@ -7,6 +7,7 @@
 """
 
 from .products import (
+    ProductInventorySerializer,
     ProductListItemSerializer,
     ProductListQuerySerializer,
     ProductListResponseSerializer,
@@ -15,8 +16,8 @@ from .products import (
     ProductSpecificationsSerializer,
 )
 
-
 __all__ = [
+    "ProductInventorySerializer",
     "ProductListItemSerializer",
     "ProductListQuerySerializer",
     "ProductListResponseSerializer",

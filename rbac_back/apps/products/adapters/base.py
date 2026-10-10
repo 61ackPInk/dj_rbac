@@ -22,8 +22,8 @@ class BaseProductProvider(ABC):
 
     @abstractmethod
     def get_product_list(
-        self,
-        query: dict[str, Any],
+            self,
+            query: dict[str, Any],
     ) -> dict[str, Any]:
         """获取普通商品列表。"""
 
@@ -31,10 +31,32 @@ class BaseProductProvider(ABC):
 
     @abstractmethod
     def get_product_detail(
-        self,
-        customer_sku: str,
+            self,
+            customer_sku: str,
     ) -> dict[str, Any]:
         """根据客户 SKU 获取普通商品详情。"""
+
+        raise NotImplementedError
+
+
+# ==================== 商品库存适配器协议 ====================
+
+
+class BaseStockProvider(ABC):
+    """ERP 商品库存数据提供方协议。"""
+
+    @abstractmethod
+    def get_stock_list(
+            self,
+            warehouse_code: str,
+            customer_skus: list[str],
+    ) -> dict[str, dict[str, Any]]:
+        """
+        批量获取指定仓库的商品库存。
+
+        返回值以 customer_sku 作为键，
+        方便商品服务层快速合并库存。
+        """
 
         raise NotImplementedError
 
@@ -52,8 +74,8 @@ class BaseBundleProvider(ABC):
 
     @abstractmethod
     def get_bundle_list(
-        self,
-        query: dict[str, Any],
+            self,
+            query: dict[str, Any],
     ) -> dict[str, Any]:
         """获取组合商品列表。"""
 
@@ -61,8 +83,8 @@ class BaseBundleProvider(ABC):
 
     @abstractmethod
     def get_bundle_detail(
-        self,
-        bundle_id: str,
+            self,
+            bundle_id: str,
     ) -> dict[str, Any]:
         """获取组合商品详情。"""
 
