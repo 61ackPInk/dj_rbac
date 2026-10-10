@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'apps.example',
     'apps.users',
     'apps.pages',
+    'apps.dashboards'
 ]
 
 # 中间件
