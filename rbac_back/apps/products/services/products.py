@@ -40,13 +40,13 @@ class ProductService:
         )
 
     # ==================== 商品详情 ====================
-
+    
     def get_product_detail(
-        self,
-        product_id: str,
+            self,
+            customer_sku: str,
     ) -> dict[str, Any]:
-        """获取统一结构的普通商品详情。"""
+        """根据客户 SKU 获取统一商品详情。"""
 
         return self.provider.get_product_detail(
-            product_id,
+            customer_sku,
         )

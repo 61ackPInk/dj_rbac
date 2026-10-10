@@ -7,7 +7,10 @@
 """
 # ==================== ERP 适配器导出 ====================
 
-from .base import BaseProductProvider
+from .base import (
+    BaseBundleProvider,
+    BaseProductProvider,
+)
 from .exceptions import (
     ProductProviderConfigurationError,
     ProductProviderError,
@@ -17,6 +20,7 @@ from .exceptions import (
 
 
 __all__ = [
+    "BaseBundleProvider",
     "BaseProductProvider",
     "ProductProviderConfigurationError",
     "ProductProviderError",

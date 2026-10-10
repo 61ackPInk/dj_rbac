@@ -7,7 +7,7 @@
 """
 from typing import Any
 
-from apps.products.adapters import BaseProductProvider
+from apps.products.adapters import BaseBundleProvider
 
 
 # ==================== 组合商品服务 ====================
@@ -23,7 +23,7 @@ class BundleService:
 
     def __init__(
         self,
-        provider: BaseProductProvider,
+        provider: BaseBundleProvider,
     ):
         self.provider = provider
 
