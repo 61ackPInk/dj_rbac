@@ -6,6 +6,67 @@
 
   color: var(--text-main);
 
+  /* ==================== 加载与错误状态 ==================== */
+
+  .dashboard-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 9px;
+
+    min-height: 360px;
+    padding: 32px;
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    background: var(--bg-card);
+
+    color: var(--text-sub);
+    text-align: center;
+
+    > i {
+      color: var(--primary);
+      font-size: 27px;
+    }
+
+    > strong {
+      color: var(--text-title);
+      font-size: var(--font-card-title);
+      font-weight: var(--font-weight-heading);
+    }
+
+    > span {
+      font-size: var(--font-small);
+    }
+
+    &.error {
+      > i {
+        color: var(--danger);
+      }
+    }
+
+    .state-loading {
+      animation: dashboard-spin 0.8s linear infinite;
+    }
+
+    .retry-button {
+      margin-top: 7px;
+      padding: 8px 15px;
+
+      border: 0;
+      border-radius: 7px;
+      background: var(--primary);
+      color: #fff;
+
+      font-size: var(--font-small);
+
+      &:hover {
+        background: var(--primary-hover);
+      }
+    }
+  }
+
   /* ==================== 页面标题 ==================== */
 
   .page-heading {
@@ -338,12 +399,7 @@
 
         border-radius: 50%;
 
-        background:
-          conic-gradient(
-            var(--primary) 0 73%,
-            var(--success) 73% 91%,
-            var(--border) 91% 100%
-          );
+        background: var(--border);
 
         /* 环形图中心留白 */
         &::before {
@@ -450,6 +506,10 @@
               background: var(--success);
             }
 
+            &.blue {
+              background: var(--primary);
+            }
+
             &.gray {
               background: var(--text-muted);
             }
@@ -502,6 +562,11 @@
 
         font-size: var(--font-small);
         font-weight: var(--font-weight-title);
+
+        &.muted {
+          color: var(--text-sub);
+          background: var(--bg-hover);
+        }
       }
 
       .role-info {
@@ -537,6 +602,26 @@
         font-size: var(--font-caption);
         white-space: nowrap;
       }
+    }
+  }
+
+  /* ==================== 面板空状态 ==================== */
+
+  .panel-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+
+    min-height: 190px;
+    padding: 24px;
+
+    color: var(--text-muted);
+    font-size: var(--font-small);
+
+    i {
+      font-size: 25px;
     }
   }
 
@@ -827,5 +912,11 @@
         transition: none;
       }
     }
+  }
+}
+
+@keyframes dashboard-spin {
+  to {
+    transform: rotate(360deg);
   }
 }

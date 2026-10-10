@@ -16,5 +16,9 @@ urlpatterns = [
         "api/pages/",
         include("apps.pages.urls"),
     ),
+    # 仪表盘【数据概览】
+    path(
+        "api/dashboards/",
+        include("apps.dashboards.urls"),
+    ),
 ]
-
