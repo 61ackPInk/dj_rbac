@@ -21,6 +21,8 @@ from apps.products.adapters.factory import (
     get_stock_provider,
 )
 from apps.products.serializers import (
+    ProductDetailPathSerializer,
+    ProductDetailSerializer,
     ProductListQuerySerializer,
     ProductListResponseSerializer,
 )
@@ -145,6 +147,115 @@ class ProductListAPIView(GenericAPIView):
 
         # 项目自定义 Renderer 会统一包装
         # code、message 和 data
+        return Response(
+            response_serializer.validated_data
+        )
+
+
+# ==================== 商品详情接口 ====================
+
+
+class ProductDetailAPIView(GenericAPIView):
+    """根据客户SKU查询商品详情和实时库存。"""
+
+    permission_classes = [
+        HasOperationPermission,
+    ]
+
+    required_permissions = {
+        "GET": "PRODUCT_DETAIL",
+    }
+
+    path_serializer_class = (
+        ProductDetailPathSerializer
+    )
+    response_serializer_class = (
+        ProductDetailSerializer
+    )
+
+    def get(
+        self,
+        request,
+        customer_sku,
+        *args,
+        **kwargs,
+    ):
+        """获取统一结构的商品详情。"""
+
+        # --------------------
+        # 校验路径中的客户SKU
+        # --------------------
+
+        path_serializer = (
+            self.path_serializer_class(
+                data={
+                    "customer_sku": (
+                        customer_sku
+                    ),
+                },
+            )
+        )
+        path_serializer.is_valid(
+            raise_exception=True
+        )
+
+        validated_customer_sku = (
+            path_serializer.validated_data[
+                "customer_sku"
+            ]
+        )
+
+        # --------------------
+        # 调用商品详情服务
+        # --------------------
+
+        try:
+            service = ProductService(
+                product_provider=(
+                    get_product_provider()
+                ),
+                stock_provider=(
+                    get_stock_provider()
+                ),
+            )
+            result = (
+                service.get_product_detail(
+                    validated_customer_sku
+                )
+            )
+        except (
+            ProductProviderConfigurationError
+        ) as error:
+            logger.exception(
+                "商品数据源配置错误"
+            )
+
+            raise ProductProviderUnavailable() from error
+        except ProductProviderError as error:
+            logger.exception(
+                "第三方商品详情接口请求失败"
+            )
+
+            raise ProductProviderBadGateway() from error
+
+        # --------------------
+        # 校验统一详情响应
+        # --------------------
+
+        response_serializer = (
+            self.response_serializer_class(
+                data=result,
+            )
+        )
+
+        if not response_serializer.is_valid():
+            logger.error(
+                "商品详情统一响应校验失败：%s",
+                response_serializer.errors,
+            )
+
+            raise ProductProviderBadGateway()
+
         return Response(
             response_serializer.validated_data
         )

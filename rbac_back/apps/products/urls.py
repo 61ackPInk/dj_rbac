@@ -9,6 +9,7 @@
 from django.urls import path
 
 from apps.products.views import (
+    ProductDetailAPIView,
     ProductListAPIView,
 )
 
@@ -21,5 +22,11 @@ urlpatterns = [
         "",
         ProductListAPIView.as_view(),
         name="product-list",
+    ),
+    # 普通商品详情
+    path(
+        "by-sku/<str:customer_sku>/",
+        ProductDetailAPIView.as_view(),
+        name="product-detail",
     ),
 ]

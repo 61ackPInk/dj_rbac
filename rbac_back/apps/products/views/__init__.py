@@ -6,9 +6,12 @@
 @Desc : 商品系统视图统一导出
 """
 
-from .products import ProductListAPIView
-
+from .products import (
+    ProductDetailAPIView,
+    ProductListAPIView,
+)
 
 __all__ = [
+    "ProductDetailAPIView",
     "ProductListAPIView",
 ]

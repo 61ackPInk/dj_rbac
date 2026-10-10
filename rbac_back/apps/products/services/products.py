@@ -29,9 +29,9 @@ class ProductService:
     """
 
     def __init__(
-        self,
-        product_provider: BaseProductProvider,
-        stock_provider: BaseStockProvider,
+            self,
+            product_provider: BaseProductProvider,
+            stock_provider: BaseStockProvider,
     ):
         self.product_provider = (
             product_provider
@@ -43,8 +43,8 @@ class ProductService:
     # ==================== 商品列表 ====================
 
     def get_product_list(
-        self,
-        query: dict[str, Any],
+            self,
+            query: dict[str, Any],
     ) -> dict[str, Any]:
         """获取包含实时库存的商品列表。"""
 
@@ -87,23 +87,72 @@ class ProductService:
     # ==================== 商品详情 ====================
 
     def get_product_detail(
-        self,
-        customer_sku: str,
+            self,
+            customer_sku: str,
     ) -> dict[str, Any]:
-        """根据客户SKU获取统一商品详情。"""
+        """获取包含实时库存的商品详情。"""
 
-        return (
+        product = (
             self.product_provider
             .get_product_detail(
                 customer_sku
             )
         )
 
+        if not isinstance(product, dict):
+            raise ProductProviderResponseError(
+                "商品详情Provider返回格式错误"
+            )
+
+        product_customer_sku = (
+                product.get("customer_sku")
+                or customer_sku
+        )
+
+        main_warehouse = product.get(
+            "main_warehouse"
+        )
+        warehouse_code = None
+
+        if isinstance(main_warehouse, dict):
+            warehouse_code = (
+                main_warehouse.get("code")
+            )
+
+        stock = None
+
+        if (
+                warehouse_code
+                and product_customer_sku
+        ):
+            stock_map = (
+                self.stock_provider
+                .get_stock_list(
+                    warehouse_code,
+                    [
+                        product_customer_sku,
+                    ],
+                )
+            )
+
+            stock = stock_map.get(
+                product_customer_sku
+            )
+
+        if stock is None:
+            stock = self._create_missing_stock(
+                warehouse_code
+            )
+
+        product["inventory"] = stock
+
+        return product
+
     # ==================== 按主仓库分组 ====================
 
     @staticmethod
     def _group_products_by_warehouse(
-        items: list[dict[str, Any]],
+            items: list[dict[str, Any]],
     ) -> dict[str, list[str]]:
         """
         将当前页商品按照主仓库分组。
@@ -126,8 +175,8 @@ class ProductService:
             )
 
             if not isinstance(
-                main_warehouse,
-                dict,
+                    main_warehouse,
+                    dict,
             ):
                 continue
 
@@ -136,8 +185,8 @@ class ProductService:
             )
 
             if (
-                not customer_sku
-                or not warehouse_code
+                    not customer_sku
+                    or not warehouse_code
             ):
                 continue
 
@@ -159,11 +208,11 @@ class ProductService:
     # ==================== 批量加载库存 ====================
 
     def _load_stock_map(
-        self,
-        warehouse_groups: dict[
-            str,
-            list[str],
-        ],
+            self,
+            warehouse_groups: dict[
+                str,
+                list[str],
+            ],
     ) -> dict[
         tuple[str, str],
         dict[str, Any],
@@ -178,8 +227,8 @@ class ProductService:
         stock_map = {}
 
         for (
-            warehouse_code,
-            customer_skus,
+                warehouse_code,
+                customer_skus,
         ) in warehouse_groups.items():
             warehouse_stock = (
                 self.stock_provider
@@ -190,8 +239,8 @@ class ProductService:
             )
 
             for (
-                customer_sku,
-                stock,
+                    customer_sku,
+                    stock,
             ) in warehouse_stock.items():
                 stock_map[
                     (
@@ -205,12 +254,12 @@ class ProductService:
     # ==================== 合并商品和库存 ====================
 
     def _merge_product_stock(
-        self,
-        items: list[dict[str, Any]],
-        stock_map: dict[
-            tuple[str, str],
-            dict[str, Any],
-        ],
+            self,
+            items: list[dict[str, Any]],
+            stock_map: dict[
+                tuple[str, str],
+                dict[str, Any],
+            ],
     ):
         """把实时库存写入对应商品。"""
 
@@ -225,8 +274,8 @@ class ProductService:
             warehouse_code = None
 
             if isinstance(
-                main_warehouse,
-                dict,
+                    main_warehouse,
+                    dict,
             ):
                 warehouse_code = (
                     main_warehouse.get("code")
@@ -252,7 +301,7 @@ class ProductService:
 
     @staticmethod
     def _create_missing_stock(
-        warehouse_code: str | None,
+            warehouse_code: str | None,
     ) -> dict[str, Any]:
         """
         创建未匹配库存结构。

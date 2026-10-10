@@ -14,6 +14,10 @@ from .products import (
     ProductMainWarehouseSerializer,
     ProductPaginationSerializer,
     ProductSpecificationsSerializer,
+    ProductCustomsSerializer,
+    ProductDetailPathSerializer,
+    ProductDetailSerializer,
+    ProductWarehouseInfoSerializer,
 )
 
 __all__ = [
@@ -24,4 +28,8 @@ __all__ = [
     "ProductMainWarehouseSerializer",
     "ProductPaginationSerializer",
     "ProductSpecificationsSerializer",
+    "ProductCustomsSerializer",
+    "ProductDetailPathSerializer",
+    "ProductDetailSerializer",
+    "ProductWarehouseInfoSerializer",
 ]

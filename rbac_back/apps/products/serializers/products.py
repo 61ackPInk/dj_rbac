@@ -9,6 +9,23 @@
 from rest_framework import serializers
 
 
+# ==================== 商品详情路径参数 ====================
+
+
+class ProductDetailPathSerializer(
+    serializers.Serializer
+):
+    """校验商品详情中的客户SKU。"""
+
+    customer_sku = serializers.CharField(
+        allow_blank=False,
+        trim_whitespace=True,
+        error_messages={
+            "blank": "客户SKU不能为空",
+        },
+    )
+
+
 # ==================== 商品列表查询参数 ====================
 
 
@@ -318,6 +335,128 @@ class ProductListItemSerializer(
     updated_at = serializers.CharField(
         allow_blank=True,
         allow_null=True,
+    )
+
+
+# ==================== 商品报关信息 ====================
+
+
+class ProductCustomsSerializer(
+    serializers.Serializer
+):
+    """商品报关国家和价格信息。"""
+
+    country = serializers.CharField(
+        allow_blank=True,
+        allow_null=True,
+    )
+    price = serializers.FloatField(
+        allow_null=True
+    )
+
+
+# ==================== 商品仓库价格信息 ====================
+
+
+class ProductWarehouseInfoSerializer(
+    serializers.Serializer
+):
+    """商品在仓库中的价格信息。"""
+
+    code = serializers.CharField(
+        allow_blank=True,
+        allow_null=True,
+    )
+    name = serializers.CharField(
+        allow_blank=True,
+        allow_null=True,
+    )
+    purchase_price = serializers.FloatField(
+        allow_null=True
+    )
+    stock_price = serializers.FloatField(
+        allow_null=True
+    )
+    updated_at = serializers.CharField(
+        allow_blank=True,
+        allow_null=True,
+    )
+
+
+# ==================== 商品详情响应 ====================
+
+
+class ProductDetailSerializer(
+    ProductListItemSerializer
+):
+    """本系统统一商品详情结构。"""
+
+    declared_name = serializers.CharField(
+        allow_blank=True,
+        allow_null=True,
+    )
+    declared_chinese_name = (
+        serializers.CharField(
+            allow_blank=True,
+            allow_null=True,
+        )
+    )
+    product_link = serializers.CharField(
+        allow_blank=True,
+        allow_null=True,
+    )
+
+    product_attribute = (
+        serializers.IntegerField(
+            allow_null=True
+        )
+    )
+    product_attribute_name = (
+        serializers.CharField(
+            allow_blank=True,
+            allow_null=True,
+        )
+    )
+
+    has_brand = serializers.BooleanField()
+
+    brand_name = serializers.CharField(
+        allow_blank=True,
+        allow_null=True,
+    )
+    model = serializers.CharField(
+        allow_blank=True,
+        allow_null=True,
+    )
+    usage = serializers.CharField(
+        allow_blank=True,
+        allow_null=True,
+    )
+    material = serializers.CharField(
+        allow_blank=True,
+        allow_null=True,
+    )
+    reference_cost_price = (
+        serializers.CharField(
+            allow_blank=True,
+            allow_null=True,
+        )
+    )
+
+    inbound_customs = (
+        ProductCustomsSerializer(
+            many=True
+        )
+    )
+    outbound_customs = (
+        ProductCustomsSerializer(
+            allow_null=True
+        )
+    )
+    warehouses = (
+        ProductWarehouseInfoSerializer(
+            many=True
+        )
     )
 
 
