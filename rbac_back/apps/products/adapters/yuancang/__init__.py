@@ -5,3 +5,13 @@
 @Time : 2026/10/10 15:58
 @Desc : 
 """
+# ==================== 元仓适配器导出 ====================
+
+from .client import YuanCangClient
+from .config import YuanCangConfig
+
+
+__all__ = [
+    "YuanCangClient",
+    "YuanCangConfig",
+]
