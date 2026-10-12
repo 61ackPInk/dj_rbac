@@ -1,3 +1,4 @@
+import productRoutes from './product'
 import systemRoutes from './system'
 
 /* ==================== 登录后的主布局 ==================== */
@@ -22,6 +23,7 @@ export default [
 
       /* ==================== 业务模块路由 ==================== */
       ...systemRoutes,
+      ...productRoutes,
 
       /* ==================== 尚未开发的页面 ==================== */
       // 必须放在最后，避免抢先匹配业务模块的路径
