@@ -213,7 +213,7 @@
                 <td>
                   <div class="product-name-cell">
                     <div class="product-thumbnail">
-                      <img
+                      <!-- <img
                         v-if="
                           hasProductImage(product)
                         "
@@ -228,6 +228,24 @@
                           handleProductImageError(
                             product,
                           )
+                        "
+                      /> -->
+                      <el-image
+                        v-if="hasProductImage(product)"
+                        class="product-preview-image"
+                        :src="getProductImage(product)"
+                        :preview-src-list="[
+                          getProductImage(product),
+                        ]"
+                        :alt="getProductName(product)"
+                        fit="contain"
+                        loading="lazy"
+                        preview-teleported
+                        hide-on-click-modal
+                        :infinite="false"
+                        :z-index="10000"
+                        @error="
+                          handleProductImageError(product)
                         "
                       />
 
@@ -340,11 +358,29 @@
           >
             <!-- 商品主图 -->
             <div class="card-image">
-              <img
+              <!-- <img
                 v-if="hasProductImage(product)"
                 :src="getProductImage(product)"
                 :alt="getProductName(product)"
                 loading="lazy"
+                @error="
+                  handleProductImageError(product)
+                "
+              /> -->
+              <el-image
+                v-if="hasProductImage(product)"
+                class="product-preview-image"
+                :src="getProductImage(product)"
+                :preview-src-list="[
+                  getProductImage(product),
+                ]"
+                :alt="getProductName(product)"
+                fit="contain"
+                loading="lazy"
+                preview-teleported
+                hide-on-click-modal
+                :infinite="false"
+                :z-index="10000"
                 @error="
                   handleProductImageError(product)
                 "
