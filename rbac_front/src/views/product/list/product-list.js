@@ -30,8 +30,8 @@ export default {
     /* ==================== 操作权限 ==================== */
 
     /*
-     * 页面可见性由路由中的 PRODUCT_LIST 页面编码控制。
-     * 进入页面后，列表接口还要单独检查 PRODUCT_LIST 操作权限。
+     * 页面访问由路由中的 PRODUCT_LIST 页面编码控制。
+     * 商品列表接口还需要 PRODUCT_LIST 操作权限。
      */
     const canViewProductList = computed(() => {
       return authStore.hasPermission(
@@ -44,6 +44,24 @@ export default {
     const products = ref([])
     const loading = ref(false)
     const errorMessage = ref('')
+
+    /* ==================== 显示模式 ==================== */
+
+    /*
+     * list：列表模式。
+     * card：卡片模式。
+     *
+     * 切换模式只改变前端展示，不重新请求 ERP 数据。
+     */
+    const viewMode = ref('list')
+
+    const setViewMode = (mode) => {
+      if (!['list', 'card'].includes(mode)) {
+        return
+      }
+
+      viewMode.value = mode
+    }
 
     /* ==================== 分页状态 ==================== */
 
@@ -106,8 +124,8 @@ export default {
 
     const loadProducts = async () => {
       /*
-       * 页面可见不代表拥有查看列表操作权限。
-       * 没有权限时不发送接口请求。
+       * 页面可见不代表拥有列表操作权限。
+       * 没有操作权限时不发送商品接口请求。
        */
       if (!canViewProductList.value) {
         products.value = []
@@ -136,10 +154,6 @@ export default {
             ? result.items
             : []
 
-        /*
-         * 分页信息以后端返回值为准。
-         * Number 转换避免后端数字字符串影响分页计算。
-         */
         const pagination =
           result?.pagination || {}
 
@@ -198,13 +212,82 @@ export default {
       loadProducts()
     }
 
+    /* ==================== 商品图片 ==================== */
+
+    /*
+     * 记录当前页面加载失败的商品图片。
+     *
+     * 不直接修改接口返回的 product.images，
+     * 避免污染后端原始数据。
+     */
+    const failedImageKeys = ref(
+      new Set(),
+    )
+
+    const getProductKey = (product) => {
+      return String(
+        product?.id ||
+        product?.customer_sku ||
+        '',
+      )
+    }
+
+    /*
+     * 商品列表和卡片均使用 images 中的第一张有效图片。
+     * 完整图片列表留到商品详情弹窗展示。
+     */
+    const getProductImage = (product) => {
+      if (!Array.isArray(product?.images)) {
+        return ''
+      }
+
+      return (
+        product.images.find((image) => {
+          return (
+            typeof image === 'string' &&
+            image.trim()
+          )
+        }) || ''
+      )
+    }
+
+    const hasProductImage = (product) => {
+      const imageUrl =
+        getProductImage(product)
+
+      if (!imageUrl) {
+        return false
+      }
+
+      return !failedImageKeys.value.has(
+        getProductKey(product),
+      )
+    }
+
+    const handleProductImageError = (
+      product,
+    ) => {
+      const nextFailedKeys = new Set(
+        failedImageKeys.value,
+      )
+
+      nextFailedKeys.add(
+        getProductKey(product),
+      )
+
+      /*
+       * 使用新 Set 替换原值，
+       * 保证 Vue 能检测到状态变化。
+       */
+      failedImageKeys.value =
+        nextFailedKeys
+    }
+
     /* ==================== 商品展示辅助方法 ==================== */
 
     /*
-     * 必须使用 value == null 判断。
-     *
-     * null 表示未知，显示“—”；
-     * 0 表示真实的零库存，必须显示为 0。
+     * null 表示数量未知，显示“—”；
+     * 0 是真实数量，必须显示为 0。
      */
     const formatQuantity = (value) => {
       return value == null
@@ -271,6 +354,9 @@ export default {
       errorMessage,
       loadProducts,
 
+      viewMode,
+      setViewMode,
+
       page,
       pageSize,
       total,
@@ -283,6 +369,10 @@ export default {
       changePageSize,
       goToPreviousPage,
       goToNextPage,
+
+      getProductImage,
+      hasProductImage,
+      handleProductImageError,
 
       formatQuantity,
       getProductName,

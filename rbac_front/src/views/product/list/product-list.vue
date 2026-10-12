@@ -12,23 +12,67 @@
         <p>查看 ERP 商品资料及实时库存信息。</p>
       </div>
 
-      <button
+      <div
         v-if="canViewProductList"
-        class="refresh-button"
-        type="button"
-        :disabled="loading"
-        aria-label="刷新商品列表"
-        title="刷新商品列表"
-        @click="loadProducts"
+        class="heading-actions"
       >
-        <i
-          class="bi bi-arrow-clockwise"
-          :class="{
-            'is-rotating': loading,
-          }"
-          aria-hidden="true"
-        ></i>
-      </button>
+        <!-- 刷新商品列表 -->
+        <button
+          class="refresh-button"
+          type="button"
+          :disabled="loading"
+          aria-label="刷新商品列表"
+          title="刷新商品列表"
+          @click="loadProducts"
+        >
+          <i
+            class="bi bi-arrow-clockwise"
+            :class="{
+              'is-rotating': loading,
+            }"
+            aria-hidden="true"
+          ></i>
+        </button>
+
+        <!-- 显示模式切换 -->
+        <div
+          class="view-switch"
+          role="group"
+          aria-label="商品显示方式"
+        >
+          <button
+            class="view-button"
+            :class="{
+              'is-active': viewMode === 'list',
+            }"
+            type="button"
+            aria-label="列表显示"
+            :aria-pressed="viewMode === 'list'"
+            @click="setViewMode('list')"
+          >
+            <i
+              class="bi bi-list-ul"
+              aria-hidden="true"
+            ></i>
+          </button>
+
+          <button
+            class="view-button"
+            :class="{
+              'is-active': viewMode === 'card',
+            }"
+            type="button"
+            aria-label="卡片显示"
+            :aria-pressed="viewMode === 'card'"
+            @click="setViewMode('card')"
+          >
+            <i
+              class="bi bi-grid"
+              aria-hidden="true"
+            ></i>
+          </button>
+        </div>
+      </div>
     </header>
 
     <!-- ==================== 商品列表面板 ==================== -->
@@ -130,9 +174,12 @@
           </span>
         </div>
 
-        <!-- ==================== 商品表格 ==================== -->
+        <!-- ==================== 列表显示 ==================== -->
 
-        <div class="table-scroll">
+        <div
+          v-if="viewMode === 'list'"
+          class="table-scroll"
+        >
           <table class="product-table">
             <thead>
               <tr>
@@ -162,17 +209,36 @@
                 v-for="product in products"
                 :key="product.id"
               >
-                <!-- 商品名称 -->
+                <!-- 商品图片与名称 -->
                 <td>
                   <div class="product-name-cell">
-                    <span class="product-icon">
+                    <div class="product-thumbnail">
+                      <img
+                        v-if="
+                          hasProductImage(product)
+                        "
+                        :src="
+                          getProductImage(product)
+                        "
+                        :alt="
+                          getProductName(product)
+                        "
+                        loading="lazy"
+                        @error="
+                          handleProductImageError(
+                            product,
+                          )
+                        "
+                      />
+
                       <i
-                        class="bi bi-box-seam"
+                        v-else
+                        class="bi bi-image"
                         aria-hidden="true"
                       ></i>
-                    </span>
+                    </div>
 
-                    <div>
+                    <div class="product-name">
                       <strong>
                         {{ getProductName(product) }}
                       </strong>
@@ -187,7 +253,7 @@
                   </div>
                 </td>
 
-                <!-- SKU 信息 -->
+                <!-- SKU -->
                 <td class="sku-cell">
                   {{ product.customer_sku || '—' }}
                 </td>
@@ -259,6 +325,156 @@
               </tr>
             </tbody>
           </table>
+        </div>
+
+        <!-- ==================== 卡片显示 ==================== -->
+
+        <div
+          v-else
+          class="card-view"
+        >
+          <article
+            v-for="product in products"
+            :key="product.id"
+            class="product-card"
+          >
+            <!-- 商品主图 -->
+            <div class="card-image">
+              <img
+                v-if="hasProductImage(product)"
+                :src="getProductImage(product)"
+                :alt="getProductName(product)"
+                loading="lazy"
+                @error="
+                  handleProductImageError(product)
+                "
+              />
+
+              <div
+                v-else
+                class="image-placeholder"
+              >
+                <i
+                  class="bi bi-image"
+                  aria-hidden="true"
+                ></i>
+
+                <span>暂无商品图片</span>
+              </div>
+            </div>
+
+            <!-- 商品基础信息 -->
+            <div class="card-header">
+              <div>
+                <h2>
+                  {{ getProductName(product) }}
+                </h2>
+
+                <p>
+                  {{
+                    product.english_name ||
+                    '暂无英文名称'
+                  }}
+                </p>
+              </div>
+
+              <span class="status-tag">
+                {{ product.status_name || '—' }}
+              </span>
+            </div>
+
+            <!-- 商品资料 -->
+            <dl class="card-info">
+              <div>
+                <dt>客户 SKU</dt>
+                <dd>
+                  {{ product.customer_sku || '—' }}
+                </dd>
+              </div>
+
+              <div>
+                <dt>ERP SKU</dt>
+                <dd>
+                  {{ product.erp_sku || '—' }}
+                </dd>
+              </div>
+
+              <div class="full">
+                <dt>主仓库</dt>
+                <dd>
+                  {{ getWarehouseName(product) }}
+                </dd>
+              </div>
+            </dl>
+
+            <!-- 库存信息 -->
+            <div class="card-inventory">
+              <header>
+                <span>实时库存</span>
+
+                <span
+                  class="inventory-status"
+                  :class="{
+                    missing:
+                      product.inventory
+                        ?.found === false,
+                  }"
+                >
+                  {{
+                    getInventoryStateText(product)
+                  }}
+                </span>
+              </header>
+
+              <dl>
+                <div>
+                  <dt>总库存</dt>
+                  <dd>
+                    {{
+                      formatQuantity(
+                        product.inventory?.total,
+                      )
+                    }}
+                  </dd>
+                </div>
+
+                <div>
+                  <dt>可用</dt>
+                  <dd class="available">
+                    {{
+                      formatQuantity(
+                        product.inventory?.available,
+                      )
+                    }}
+                  </dd>
+                </div>
+
+                <div>
+                  <dt>在途</dt>
+                  <dd>
+                    {{
+                      formatQuantity(
+                        product.inventory
+                          ?.transferring,
+                      )
+                    }}
+                  </dd>
+                </div>
+
+                <div>
+                  <dt>待上架</dt>
+                  <dd>
+                    {{
+                      formatQuantity(
+                        product.inventory
+                          ?.waiting_for_shelf,
+                      )
+                    }}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </article>
         </div>
 
         <!-- ==================== 分页 ==================== -->
