@@ -41,3 +41,4 @@ rbac_front/.env.*.local
 .idea/
 *.DS_Store
 Thumbs.db
+docs/
