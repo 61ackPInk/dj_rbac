@@ -47,6 +47,253 @@ export default {
     const loading = ref(false)
     const errorMessage = ref('')
 
+    /* ==================== 当前页搜索与筛选 ==================== */
+
+    /*
+     * 搜索、库存状态筛选和排序只作用于
+     * 当前接口已经返回的这一页商品。
+     *
+     * 切换条件不会重新请求后端。
+     */
+    const keyword = ref('')
+    const inventoryFilter = ref('all')
+    const sortMode = ref('default')
+
+    const sortOptions = [
+      {
+        label: '默认排序',
+        value: 'default',
+      },
+      {
+        label: '商品名称 A-Z',
+        value: 'name_asc',
+      },
+      {
+        label: '总库存 高-低',
+        value: 'total_desc',
+      },
+      {
+        label: '总库存 低-高',
+        value: 'total_asc',
+      },
+      {
+        label: '更新时间 最新',
+        value: 'updated_desc',
+      },
+    ]
+
+    /* ==================== 库存状态判断 ==================== */
+
+    const getInventoryCategory = (
+      product,
+    ) => {
+      const inventory =
+        product?.inventory
+
+      /*
+       * 没有匹配到库存记录，或者可用库存未知，
+       * 都不能当成真实的零库存。
+       */
+      if (
+        inventory?.found === false ||
+        inventory?.available == null
+      ) {
+        return 'unknown'
+      }
+
+      const available =
+        Number(inventory.available)
+
+      if (Number.isNaN(available)) {
+        return 'unknown'
+      }
+
+      if (available === 0) {
+        return 'out_of_stock'
+      }
+
+      if (
+        available > 0 &&
+        available < 50
+      ) {
+        return 'low_stock'
+      }
+
+      if (available >= 50) {
+        return 'in_stock'
+      }
+
+      return 'unknown'
+    }
+
+    /* ==================== 当前页库存统计 ==================== */
+
+    const currentPageInventoryCounts = computed(() => {
+      const counts = {
+        all: products.value.length,
+        in_stock: 0,
+        low_stock: 0,
+        out_of_stock: 0,
+        unknown: 0,
+      }
+
+      products.value.forEach((product) => {
+        const category =
+          getInventoryCategory(product)
+
+        counts[category] += 1
+      })
+
+      return counts
+    })
+
+    /* ==================== 当前页商品处理 ==================== */
+
+    const displayedProducts = computed(() => {
+      const search =
+        keyword.value.trim().toLowerCase()
+
+      /*
+       * 先筛选，再复制数组进行排序。
+       * 不直接修改接口返回的 products 原数组。
+       */
+      const result = products.value.filter(
+        (product) => {
+          const searchContent = [
+            product?.name,
+            product?.english_name,
+            product?.customer_sku,
+            product?.erp_sku,
+            product?.reference_code,
+          ]
+            .filter((value) => {
+              return value != null
+            })
+            .join(' ')
+            .toLowerCase()
+
+          const matchesKeyword =
+            !search ||
+            searchContent.includes(search)
+
+          const matchesInventory =
+            inventoryFilter.value === 'all' ||
+            getInventoryCategory(product) ===
+            inventoryFilter.value
+
+          return (
+            matchesKeyword &&
+            matchesInventory
+          )
+        },
+      )
+
+      if (sortMode.value === 'default') {
+        return result
+      }
+
+      return [...result].sort(
+        (productA, productB) => {
+          /* 商品名称 A-Z */
+          if (sortMode.value === 'name_asc') {
+            const nameA =
+              getProductName(productA)
+
+            const nameB =
+              getProductName(productB)
+
+            return nameA.localeCompare(
+              nameB,
+              'zh-CN',
+              {
+                numeric: true,
+                sensitivity: 'base',
+              },
+            )
+          }
+
+          /* 更新时间 最新 */
+          if (
+            sortMode.value ===
+            'updated_desc'
+          ) {
+            const timeA =
+              Date.parse(
+                productA?.updated_at || '',
+              ) || 0
+
+            const timeB =
+              Date.parse(
+                productB?.updated_at || '',
+              ) || 0
+
+            return timeB - timeA
+          }
+
+          /* 总库存排序 */
+          const totalA =
+            productA?.inventory?.total
+
+          const totalB =
+            productB?.inventory?.total
+
+          /*
+           * null 表示未知。
+           * 无论升序还是降序，未知库存都排在最后。
+           */
+          if (
+            totalA == null &&
+            totalB == null
+          ) {
+            return 0
+          }
+
+          if (totalA == null) {
+            return 1
+          }
+
+          if (totalB == null) {
+            return -1
+          }
+
+          const numberA = Number(totalA)
+          const numberB = Number(totalB)
+
+          if (
+            Number.isNaN(numberA) &&
+            Number.isNaN(numberB)
+          ) {
+            return 0
+          }
+
+          if (Number.isNaN(numberA)) {
+            return 1
+          }
+
+          if (Number.isNaN(numberB)) {
+            return -1
+          }
+
+          if (
+            sortMode.value ===
+            'total_asc'
+          ) {
+            return numberA - numberB
+          }
+
+          return numberB - numberA
+        },
+      )
+    })
+
+    /* ==================== 重置当前页筛选 ==================== */
+
+    const resetPageFilters = () => {
+      keyword.value = ''
+      inventoryFilter.value = 'all'
+      sortMode.value = 'default'
+    }
+
     /* ==================== 显示模式 ==================== */
 
     /*
@@ -102,7 +349,7 @@ export default {
 
       return (
         (page.value - 1) *
-          pageSize.value +
+        pageSize.value +
         1
       )
     })
@@ -355,6 +602,14 @@ export default {
       loading,
       errorMessage,
       loadProducts,
+
+      keyword,
+      inventoryFilter,
+      sortMode,
+      sortOptions,
+      displayedProducts,
+      currentPageInventoryCounts,
+      resetPageFilters,
 
       viewMode,
       setViewMode,

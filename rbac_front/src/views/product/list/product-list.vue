@@ -158,26 +158,182 @@
       <!-- ==================== 商品数据 ==================== -->
 
       <template v-else>
+        <!-- ==================== 当前页搜索与筛选 ==================== -->
+
+        <div class="product-toolbar">
+          <!-- 商品搜索 -->
+          <label class="search-box">
+            <i
+              class="bi bi-search"
+              aria-hidden="true"
+            ></i>
+
+            <input
+              v-model="keyword"
+              type="search"
+              placeholder="搜索商品名称、客户 SKU、ERP SKU"
+              aria-label="搜索当前页商品"
+            />
+          </label>
+
+          <!-- 库存状态筛选 -->
+          <div
+            class="inventory-filters"
+            role="group"
+            aria-label="按库存状态筛选当前页商品"
+          >
+            <button
+              type="button"
+              :class="{
+                'is-active':
+                  inventoryFilter === 'all',
+              }"
+              @click="inventoryFilter = 'all'"
+            >
+              全部
+              <span>
+                {{ currentPageInventoryCounts.all }}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              :class="{
+                'is-active':
+                  inventoryFilter === 'in_stock',
+              }"
+              @click="
+                inventoryFilter = 'in_stock'
+              "
+            >
+              有货
+              <span>
+                {{
+                  currentPageInventoryCounts.in_stock
+                }}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              :class="{
+                'is-active':
+                  inventoryFilter === 'low_stock',
+              }"
+              @click="
+                inventoryFilter = 'low_stock'
+              "
+            >
+              低库存
+              <span>
+                {{
+                  currentPageInventoryCounts.low_stock
+                }}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              :class="{
+                'is-active':
+                  inventoryFilter ===
+                  'out_of_stock',
+              }"
+              @click="
+                inventoryFilter = 'out_of_stock'
+              "
+            >
+              无库存
+              <span>
+                {{
+                  currentPageInventoryCounts
+                    .out_of_stock
+                }}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              :class="{
+                'is-active':
+                  inventoryFilter === 'unknown',
+              }"
+              @click="
+                inventoryFilter = 'unknown'
+              "
+            >
+              未知
+              <span>
+                {{
+                  currentPageInventoryCounts.unknown
+                }}
+              </span>
+            </button>
+          </div>
+
+          <!-- 当前页排序 -->
+          <div class="sort-control">
+            <span>排序</span>
+
+            <AppSelect
+              v-model="sortMode"
+              :options="sortOptions"
+              :width="168"
+              aria-label="当前页商品排序"
+            />
+          </div>
+        </div>
+
         <!-- ==================== 结果统计 ==================== -->
 
         <div class="result-summary">
           <span>
-            共
+            ERP 共
             <strong>{{ total }}</strong>
-            件商品
+            件商品，当前页
+            <strong>{{ products.length }}</strong>
+            件
           </span>
 
           <span>
-            当前显示第
-            {{ resultStart }}～{{ resultEnd }}
-            条
+            当前筛选结果
+            <strong>
+              {{ displayedProducts.length }}
+            </strong>
+            件
           </span>
+        </div>
+        
+        <!-- ==================== 当前页无匹配结果 ==================== -->
+
+        <div
+          v-if="displayedProducts.length === 0"
+          class="page-state filtered-empty"
+        >
+          <i
+            class="bi bi-search"
+            aria-hidden="true"
+          ></i>
+
+          <strong>当前页没有匹配商品</strong>
+
+          <span>
+            请修改搜索内容或库存状态筛选。
+          </span>
+
+          <button
+            class="secondary-button"
+            type="button"
+            @click="resetPageFilters"
+          >
+            清除筛选
+          </button>
         </div>
 
         <!-- ==================== 列表显示 ==================== -->
 
         <div
-          v-if="viewMode === 'list'"
+          v-else-if="viewMode === 'list'"
           class="table-scroll"
         >
           <table class="product-table">
@@ -206,7 +362,7 @@
 
             <tbody>
               <tr
-                v-for="product in products"
+                v-for="product in displayedProducts"
                 :key="product.id"
               >
                 <!-- 商品图片与名称 -->
@@ -362,7 +518,7 @@
           class="card-view"
         >
           <article
-            v-for="product in products"
+            v-for="product in displayedProducts"
             :key="product.id"
             class="product-card"
           >
