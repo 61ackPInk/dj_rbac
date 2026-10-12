@@ -9,6 +9,7 @@ import {
 /* ==================== 公共组件 ==================== */
 
 import AppSelect from '@/components/form/select/app-select.vue'
+import AppCopyText from '@/components/common/copy-text/copy-text.vue'
 
 /* ==================== 商品接口与权限 ==================== */
 
@@ -22,6 +23,7 @@ export default {
 
   components: {
     AppSelect,
+    AppCopyText,
   },
 
   setup() {

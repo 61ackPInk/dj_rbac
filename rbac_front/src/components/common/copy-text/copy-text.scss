@@ -1,0 +1,73 @@
+/* ==================== 可复制文本 ==================== */
+
+.app-copy-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  max-width: 100%;
+  padding: 0;
+
+  border: 0;
+  outline: none;
+
+  color: inherit;
+  background: transparent;
+
+  font: inherit;
+  text-align: left;
+
+  cursor: copy;
+
+  transition:
+    color 0.2s ease;
+
+  span {
+    min-width: 0;
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  i {
+    flex: 0 0 auto;
+
+    color: var(--text-muted);
+    font-size: 12px;
+
+    opacity: 0;
+
+    transition:
+      color 0.2s ease,
+      opacity 0.2s ease;
+  }
+
+  &:hover {
+    color: var(--primary);
+
+    i {
+      color: var(--primary);
+      opacity: 1;
+    }
+  }
+
+  &:focus-visible {
+    color: var(--primary);
+
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+    border-radius: 3px;
+
+    i {
+      color: var(--primary);
+      opacity: 1;
+    }
+  }
+}
+
+/* ==================== 空内容 ==================== */
+
+.app-copy-text-empty {
+  color: var(--text-muted);
+}

@@ -258,7 +258,11 @@
 
                     <div class="product-name">
                       <strong>
-                        {{ getProductName(product) }}
+                        <AppCopyText
+                          class="product-title-copy"
+                          :value="getProductName(product)"
+                          label="商品名"
+                        />
                       </strong>
 
                       <span>
@@ -273,11 +277,17 @@
 
                 <!-- SKU -->
                 <td class="sku-cell">
-                  {{ product.customer_sku || '—' }}
+                  <AppCopyText
+                    :value="product.customer_sku"
+                    label="客户 SKU"
+                  />
                 </td>
 
                 <td class="sku-cell">
-                  {{ product.erp_sku || '—' }}
+                  <AppCopyText
+                    :value="product.erp_sku"
+                    label="ERP SKU"
+                  />
                 </td>
 
                 <!-- 仓库与状态 -->
@@ -402,9 +412,13 @@
             <!-- 商品基础信息 -->
             <div class="card-header">
               <div>
-                <h2>
-                  {{ getProductName(product) }}
-                </h2>
+                <h4>
+                  <AppCopyText
+                    class="product-title-copy"
+                    :value="getProductName(product)"
+                    label="商品名"
+                  />
+                </h4>
 
                 <p>
                   {{
@@ -422,16 +436,22 @@
             <!-- 商品资料 -->
             <dl class="card-info">
               <div>
-                <dt>客户 SKU</dt>
+                <dt>Customer SKU</dt>
                 <dd>
-                  {{ product.customer_sku || '—' }}
+                  <AppCopyText
+                    :value="product.customer_sku"
+                    label="客户 SKU"
+                  />
                 </dd>
               </div>
 
               <div>
                 <dt>ERP SKU</dt>
                 <dd>
-                  {{ product.erp_sku || '—' }}
+                  <AppCopyText
+                    :value="product.erp_sku"
+                    label="ERP SKU"
+                  />
                 </dd>
               </div>
 
