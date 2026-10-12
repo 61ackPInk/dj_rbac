@@ -29,6 +29,9 @@ class Command(BaseCommand):
     # 键：页面编码
     # 值：该页面下的操作权限
     PERMISSION_CONFIG = {
+        # ====================
+        # 用户操作权限
+        # ====================
         "SYSTEM_USERS": [
             {
                 "name": "查看用户列表",
@@ -87,6 +90,9 @@ class Command(BaseCommand):
                 "sort_order": 70,
             },
         ],
+        # ====================
+        # 角色操作权限
+        # ====================
         "SYSTEM_ROLES": [
             {
                 "name": "查看角色列表",
@@ -130,6 +136,9 @@ class Command(BaseCommand):
                 "sort_order": 50,
             },
         ],
+        # ====================
+        # 页面操作权限
+        # ====================
         "SYSTEM_PAGES": [
             {
                 "name": "查看页面列表",
@@ -179,6 +188,28 @@ class Command(BaseCommand):
                     "允许配置页面对哪些角色可见"
                 ),
                 "sort_order": 60,
+            },
+        ],
+        # ====================
+        # 商品列表操作权限
+        # ====================
+
+        "PRODUCT_LIST": [
+            {
+                "name": "查看商品列表",
+                "code": "PRODUCT_LIST",
+                "description": (
+                    "允许查看 ERP 商品列表及实时库存"
+                ),
+                "sort_order": 10,
+            },
+            {
+                "name": "查看商品详情",
+                "code": "PRODUCT_DETAIL",
+                "description": (
+                    "允许查看指定商品的详细信息及实时库存"
+                ),
+                "sort_order": 20,
             },
         ],
     }
