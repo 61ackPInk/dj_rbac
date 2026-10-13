@@ -15,6 +15,7 @@ import AppCopyText from '@/components/common/copy-text/copy-text.vue'
 
 import { getProductsApi } from '@/api/products'
 import { useAuthStore } from '@/stores/auth'
+import { message } from '@/utils/message'
 
 /* ==================== 商品列表页面 ==================== */
 
@@ -381,11 +382,11 @@ export default {
         total.value = 0
         errorMessage.value = ''
 
-        return
+        return false
       }
 
       if (loading.value) {
-        return
+        return false
       }
 
       loading.value = true
@@ -416,6 +417,12 @@ export default {
 
         total.value =
           Number(pagination.total) || 0
+
+        /*
+         * 返回 true 表示本次商品和库存数据
+         * 已经成功从后端获取。
+         */
+        return true
       } catch (error) {
         products.value = []
         total.value = 0
@@ -423,9 +430,33 @@ export default {
         errorMessage.value =
           error.userMessage ||
           '商品列表加载失败'
+
+        return false
       } finally {
         loading.value = false
       }
+    }
+
+    /* ==================== 主动刷新商品数据 ==================== */
+
+    /*
+     * 只有用户主动点击顶部刷新按钮，
+     * 并且接口请求成功时才显示成功消息。
+     *
+     * 首次加载、翻页和改变每页数量仍然直接调用
+     * loadProducts，不会重复弹出成功提示。
+     */
+    const refreshProducts = async () => {
+      const succeeded =
+        await loadProducts()
+
+      if (!succeeded) {
+        return
+      }
+
+      message.success(
+        '数据刷新成功',
+      )
     }
 
     onMounted(loadProducts)
@@ -602,6 +633,7 @@ export default {
       loading,
       errorMessage,
       loadProducts,
+      refreshProducts,
 
       keyword,
       inventoryFilter,

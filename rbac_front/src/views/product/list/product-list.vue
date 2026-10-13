@@ -23,7 +23,7 @@
           :disabled="loading"
           aria-label="刷新商品列表"
           title="刷新商品列表"
-          @click="loadProducts"
+          @click="refreshProducts"
         >
           <i
             class="bi bi-arrow-clockwise"
@@ -171,7 +171,7 @@
             <input
               v-model="keyword"
               type="search"
-              placeholder="搜索商品名称、客户 SKU、ERP SKU"
+              placeholder="搜索商品名称、Customer SKU、ERP SKU"
               aria-label="搜索当前页商品"
             />
           </label>
