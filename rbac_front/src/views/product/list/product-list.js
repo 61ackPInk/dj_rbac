@@ -10,10 +10,14 @@ import {
 
 import AppSelect from '@/components/form/select/app-select.vue'
 import AppCopyText from '@/components/common/copy-text/copy-text.vue'
+import AppModal from '@/components/feedback/modal/app-modal.vue'
 
 /* ==================== 商品接口与权限 ==================== */
 
-import { getProductsApi } from '@/api/products'
+import {
+  getProductDetailApi,
+  getProductsApi,
+} from '@/api/products'
 import { useAuthStore } from '@/stores/auth'
 import { message } from '@/utils/message'
 
@@ -24,6 +28,7 @@ export default {
 
   components: {
     AppSelect,
+    AppModal,
     AppCopyText,
   },
 
@@ -39,6 +44,14 @@ export default {
     const canViewProductList = computed(() => {
       return authStore.hasPermission(
         'PRODUCT_LIST',
+      )
+    })
+
+    /* ==================== 商品详情权限 ==================== */
+
+    const canViewProductDetail = computed(() => {
+      return authStore.hasPermission(
+        'PRODUCT_DETAIL',
       )
     })
 
@@ -624,10 +637,144 @@ export default {
       )
     }
 
+    /* ==================== 商品详情弹窗 ==================== */
+
+    const detailModalVisible = ref(false)
+    const detailLoading = ref(false)
+    const selectedProduct = ref(null)
+
+    /*
+     * 商品详情中的全部有效图片。
+     * 列表只显示第一张，详情中允许查看全部图片。
+     */
+    const detailImages = computed(() => {
+      const images =
+        selectedProduct.value?.images
+
+      if (!Array.isArray(images)) {
+        return []
+      }
+
+      return images.filter((image) => {
+        return (
+          typeof image === 'string' &&
+          image.trim()
+        )
+      })
+    })
+
+    /* ==================== 打开商品详情 ==================== */
+
+    const openProductDetail = async (
+      product,
+    ) => {
+      if (!canViewProductDetail.value) {
+        return
+      }
+
+      if (
+        !product ||
+        detailLoading.value
+      ) {
+        return
+      }
+
+      const customerSku = String(
+        product.customer_sku ?? '',
+      ).trim()
+
+      if (!customerSku) {
+        message.warning(
+          '当前商品缺少客户 SKU，无法查询详情',
+        )
+
+        return
+      }
+
+      detailModalVisible.value = true
+      detailLoading.value = true
+      selectedProduct.value = null
+
+      try {
+        selectedProduct.value =
+          await getProductDetailApi(
+            customerSku,
+          )
+      } catch (error) {
+        detailModalVisible.value = false
+
+        message.error(
+          error.userMessage ||
+          '商品详情加载失败',
+        )
+      } finally {
+        detailLoading.value = false
+      }
+    }
+
+    /* ==================== 关闭商品详情 ==================== */
+
+    const closeProductDetail = () => {
+      if (detailLoading.value) {
+        return
+      }
+
+      detailModalVisible.value = false
+    }
+
+    /* ==================== 详情展示格式 ==================== */
+
+    const formatDetailValue = (value) => {
+      if (
+        value == null ||
+        value === ''
+      ) {
+        return '—'
+      }
+
+      return value
+    }
+
+    const formatBoolean = (value) => {
+      if (value === true) {
+        return '是'
+      }
+
+      if (value === false) {
+        return '否'
+      }
+
+      return '—'
+    }
+
+    const formatDateTime = (value) => {
+      if (!value) {
+        return '—'
+      }
+
+      const date = new Date(value)
+
+      if (Number.isNaN(date.getTime())) {
+        /*
+         * 后端字段存在但不是浏览器可解析时间时，
+         * 保留后端原始内容，不擅自改写。
+         */
+        return value
+      }
+
+      return date.toLocaleString(
+        'zh-CN',
+        {
+          hour12: false,
+        },
+      )
+    }
+
     /* ==================== 向模板暴露内容 ==================== */
 
     return {
       canViewProductList,
+      canViewProductDetail,
 
       products,
       loading,
@@ -667,6 +814,18 @@ export default {
       getProductName,
       getWarehouseName,
       getInventoryStateText,
+
+
+      detailModalVisible,
+      detailLoading,
+      selectedProduct,
+      detailImages,
+      openProductDetail,
+      closeProductDetail,
+
+      formatDetailValue,
+      formatBoolean,
+      formatDateTime,
     }
   },
 }

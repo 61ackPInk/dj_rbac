@@ -364,11 +364,26 @@
               <tr
                 v-for="product in displayedProducts"
                 :key="product.id"
+                :class="{
+                  'is-clickable':
+                    canViewProductDetail,
+                }"
+                :tabindex="
+                  canViewProductDetail
+                    ? 0
+                    : undefined
+                "
+                @click="
+                  openProductDetail(product)
+                "
+                @keydown.enter="
+                  openProductDetail(product)
+                "
               >
                 <!-- 商品图片与名称 -->
                 <td>
                   <div class="product-name-cell">
-                    <div class="product-thumbnail">
+                    <div class="product-thumbnail" @click.stop @keydown.stop>
                       <!-- <img
                         v-if="
                           hasProductImage(product)
@@ -418,6 +433,7 @@
                           class="product-title-copy"
                           :value="getProductName(product)"
                           label="商品名"
+                          @click.stop
                         />
                       </strong>
 
@@ -436,6 +452,7 @@
                   <AppCopyText
                     :value="product.customer_sku"
                     label="客户 SKU"
+                    @click.stop
                   />
                 </td>
 
@@ -443,6 +460,7 @@
                   <AppCopyText
                     :value="product.erp_sku"
                     label="ERP SKU"
+                    @click.stop
                   />
                 </td>
 
@@ -521,9 +539,24 @@
             v-for="product in displayedProducts"
             :key="product.id"
             class="product-card"
+            :class="{
+              'is-clickable':
+                canViewProductDetail,
+            }"
+            :tabindex="
+              canViewProductDetail
+                ? 0
+                : undefined
+            "
+            @click="
+              openProductDetail(product)
+            "
+            @keydown.enter="
+              openProductDetail(product)
+            "
           >
             <!-- 商品主图 -->
-            <div class="card-image">
+            <div class="card-image" @click.stop @keydown.stop>
               <!-- <img
                 v-if="hasProductImage(product)"
                 :src="getProductImage(product)"
@@ -573,6 +606,7 @@
                     class="product-title-copy"
                     :value="getProductName(product)"
                     label="商品名"
+                    @click.stop
                   />
                 </h4>
 
@@ -597,6 +631,7 @@
                   <AppCopyText
                     :value="product.customer_sku"
                     label="客户 SKU"
+                    @click.stop
                   />
                 </dd>
               </div>
@@ -607,6 +642,7 @@
                   <AppCopyText
                     :value="product.erp_sku"
                     label="ERP SKU"
+                    @click.stop
                   />
                 </dd>
               </div>
@@ -739,6 +775,821 @@
       </template>
     </section>
   </div>
+
+  <!-- ==================== 商品详情弹窗 ==================== -->
+
+  <AppModal
+    v-model="detailModalVisible"
+    scope-class="product-detail-modal-scope"
+    title="商品详情"
+    :width="1000"
+    :closable="!detailLoading"
+    :close-on-overlay="!detailLoading"
+    :close-on-escape="!detailLoading"
+    @close="closeProductDetail"
+  >
+    <!-- ==================== 详情加载状态 ==================== -->
+
+    <div
+      v-if="detailLoading"
+      class="product-detail-loading"
+    >
+      <i
+        class="bi bi-arrow-clockwise"
+        aria-hidden="true"
+      ></i>
+
+      <span>正在加载商品详情...</span>
+    </div>
+
+    <!-- ==================== 商品详情内容 ==================== -->
+
+    <div
+      v-else-if="selectedProduct"
+      class="product-detail"
+    >
+      <!-- ==================== 商品头部 ==================== -->
+
+      <header class="detail-heading">
+        <div class="detail-main-image">
+          <el-image
+            v-if="detailImages.length"
+            :src="detailImages[0]"
+            :preview-src-list="detailImages"
+            :alt="getProductName(selectedProduct)"
+            fit="contain"
+            preview-teleported
+            hide-on-click-modal
+            :z-index="10000"
+          >
+            <template #error>
+              <div class="detail-image-empty">
+                <i
+                  class="bi bi-image"
+                  aria-hidden="true"
+                ></i>
+              </div>
+            </template>
+          </el-image>
+
+          <div
+            v-else
+            class="detail-image-empty"
+          >
+            <i
+              class="bi bi-image"
+              aria-hidden="true"
+            ></i>
+          </div>
+        </div>
+
+        <div class="detail-heading-content">
+          <div class="detail-title-row">
+            <div>
+              <h2>
+                {{
+                  getProductName(
+                    selectedProduct,
+                  )
+                }}
+              </h2>
+
+              <p>
+                {{
+                  selectedProduct.english_name ||
+                  '暂无英文名称'
+                }}
+              </p>
+            </div>
+
+            <span class="status-tag">
+              {{
+                selectedProduct.status_name ||
+                '—'
+              }}
+            </span>
+          </div>
+
+          <dl class="detail-summary">
+            <div>
+              <dt>客户 SKU</dt>
+              <dd>
+                <AppCopyText
+                  :value="
+                    selectedProduct.customer_sku
+                  "
+                  label="客户 SKU"
+                />
+              </dd>
+            </div>
+
+            <div>
+              <dt>ERP SKU</dt>
+              <dd>
+                <AppCopyText
+                  :value="
+                    selectedProduct.erp_sku
+                  "
+                  label="ERP SKU"
+                />
+              </dd>
+            </div>
+
+            <div>
+              <dt>参考编码</dt>
+              <dd>
+                {{
+                  formatDetailValue(
+                    selectedProduct.reference_code,
+                  )
+                }}
+              </dd>
+            </div>
+
+            <div>
+              <dt>元仓分类 ID</dt>
+              <dd>
+                {{
+                  formatDetailValue(
+                    selectedProduct.category_id,
+                  )
+                }}
+              </dd>
+            </div>
+
+            <div>
+              <dt>商品类型</dt>
+              <dd>
+                {{
+                  formatDetailValue(
+                    selectedProduct
+                      .product_type_name,
+                  )
+                }}
+              </dd>
+            </div>
+
+            <div>
+              <dt>成交单位</dt>
+              <dd>
+                {{
+                  selectedProduct.unit_name ||
+                  selectedProduct.unit_code ||
+                  '—'
+                }}
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </header>
+
+      <!-- ==================== 商品图片 ==================== -->
+
+      <section
+        v-if="detailImages.length > 1"
+        class="detail-section"
+      >
+        <h3>商品图片</h3>
+
+        <div class="detail-image-list">
+          <el-image
+            v-for="(image, index) in detailImages"
+            :key="`${image}-${index}`"
+            :src="image"
+            :preview-src-list="detailImages"
+            :initial-index="index"
+            :alt="
+              `${getProductName(selectedProduct)} ${
+                index + 1
+              }`
+            "
+            fit="contain"
+            loading="lazy"
+            preview-teleported
+            hide-on-click-modal
+            :z-index="10000"
+          >
+            <template #error>
+              <div class="detail-image-empty">
+                <i
+                  class="bi bi-image"
+                  aria-hidden="true"
+                ></i>
+              </div>
+            </template>
+          </el-image>
+        </div>
+      </section>
+
+      <!-- ==================== 实时库存 ==================== -->
+
+      <section class="detail-section">
+        <h3>实时库存</h3>
+
+        <div
+          v-if="
+            selectedProduct.inventory
+              ?.found === false
+          "
+          class="inventory-missing-notice"
+        >
+          <i
+            class="bi bi-exclamation-circle"
+            aria-hidden="true"
+          ></i>
+
+          没有匹配到该商品的库存记录
+        </div>
+
+        <dl class="inventory-grid">
+          <div>
+            <dt>仓库编码</dt>
+            <dd>
+              {{
+                formatDetailValue(
+                  selectedProduct.inventory
+                    ?.warehouse_code,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>站点编码</dt>
+            <dd>
+              {{
+                formatDetailValue(
+                  selectedProduct.inventory
+                    ?.site_code,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>备货中</dt>
+            <dd>
+              {{
+                formatQuantity(
+                  selectedProduct.inventory
+                    ?.preparing,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>在途</dt>
+            <dd>
+              {{
+                formatQuantity(
+                  selectedProduct.inventory
+                    ?.transferring,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>待上架</dt>
+            <dd>
+              {{
+                formatQuantity(
+                  selectedProduct.inventory
+                    ?.waiting_for_shelf,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>总库存</dt>
+            <dd>
+              {{
+                formatQuantity(
+                  selectedProduct.inventory
+                    ?.total,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>占用库存</dt>
+            <dd>
+              {{
+                formatQuantity(
+                  selectedProduct.inventory
+                    ?.occupied,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>未发货</dt>
+            <dd>
+              {{
+                formatQuantity(
+                  selectedProduct.inventory
+                    ?.unshipped,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div class="available">
+            <dt>可用库存</dt>
+            <dd>
+              {{
+                formatQuantity(
+                  selectedProduct.inventory
+                    ?.available,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>库存状态</dt>
+            <dd>
+              {{
+                formatDetailValue(
+                  selectedProduct.inventory
+                    ?.status_name,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>锁定状态</dt>
+            <dd>
+              {{
+                formatDetailValue(
+                  selectedProduct.inventory
+                    ?.lock_status_name,
+                )
+              }}
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      <!-- ==================== 申报与商品资料 ==================== -->
+
+      <section class="detail-section">
+        <h3>商品资料</h3>
+
+        <dl class="detail-grid">
+          <div>
+            <dt>申报中文名</dt>
+            <dd>
+              {{
+                formatDetailValue(
+                  selectedProduct
+                    .declared_chinese_name,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>申报英文名</dt>
+            <dd>
+              {{
+                formatDetailValue(
+                  selectedProduct.declared_name,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>商品属性</dt>
+            <dd>
+              {{
+                formatDetailValue(
+                  selectedProduct
+                    .product_attribute_name,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>是否有品牌</dt>
+            <dd>
+              {{
+                formatBoolean(
+                  selectedProduct.has_brand,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>品牌名称</dt>
+            <dd>
+              {{
+                formatDetailValue(
+                  selectedProduct.brand_name,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>型号</dt>
+            <dd>
+              {{
+                formatDetailValue(
+                  selectedProduct.model,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>用途</dt>
+            <dd>
+              {{
+                formatDetailValue(
+                  selectedProduct.usage,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>材质</dt>
+            <dd>
+              {{
+                formatDetailValue(
+                  selectedProduct.material,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>参考成本价</dt>
+            <dd>
+              {{
+                formatDetailValue(
+                  selectedProduct
+                    .reference_cost_price,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div class="full">
+            <dt>商品链接</dt>
+            <dd>
+              <a
+                v-if="selectedProduct.product_link"
+                :href="
+                  selectedProduct.product_link
+                "
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {{
+                  selectedProduct.product_link
+                }}
+              </a>
+
+              <span v-else>—</span>
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      <!-- ==================== 商品规格 ==================== -->
+
+      <section class="detail-section">
+        <h3>商品规格</h3>
+
+        <dl class="specification-grid">
+          <div>
+            <dt>商品长度</dt>
+            <dd>
+              {{
+                formatDetailValue(
+                  selectedProduct.specifications
+                    ?.length,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>商品宽度</dt>
+            <dd>
+              {{
+                formatDetailValue(
+                  selectedProduct.specifications
+                    ?.width,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>商品高度</dt>
+            <dd>
+              {{
+                formatDetailValue(
+                  selectedProduct.specifications
+                    ?.height,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>商品重量</dt>
+            <dd>
+              {{
+                formatDetailValue(
+                  selectedProduct.specifications
+                    ?.weight,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>包装长度</dt>
+            <dd>
+              {{
+                formatDetailValue(
+                  selectedProduct.specifications
+                    ?.package_length,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>包装宽度</dt>
+            <dd>
+              {{
+                formatDetailValue(
+                  selectedProduct.specifications
+                    ?.package_width,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>包装高度</dt>
+            <dd>
+              {{
+                formatDetailValue(
+                  selectedProduct.specifications
+                    ?.package_height,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>包装重量</dt>
+            <dd>
+              {{
+                formatDetailValue(
+                  selectedProduct.specifications
+                    ?.package_weight,
+                )
+              }}
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      <!-- ==================== 关联仓库 ==================== -->
+
+      <section class="detail-section">
+        <h3>关联仓库</h3>
+
+        <div
+          v-if="
+            selectedProduct.warehouses?.length
+          "
+          class="detail-table-scroll"
+        >
+          <table class="detail-table">
+            <thead>
+              <tr>
+                <th>仓库编码</th>
+                <th>仓库名称</th>
+                <th>采购价</th>
+                <th>库存价</th>
+                <th>更新时间</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr
+                v-for="(
+                  warehouse,
+                  index
+                ) in selectedProduct.warehouses"
+                :key="
+                  warehouse.code ||
+                  index
+                "
+              >
+                <td>
+                  {{
+                    formatDetailValue(
+                      warehouse.code,
+                    )
+                  }}
+                </td>
+
+                <td>
+                  {{
+                    formatDetailValue(
+                      warehouse.name,
+                    )
+                  }}
+                </td>
+
+                <td>
+                  {{
+                    formatDetailValue(
+                      warehouse.purchase_price,
+                    )
+                  }}
+                </td>
+
+                <td>
+                  {{
+                    formatDetailValue(
+                      warehouse.stock_price,
+                    )
+                  }}
+                </td>
+
+                <td>
+                  {{
+                    formatDateTime(
+                      warehouse.updated_at,
+                    )
+                  }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p
+          v-else
+          class="detail-empty"
+        >
+          暂无关联仓库信息
+        </p>
+      </section>
+
+      <!-- ==================== 海关申报 ==================== -->
+
+      <section class="detail-section">
+        <h3>海关申报</h3>
+
+        <div class="customs-grid">
+          <div class="customs-card">
+            <h4>出境申报</h4>
+
+            <dl>
+              <div>
+                <dt>国家或地区</dt>
+                <dd>
+                  {{
+                    formatDetailValue(
+                      selectedProduct
+                        .outbound_customs
+                        ?.country,
+                    )
+                  }}
+                </dd>
+              </div>
+
+              <div>
+                <dt>申报价</dt>
+                <dd>
+                  {{
+                    formatDetailValue(
+                      selectedProduct
+                        .outbound_customs
+                        ?.price,
+                    )
+                  }}
+                </dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="customs-card">
+            <h4>入境申报</h4>
+
+            <div
+              v-if="
+                selectedProduct
+                  .inbound_customs?.length
+              "
+              class="customs-list"
+            >
+              <dl
+                v-for="(
+                  customs,
+                  index
+                ) in selectedProduct
+                  .inbound_customs"
+                :key="index"
+              >
+                <div>
+                  <dt>国家或地区</dt>
+                  <dd>
+                    {{
+                      formatDetailValue(
+                        customs.country,
+                      )
+                    }}
+                  </dd>
+                </div>
+
+                <div>
+                  <dt>申报价</dt>
+                  <dd>
+                    {{
+                      formatDetailValue(
+                        customs.price,
+                      )
+                    }}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+
+            <p
+              v-else
+              class="detail-empty"
+            >
+              暂无入境申报信息
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 时间信息 ==================== -->
+
+      <section class="detail-section">
+        <h3>时间信息</h3>
+
+        <dl class="detail-grid">
+          <div>
+            <dt>创建时间</dt>
+            <dd>
+              {{
+                formatDateTime(
+                  selectedProduct.created_at,
+                )
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>更新时间</dt>
+            <dd>
+              {{
+                formatDateTime(
+                  selectedProduct.updated_at,
+                )
+              }}
+            </dd>
+          </div>
+        </dl>
+      </section>
+    </div>
+
+    <!-- ==================== 弹窗底部 ==================== -->
+
+    <template #footer>
+      <button
+        class="detail-close-button"
+        type="button"
+        :disabled="detailLoading"
+        @click="closeProductDetail"
+      >
+        关闭
+      </button>
+    </template>
+  </AppModal>
+
 </template>
 
 <!-- ==================== 商品列表页面样式 ==================== -->
@@ -747,4 +1598,15 @@
   scoped
   lang="scss"
   src="./product-list.scss"
+></style>
+
+<!-- ==================== 商品详情弹窗样式 ==================== -->
+
+<!--
+  AppModal 通过 Teleport 渲染到 body，
+  因此弹窗业务样式不能使用 scoped。
+-->
+<style
+  lang="scss"
+  src="./product-list-modal.scss"
 ></style>
