@@ -29,12 +29,17 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
 venv/
 env/
+
 *.env
 .env
+local_settings.py
+
 logs/
 db.sqlite3
+db.sqlite3-journal
 media/
 
 # ===== Vue 前端 =====
@@ -45,3 +50,6 @@ rbac_front/.vite/
 rbac_front/.cache/
 rbac_front/.env.local
 rbac_front/.env.*.local
+
+# ===== 项目内部文档 =====
+docs/
