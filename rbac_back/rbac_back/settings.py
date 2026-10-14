@@ -159,6 +159,7 @@ INSTALLED_APPS = [
     'apps.pages',
     'apps.dashboards',
     'apps.products',
+    'apps.data_collectors',
 ]
 
 # 中间件
