@@ -6,3 +6,6 @@ loguru==0.7.3
 PyJWT==2.10.1
 requests==2.34.2
 python-dotenv==1.2.4
+
+# Windows 正式环境 WSGI 服务
+waitress==3.0.2
