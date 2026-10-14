@@ -25,7 +25,7 @@ class InitRbacPermissionsCommandTests(
     """RBAC 权限初始化命令测试"""
 
     def create_required_pages(self):
-        """创建初始化权限所需的三个系统页面"""
+        """创建初始化权限所需的四个业务页面"""
 
         Page.objects.create(
             name="用户管理",
@@ -48,6 +48,18 @@ class InitRbacPermissionsCommandTests(
             code="SYSTEM_PAGES",
             path="/system/pages",
             sort_order=30,
+            is_active=True,
+        )
+
+        # ====================
+        # 商品列表页面
+        # ====================
+
+        Page.objects.create(
+            name="商品列表",
+            code="PRODUCT_LIST",
+            path="/product/list",
+            sort_order=10,
             is_active=True,
         )
 
@@ -92,7 +104,7 @@ class InitRbacPermissionsCommandTests(
         )
 
     def test_command_creates_all_permissions(self):
-        """首次执行命令应创建全部18项权限"""
+        """首次执行命令应创建全部20项权限"""
 
         self.create_required_pages()
 
@@ -100,7 +112,7 @@ class InitRbacPermissionsCommandTests(
 
         self.assertEqual(
             Permission.objects.count(),
-            18,
+            20,
         )
 
         expected_codes = {
@@ -127,6 +139,10 @@ class InitRbacPermissionsCommandTests(
             "PAGE_UPDATE",
             "PAGE_CHANGE_STATUS",
             "PAGE_ASSIGN_ROLE",
+
+            # 商品列表
+            "PRODUCT_LIST",
+            "PRODUCT_DETAIL",
         }
 
         actual_codes = set(
@@ -142,7 +158,7 @@ class InitRbacPermissionsCommandTests(
         )
 
         self.assertIn(
-            "新建 18 项",
+            "新建 20 项",
             output,
         )
 
@@ -161,7 +177,7 @@ class InitRbacPermissionsCommandTests(
 
         self.assertEqual(
             Permission.objects.count(),
-            18,
+            20,
         )
 
         # 人为修改一条内置权限
@@ -186,10 +202,10 @@ class InitRbacPermissionsCommandTests(
         # 第二次执行：更新现有权限
         output = self.run_command()
 
-        # 权限数量仍然是18，不会重复创建
+        # 权限数量仍然是20，不会重复创建
         self.assertEqual(
             Permission.objects.count(),
-            18,
+            20,
         )
 
         permission.refresh_from_db()
@@ -219,6 +235,6 @@ class InitRbacPermissionsCommandTests(
         )
 
         self.assertIn(
-            "更新 18 项",
+            "更新 20 项",
             output,
         )
