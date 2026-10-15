@@ -7,7 +7,7 @@
 """
 
 from datetime import date
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from django.test import SimpleTestCase
 
@@ -308,3 +308,48 @@ class YuancangBundleCollectionTests(
             "total无效",
         ):
             collector.collect()
+
+    @patch(
+        (
+            "apps.data_collectors.collectors"
+            ".yuancang.collectors.bundle_mappings"
+            ".timezone.localdate"
+        ),
+        return_value=date(
+            2026,
+            10,
+            15,
+        ),
+    )
+    def test_collect_uses_local_date_by_default(
+        self,
+        localdate,
+    ):
+        """未指定结束日期时使用系统本地日期。"""
+
+        self.client.post_authenticated.return_value = (
+            self.create_response(
+                [],
+                total=0,
+                page=1,
+            )
+        )
+
+        collector = (
+            YuancangBundleMappingCollector(
+                client=self.client,
+                config=self.bundle_config,
+            )
+        )
+
+        result = collector.collect()
+
+        self.assertEqual(result, [])
+        localdate.assert_called_once_with()
+
+        self.assertEqual(
+            self.client
+            .post_authenticated
+            .call_count,
+            1,
+        )
