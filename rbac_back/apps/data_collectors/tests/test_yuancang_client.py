@@ -195,3 +195,156 @@ class YuancangWebClientTests(SimpleTestCase):
             "元仓网页登录请求失败",
         ):
             self.client.login()
+
+    def test_bundle_request_logs_in_automatically(
+        self,
+    ):
+        """首次业务请求会先自动登录。"""
+
+        login_response = self.create_response({
+            "state": "000001",
+            "msg": "登录成功",
+            "data": {
+                "token": "test-token",
+                "tokenType": "Bearer",
+            },
+        })
+
+        bundle_response = self.create_response({
+            "state": "000001",
+            "msg": "请求成功",
+            "data": {
+                "list": [],
+                "total": 0,
+                "page": 1,
+                "prePage": 20,
+            },
+        })
+
+        self.session.post.side_effect = [
+            login_response,
+            bundle_response,
+        ]
+
+        result = (
+            self.client.get_bundle_list_page({
+                "createdAt": [
+                    "2026-09-15 00:00:00",
+                    "2026-10-15 23:59:59",
+                ],
+                "matchType": "exact",
+                "searchType": "originSkuName",
+                "page": 1,
+                "prePage": 20,
+            })
+        )
+
+        self.assertEqual(
+            self.session.post.call_count,
+            2,
+        )
+        self.assertEqual(
+            result["data"]["total"],
+            0,
+        )
+
+        business_call = (
+            self.session.post.call_args_list[1]
+        )
+        business_headers = (
+            business_call.kwargs["headers"]
+        )
+
+        self.assertEqual(
+            business_headers["authorization"],
+            "Bearer test-token",
+        )
+
+    def test_bundle_request_uses_existing_token(
+        self,
+    ):
+        """已有Token时不再重复登录。"""
+
+        self.client.access_token = "test-token"
+
+        self.session.post.return_value = (
+            self.create_response({
+                "state": "000001",
+                "msg": "请求成功",
+                "data": {
+                    "list": [],
+                    "total": 0,
+                    "page": 1,
+                    "prePage": 20,
+                },
+            })
+        )
+
+        self.client.get_bundle_list_page({
+            "page": 1,
+            "prePage": 20,
+        })
+
+        self.assertEqual(
+            self.session.post.call_count,
+            1,
+        )
+
+        request_call = (
+            self.session.post.call_args
+        )
+
+        self.assertEqual(
+            request_call.args[0],
+            self.config.bundle_list_url,
+        )
+        self.assertEqual(
+            request_call.kwargs[
+                "headers"
+            ]["authorization"],
+            "Bearer test-token",
+        )
+
+    def test_bundle_business_error(self):
+        """业务接口失败时抛出响应异常。"""
+
+        self.client.access_token = "test-token"
+
+        self.session.post.return_value = (
+            self.create_response({
+                "state": "000422",
+                "msg": (
+                    "创建时间范围不能超过3个月"
+                ),
+                "data": {},
+            })
+        )
+
+        with self.assertRaisesRegex(
+            CollectorResponseError,
+            "创建时间范围不能超过3个月",
+        ):
+            self.client.get_bundle_list_page({
+                "page": 1,
+                "prePage": 20,
+            })
+
+    def test_bundle_request_error(self):
+        """业务网络失败时抛出请求异常。"""
+
+        self.client.access_token = "test-token"
+
+        self.session.post.side_effect = (
+            requests.RequestException(
+                "connection failed"
+            )
+        )
+
+        with self.assertRaisesRegex(
+            CollectorRequestError,
+            "元仓网页业务请求失败",
+        ):
+            self.client.get_bundle_list_page({
+                "page": 1,
+                "prePage": 20,
+            })
