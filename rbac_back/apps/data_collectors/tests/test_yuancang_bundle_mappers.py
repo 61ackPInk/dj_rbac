@@ -12,7 +12,7 @@ from django.utils import timezone
 from apps.data_collectors.collectors.exceptions import (
     CollectorResponseError,
 )
-from apps.data_collectors.collectors.yuancang.mappers import (
+from apps.data_collectors.collectors.yuancang.mappers.bundle_mappings import (
     map_bundle_list_response,
     map_bundle_record,
 )

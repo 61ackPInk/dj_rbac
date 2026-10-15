@@ -1,9 +1,9 @@
 """
 -*- coding: utf-8 -*-
-@File  : mappers.py
+@File  : bundle_mappings.py
 @Author: 61ackPink
 @Time : 2026/10/15 14:39
-@Desc : 元仓采集数据转换
+@Desc : 元仓组合映射采集数据转换
 """
 
 from datetime import datetime
