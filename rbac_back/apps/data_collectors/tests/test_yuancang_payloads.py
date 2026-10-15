@@ -17,7 +17,7 @@ from cryptography.hazmat.primitives.asymmetric import (
 )
 from django.test import SimpleTestCase
 
-from apps.data_collectors.collectors.yuancang.payloads import (
+from apps.data_collectors.collectors.yuancang.security.payloads import (
     build_login_payload,
 )
 

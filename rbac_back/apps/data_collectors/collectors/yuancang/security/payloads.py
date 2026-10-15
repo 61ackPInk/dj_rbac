@@ -6,7 +6,7 @@
 @Desc : 元仓网页请求体构造
 """
 
-from apps.data_collectors.collectors.yuancang.crypto import (
+from apps.data_collectors.collectors.yuancang.security.crypto import (
     encrypt_with_public_key,
 )
 

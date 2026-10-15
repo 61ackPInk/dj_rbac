@@ -9,7 +9,7 @@
 import time
 from typing import Any
 
-from apps.data_collectors.collectors.yuancang.crypto import (
+from apps.data_collectors.collectors.yuancang.security.crypto import (
     encrypt_with_public_key,
 )
 

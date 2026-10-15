@@ -18,10 +18,10 @@ from apps.data_collectors.collectors.exceptions import (
 from apps.data_collectors.collectors.yuancang.configs.common import (
     YuancangCommonConfig,
 )
-from apps.data_collectors.collectors.yuancang.payloads import (
+from apps.data_collectors.collectors.yuancang.security.payloads import (
     build_login_payload,
 )
-from apps.data_collectors.collectors.yuancang.signing import (
+from apps.data_collectors.collectors.yuancang.security.signing import (
     generate_request_sign,
 )
 
