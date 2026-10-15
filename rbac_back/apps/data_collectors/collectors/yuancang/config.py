@@ -8,6 +8,7 @@
 
 import os
 from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -56,6 +57,8 @@ YUANCANG_REQUEST_PREFIX = "com.yuancang"
 
 DEFAULT_TIMEOUT_SECONDS = 15
 
+DEFAULT_BUNDLE_PAGE_SIZE = 20
+
 
 # ==================== 元仓 RSA 公钥 ====================
 
@@ -86,6 +89,8 @@ class YuancangCollectorConfig:
     username: str
     password: str
     timeout_seconds: int
+    bundle_start_date: date
+    bundle_page_size: int
 
     rsa_public_key: str = (
         YUANCANG_RSA_PUBLIC_KEY
@@ -122,6 +127,17 @@ class YuancangCollectorConfig:
                 cls._read_positive_integer(
                     "YUANCANG_COLLECTOR_TIMEOUT_SECONDS",
                     DEFAULT_TIMEOUT_SECONDS,
+                )
+            ),
+            bundle_start_date=(
+                cls._read_date(
+                    "YUANCANG_BUNDLE_COLLECTION_START_DATE"
+                )
+            ),
+            bundle_page_size=(
+                cls._read_positive_integer(
+                    "YUANCANG_BUNDLE_PAGE_SIZE",
+                    DEFAULT_BUNDLE_PAGE_SIZE,
                 )
             ),
         )
@@ -177,6 +193,36 @@ class YuancangCollectorConfig:
             )
 
         return value
+
+    # ==================== 日期配置解析 ====================
+
+    @staticmethod
+    def _read_date(
+        variable_name: str,
+    ) -> date:
+        """读取 YYYY-MM-DD 格式日期。"""
+
+        raw_value = os.getenv(
+            variable_name,
+            "",
+        ).strip()
+
+        if not raw_value:
+            raise CollectorConfigurationError(
+                f"未配置 {variable_name}"
+            )
+
+        try:
+            return date.fromisoformat(
+                raw_value
+            )
+        except ValueError as error:
+            raise CollectorConfigurationError(
+                (
+                    f"{variable_name} "
+                    "必须使用 YYYY-MM-DD 格式"
+                )
+            ) from error
 
     # ==================== 必填配置检查 ====================
 

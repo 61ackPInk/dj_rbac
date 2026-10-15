@@ -6,6 +6,7 @@
 @Desc : 元仓网页数据采集客户端测试
 """
 
+from datetime import date
 from unittest.mock import Mock
 
 import requests
@@ -38,6 +39,12 @@ class YuancangWebClientTests(SimpleTestCase):
             username="test-user",
             password="test-password",
             timeout_seconds=15,
+            bundle_start_date=date(
+                2026,
+                9,
+                10,
+            ),
+            bundle_page_size=20,
             rsa_public_key=(
                 YUANCANG_RSA_PUBLIC_KEY
             ),
@@ -48,6 +55,7 @@ class YuancangWebClientTests(SimpleTestCase):
             config=self.config,
             session=self.session,
         )
+
 
     def create_response(self, result):
         """创建模拟 HTTP 响应。"""
