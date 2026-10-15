@@ -1,14 +1,13 @@
 """
 -*- coding: utf-8 -*-
-@File  : config.py
+@File  : common.py
 @Author: 61ackPink
 @Time : 2026/10/15 16:42
-@Desc : 元仓网页数据采集配置
+@Desc : 元仓网页采集公共配置
 """
 
 import os
 from dataclasses import dataclass
-from datetime import date
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -22,7 +21,7 @@ from apps.data_collectors.collectors.exceptions import (
 
 DATA_COLLECTORS_APP_DIR = Path(
     __file__
-).resolve().parents[2]
+).resolve().parents[3]
 
 DATA_COLLECTORS_ENV_FILE = (
     DATA_COLLECTORS_APP_DIR / ".env"
@@ -41,11 +40,6 @@ YUANCANG_LOGIN_PATH = (
     "/api/user/authorization/login"
 )
 
-YUANCANG_BUNDLE_LIST_PATH = (
-    "/api/product/productMap/list"
-)
-
-
 # ==================== 元仓固定请求配置 ====================
 
 YUANCANG_DEVICE_NAME = "Chrome"
@@ -56,9 +50,6 @@ YUANCANG_PARAM_TYPE = "1"
 YUANCANG_REQUEST_PREFIX = "com.yuancang"
 
 DEFAULT_TIMEOUT_SECONDS = 15
-
-DEFAULT_BUNDLE_PAGE_SIZE = 20
-
 
 # ==================== 元仓 RSA 公钥 ====================
 
@@ -82,15 +73,13 @@ dWxVDPljqwSNc6jH3RqNfpMCAwEAAQ==
 
 
 @dataclass(frozen=True)
-class YuancangCollectorConfig:
-    """元仓网页数据采集连接配置。"""
+class YuancangCommonConfig:
+    """元仓网页采集公共连接配置。"""
 
     base_url: str
     username: str
     password: str
     timeout_seconds: int
-    bundle_start_date: date
-    bundle_page_size: int
 
     rsa_public_key: str = (
         YUANCANG_RSA_PUBLIC_KEY
@@ -129,17 +118,6 @@ class YuancangCollectorConfig:
                     DEFAULT_TIMEOUT_SECONDS,
                 )
             ),
-            bundle_start_date=(
-                cls._read_date(
-                    "YUANCANG_BUNDLE_COLLECTION_START_DATE"
-                )
-            ),
-            bundle_page_size=(
-                cls._read_positive_integer(
-                    "YUANCANG_BUNDLE_PAGE_SIZE",
-                    DEFAULT_BUNDLE_PAGE_SIZE,
-                )
-            ),
         )
 
         config.validate()
@@ -155,15 +133,6 @@ class YuancangCollectorConfig:
         return (
             f"{self.base_url}"
             f"{YUANCANG_LOGIN_PATH}"
-        )
-
-    @property
-    def bundle_list_url(self) -> str:
-        """返回元仓组合映射列表地址。"""
-
-        return (
-            f"{self.base_url}"
-            f"{YUANCANG_BUNDLE_LIST_PATH}"
         )
 
     # ==================== 数值配置解析 ====================
@@ -193,36 +162,6 @@ class YuancangCollectorConfig:
             )
 
         return value
-
-    # ==================== 日期配置解析 ====================
-
-    @staticmethod
-    def _read_date(
-        variable_name: str,
-    ) -> date:
-        """读取 YYYY-MM-DD 格式日期。"""
-
-        raw_value = os.getenv(
-            variable_name,
-            "",
-        ).strip()
-
-        if not raw_value:
-            raise CollectorConfigurationError(
-                f"未配置 {variable_name}"
-            )
-
-        try:
-            return date.fromisoformat(
-                raw_value
-            )
-        except ValueError as error:
-            raise CollectorConfigurationError(
-                (
-                    f"{variable_name} "
-                    "必须使用 YYYY-MM-DD 格式"
-                )
-            ) from error
 
     # ==================== 必填配置检查 ====================
 

@@ -6,7 +6,6 @@
 @Desc : 元仓网页数据采集客户端测试
 """
 
-from datetime import date
 from unittest.mock import Mock
 
 import requests
@@ -20,9 +19,9 @@ from apps.data_collectors.collectors.exceptions import (
 from apps.data_collectors.collectors.yuancang.client import (
     YuancangWebClient,
 )
-from apps.data_collectors.collectors.yuancang.config import (
+from apps.data_collectors.collectors.yuancang.configs.common import (
     YUANCANG_RSA_PUBLIC_KEY,
-    YuancangCollectorConfig,
+    YuancangCommonConfig,
 )
 
 
@@ -32,30 +31,29 @@ class YuancangWebClientTests(SimpleTestCase):
     def setUp(self):
         """初始化测试客户端。"""
 
-        self.config = YuancangCollectorConfig(
+        self.config = YuancangCommonConfig(
             base_url=(
                 "https://yc-client.anestcang.com"
             ),
             username="test-user",
             password="test-password",
             timeout_seconds=15,
-            bundle_start_date=date(
-                2026,
-                9,
-                10,
-            ),
-            bundle_page_size=20,
             rsa_public_key=(
                 YUANCANG_RSA_PUBLIC_KEY
             ),
         )
 
         self.session = Mock()
+
         self.client = YuancangWebClient(
             config=self.config,
             session=self.session,
         )
 
+        self.business_url = (
+            "https://yc-client.anestcang.com"
+            "/api/test/resource"
+        )
 
     def create_response(self, result):
         """创建模拟 HTTP 响应。"""
@@ -204,7 +202,7 @@ class YuancangWebClientTests(SimpleTestCase):
         ):
             self.client.login()
 
-    def test_bundle_request_logs_in_automatically(
+    def test_authenticated_request_logs_in_automatically(
         self,
     ):
         """首次业务请求会先自动登录。"""
@@ -235,16 +233,21 @@ class YuancangWebClientTests(SimpleTestCase):
         ]
 
         result = (
-            self.client.get_bundle_list_page({
-                "createdAt": [
-                    "2026-09-15 00:00:00",
-                    "2026-10-15 23:59:59",
-                ],
-                "matchType": "exact",
-                "searchType": "originSkuName",
-                "page": 1,
-                "prePage": 20,
-            })
+            self.client.post_authenticated(
+                url=self.business_url,
+                payload={
+                    "createdAt": [
+                        "2026-09-15 00:00:00",
+                        "2026-10-15 23:59:59",
+                    ],
+                    "matchType": "exact",
+                    "searchType": (
+                        "originSkuName"
+                    ),
+                    "page": 1,
+                    "prePage": 20,
+                },
+            )
         )
 
         self.assertEqual(
@@ -268,7 +271,7 @@ class YuancangWebClientTests(SimpleTestCase):
             "Bearer test-token",
         )
 
-    def test_bundle_request_uses_existing_token(
+    def test_authenticated_request_uses_existing_token(
         self,
     ):
         """已有Token时不再重复登录。"""
@@ -288,10 +291,13 @@ class YuancangWebClientTests(SimpleTestCase):
             })
         )
 
-        self.client.get_bundle_list_page({
-            "page": 1,
-            "prePage": 20,
-        })
+        self.client.post_authenticated(
+            url=self.business_url,
+            payload={
+                "page": 1,
+                "prePage": 20,
+            },
+        )
 
         self.assertEqual(
             self.session.post.call_count,
@@ -304,7 +310,7 @@ class YuancangWebClientTests(SimpleTestCase):
 
         self.assertEqual(
             request_call.args[0],
-            self.config.bundle_list_url,
+            self.business_url,
         )
         self.assertEqual(
             request_call.kwargs[
@@ -313,7 +319,7 @@ class YuancangWebClientTests(SimpleTestCase):
             "Bearer test-token",
         )
 
-    def test_bundle_business_error(self):
+    def test_authenticated_business_error(self):
         """业务接口失败时抛出响应异常。"""
 
         self.client.access_token = "test-token"
@@ -332,12 +338,15 @@ class YuancangWebClientTests(SimpleTestCase):
             CollectorResponseError,
             "创建时间范围不能超过3个月",
         ):
-            self.client.get_bundle_list_page({
-                "page": 1,
-                "prePage": 20,
-            })
+            self.client.post_authenticated(
+                url=self.business_url,
+                payload={
+                    "page": 1,
+                    "prePage": 20,
+                },
+            )
 
-    def test_bundle_request_error(self):
+    def test_authenticated_request_error(self):
         """业务网络失败时抛出请求异常。"""
 
         self.client.access_token = "test-token"
@@ -352,7 +361,10 @@ class YuancangWebClientTests(SimpleTestCase):
             CollectorRequestError,
             "元仓网页业务请求失败",
         ):
-            self.client.get_bundle_list_page({
-                "page": 1,
-                "prePage": 20,
-            })
+            self.client.post_authenticated(
+                url=self.business_url,
+                payload={
+                    "page": 1,
+                    "prePage": 20,
+                },
+            )

@@ -15,8 +15,8 @@ from apps.data_collectors.collectors.exceptions import (
     CollectorRequestError,
     CollectorResponseError,
 )
-from apps.data_collectors.collectors.yuancang.config import (
-    YuancangCollectorConfig,
+from apps.data_collectors.collectors.yuancang.configs.common import (
+    YuancangCommonConfig,
 )
 from apps.data_collectors.collectors.yuancang.payloads import (
     build_login_payload,
@@ -31,7 +31,7 @@ class YuancangWebClient:
 
     def __init__(
         self,
-        config: YuancangCollectorConfig,
+        config: YuancangCommonConfig,
         session=None,
     ):
         """初始化配置和 HTTP Session。"""
@@ -237,16 +237,3 @@ class YuancangWebClient:
             )
 
         return result
-
-    # ==================== 组合映射列表 ====================
-
-    def get_bundle_list_page(
-        self,
-        payload: dict[str, Any],
-    ) -> dict:
-        """请求一页元仓组合映射列表。"""
-
-        return self.post_authenticated(
-            url=self.config.bundle_list_url,
-            payload=payload,
-        )
