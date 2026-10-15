@@ -4,8 +4,12 @@ django-db-connection-pool[mysql]==1.2.6
 PyMySQL==1.2.0
 loguru==0.7.3
 PyJWT==2.10.1
-requests==2.34.2
 python-dotenv==1.2.4
 
 # Windows 正式环境 WSGI 服务
 waitress==3.0.2
+
+# 爬虫相关
+requests==2.34.2
+# 元仓网页请求的 RSA 加密
+cryptography==50.0.2
