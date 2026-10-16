@@ -16,9 +16,14 @@ from .products import (
 )
 from .stocks import YuanCangStockProvider
 
+from .warehouses import (
+    YuanCangWarehouseProvider,
+)
+
 __all__ = [
     "YuanCangClient",
     "YuanCangConfig",
     "YuanCangProductProvider",
     "YuanCangStockProvider",
+    "YuanCangWarehouseProvider",
 ]

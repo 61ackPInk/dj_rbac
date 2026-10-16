@@ -12,6 +12,7 @@ from functools import lru_cache
 from apps.products.adapters.base import (
     BaseProductProvider,
     BaseStockProvider,
+    BaseWarehouseProvider,
 )
 from apps.products.adapters.exceptions import (
     ProductProviderConfigurationError,
@@ -19,6 +20,7 @@ from apps.products.adapters.exceptions import (
 from apps.products.adapters.yuancang import (
     YuanCangProductProvider,
     YuanCangStockProvider,
+    YuanCangWarehouseProvider,
 )
 
 # 导入元仓配置模块时会加载商品应用目录下的 .env
@@ -87,6 +89,26 @@ def get_stock_provider() -> BaseStockProvider:
 
     if provider_code == "yuancang":
         return YuanCangStockProvider()
+
+    raise ProductProviderConfigurationError(
+        f"不支持的商品 ERP 提供方：{provider_code}"
+    )
+
+# ==================== 仓库 Provider 工厂 ====================
+
+
+@lru_cache(maxsize=1)
+def get_warehouse_provider() -> (
+    BaseWarehouseProvider
+):
+    """获取当前启用的仓库 Provider。"""
+
+    provider_code = (
+        get_product_erp_provider_code()
+    )
+
+    if provider_code == "yuancang":
+        return YuanCangWarehouseProvider()
 
     raise ProductProviderConfigurationError(
         f"不支持的商品 ERP 提供方：{provider_code}"
