@@ -12,6 +12,7 @@ from apps.products.views import (
     ProductDetailAPIView,
     ProductListAPIView,
     BundleListAPIView,
+    WarehouseListAPIView,
 )
 
 
@@ -35,5 +36,11 @@ urlpatterns = [
         "bundles/",
         BundleListAPIView.as_view(),
         name="bundle-list",
+    ),
+    # 客户已开启仓库列表
+    path(
+        "warehouses/",
+        WarehouseListAPIView.as_view(),
+        name="warehouse-list",
     ),
 ]

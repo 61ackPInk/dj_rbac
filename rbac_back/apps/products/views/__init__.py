@@ -12,9 +12,15 @@ from .products import (
 )
 from .bundles import BundleListAPIView
 
+from .warehouses import (
+    WarehouseListAPIView,
+)
+
 __all__ = [
     "ProductDetailAPIView",
     "ProductListAPIView",
 
     "BundleListAPIView",
+
+    "WarehouseListAPIView",
 ]
