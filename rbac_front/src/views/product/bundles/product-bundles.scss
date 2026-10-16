@@ -1,0 +1,31 @@
+.product-bundles-page {
+  display: grid;
+  gap: 20px;
+
+  /* ==================== 页面标题 ==================== */
+
+  .page-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+
+    h1 {
+      margin: 0;
+
+      color: var(--text-title);
+
+      font-size: var(--font-title);
+      font-weight: var(--font-weight-title);
+    }
+
+    p {
+      margin: 8px 0 0;
+
+      color: var(--text-sub);
+
+      font-size: var(--font-small);
+      line-height: 1.6;
+    }
+  }
+}

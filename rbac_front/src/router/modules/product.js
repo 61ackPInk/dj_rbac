@@ -22,4 +22,19 @@ export default [
       pageCode: 'PRODUCT_LIST',
     },
   },
+
+  /* ==================== 商品组合 ==================== */
+
+  {
+    path: 'product/bundles',
+    name: 'product-bundles',
+    component: () =>
+      import(
+        '@/views/product/bundles/product-bundles.vue'
+      ),
+    meta: {
+      title: '商品组合',
+      pageCode: 'PRODUCT_BUNDLE',
+    },
+  },
 ]
