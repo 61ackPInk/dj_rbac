@@ -17,6 +17,9 @@ from django.test import TestCase
 
 from apps.pages.models import Page
 from apps.users.models import Permission
+from common.permissions.registry import (
+    load_permission_config,
+)
 
 
 class InitRbacPermissionsCommandTests(
@@ -24,56 +27,37 @@ class InitRbacPermissionsCommandTests(
 ):
     """RBAC 权限初始化命令测试"""
 
+    # ==================== 动态权限配置 ====================
+
+    def get_permission_config(self):
+        """读取当前全部应用声明的权限配置。"""
+
+        return load_permission_config()
+
+    def get_expected_permission_codes(self):
+        """返回当前配置中的全部权限编码。"""
+
+        return {
+            item["code"]
+            for permission_items
+            in self.get_permission_config().values()
+            for item in permission_items
+        }
+
     def create_required_pages(self):
-        """创建初始化权限所需的五个业务页面"""
+        """根据当前权限配置动态创建所需页面。"""
 
-        Page.objects.create(
-            name="用户管理",
-            code="SYSTEM_USERS",
-            path="/system/users",
-            sort_order=10,
-            is_active=True,
-        )
-
-        Page.objects.create(
-            name="角色管理",
-            code="SYSTEM_ROLES",
-            path="/system/roles",
-            sort_order=20,
-            is_active=True,
-        )
-
-        Page.objects.create(
-            name="页面管理",
-            code="SYSTEM_PAGES",
-            path="/system/pages",
-            sort_order=30,
-            is_active=True,
-        )
-
-        # ====================
-        # 商品列表页面
-        # ====================
-
-        Page.objects.create(
-            name="商品列表",
-            code="PRODUCT_LIST",
-            path="/product/list",
-            sort_order=10,
-            is_active=True,
-        )
-
-        # ====================
-        # 商品组合页面
-        # ====================
-
-        Page.objects.create(
-            name="商品组合",
-            code="PRODUCT_BUNDLE",
-            path="/product/bundles",
-            sort_order=20,
-            is_active=True,
-        )
+        for index, page_code in enumerate(
+            self.get_permission_config().keys(),
+            start=1,
+        ):
+            Page.objects.create(
+                name=f"测试页面-{page_code}",
+                code=page_code,
+                path=f"/test/page-{index}",
+                sort_order=index * 10,
+                is_active=True,
+            )
 
     def run_command(self):
         """执行初始化命令并接收输出"""
@@ -116,49 +100,21 @@ class InitRbacPermissionsCommandTests(
         )
 
     def test_command_creates_all_permissions(self):
-        """首次执行命令应创建全部21项权限"""
+        """首次执行命令应创建全部已声明权限。"""
 
         self.create_required_pages()
 
         output = self.run_command()
 
+        expected_codes = (
+            self.get_expected_permission_codes()
+        )
+        expected_count = len(expected_codes)
+
         self.assertEqual(
             Permission.objects.count(),
-            21,
+            expected_count,
         )
-
-        expected_codes = {
-            # 用户管理
-            "USER_LIST",
-            "USER_DETAIL",
-            "USER_CREATE",
-            "USER_UPDATE",
-            "USER_CHANGE_STATUS",
-            "USER_ASSIGN_ROLE",
-            "USER_RESET_PASSWORD",
-
-            # 角色管理
-            "ROLE_LIST",
-            "ROLE_DETAIL",
-            "ROLE_CREATE",
-            "ROLE_UPDATE",
-            "ROLE_CHANGE_STATUS",
-
-            # 页面管理
-            "PAGE_LIST",
-            "PAGE_DETAIL",
-            "PAGE_CREATE",
-            "PAGE_UPDATE",
-            "PAGE_CHANGE_STATUS",
-            "PAGE_ASSIGN_ROLE",
-
-            # 商品列表
-            "PRODUCT_LIST",
-            "PRODUCT_DETAIL",
-
-            # 商品组合
-            "PRODUCT_BUNDLE_LIST",
-        }
 
         actual_codes = set(
             Permission.objects.values_list(
@@ -173,7 +129,7 @@ class InitRbacPermissionsCommandTests(
         )
 
         self.assertIn(
-            "新建 21 项",
+            f"新建 {expected_count} 项",
             output,
         )
 
@@ -187,12 +143,16 @@ class InitRbacPermissionsCommandTests(
 
         self.create_required_pages()
 
+        expected_count = len(
+            self.get_expected_permission_codes()
+        )
+
         # 第一次执行：创建权限
         self.run_command()
 
         self.assertEqual(
             Permission.objects.count(),
-            21,
+            expected_count,
         )
 
         # 人为修改一条内置权限
@@ -220,7 +180,7 @@ class InitRbacPermissionsCommandTests(
         # 权限数量仍然是21，不会重复创建
         self.assertEqual(
             Permission.objects.count(),
-            21,
+            expected_count,
         )
 
         permission.refresh_from_db()
@@ -250,6 +210,6 @@ class InitRbacPermissionsCommandTests(
         )
 
         self.assertIn(
-            "更新 21 项",
+            f"更新 {expected_count} 项",
             output,
         )
