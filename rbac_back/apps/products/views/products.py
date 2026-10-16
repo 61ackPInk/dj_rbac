@@ -1,6 +1,6 @@
 """
 -*- coding: utf-8 -*-
-@File  : products.py
+@File  : provider.py
 @Author: 61ackPink
 @Time : 2026/10/10 17:16
 @Desc : 普通商品列表与详情接口视图

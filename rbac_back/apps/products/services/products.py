@@ -1,6 +1,6 @@
 """
 -*- coding: utf-8 -*-
-@File  : products.py
+@File  : provider.py
 @Author: 61ackPink
 @Time : 2026/10/10 17:53
 @Desc : 普通商品资料与实时库存业务编排
