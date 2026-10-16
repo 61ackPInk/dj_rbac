@@ -13,6 +13,7 @@ import AppSelect from '@/components/form/select/app-select.vue'
 /* ==================== 商品组合接口与权限 ==================== */
 
 import {
+  getProductBundlesApi,
   getProductWarehousesApi,
 } from '@/api/product-bundles'
 import { useAuthStore } from '@/stores/auth'
@@ -55,7 +56,7 @@ export default {
     const warehouseOptions = computed(() => {
       return warehouses.value.map((warehouse) => {
         return {
-          label: warehouse.name,
+          label: `${warehouse.name}-${warehouse.code}`,
           value: warehouse.code,
         }
       })
@@ -73,13 +74,154 @@ export default {
       return '请选择仓库'
     })
 
+    /* ==================== 组合列表状态 ==================== */
+
+    const bundles = ref([])
+    const bundleLoading = ref(false)
+    const bundleError = ref('')
+
     /* ==================== 组合分页状态 ==================== */
 
-    /*
-     * 下一步接入组合列表时直接使用。
-     * 切换仓库必须回到第一页。
-     */
     const page = ref(1)
+    const pageSize = ref(20)
+    const total = ref(0)
+
+    const pageSizeOptions = [
+      {
+        label: '每页 20 条',
+        value: 20,
+      },
+      {
+        label: '每页 50 条',
+        value: 50,
+      },
+      {
+        label: '每页 100 条',
+        value: 100,
+      },
+    ]
+
+    const totalPages = computed(() => {
+      return Math.max(
+        1,
+        Math.ceil(
+          total.value / pageSize.value,
+        ),
+      )
+    })
+
+    const canGoPrevious = computed(() => {
+      return page.value > 1
+    })
+
+    const canGoNext = computed(() => {
+      return page.value < totalPages.value
+    })
+
+    /* ==================== 数据格式化 ==================== */
+
+    const formatQuantity = (value) => {
+      if (value === null || value === undefined) {
+        return '-'
+      }
+
+      return value
+    }
+
+    const formatDateTime = (value) => {
+      if (!value) {
+        return '-'
+      }
+
+      const date = new Date(value)
+
+      if (Number.isNaN(date.getTime())) {
+        return value
+      }
+
+      return date.toLocaleString('zh-CN', {
+        hour12: false,
+      })
+    }
+
+    /* ==================== 加载组合列表 ==================== */
+
+    const loadBundles = async () => {
+      /*
+       * 没有操作权限或尚未选择仓库时，
+       * 不发送组合列表请求。
+       */
+      if (
+        !canViewBundleList.value ||
+        !warehouseCode.value
+      ) {
+        bundles.value = []
+        total.value = 0
+        bundleError.value = ''
+
+        return false
+      }
+
+      if (bundleLoading.value) {
+        return false
+      }
+
+      bundleLoading.value = true
+      bundleError.value = ''
+
+      try {
+        const result =
+          await getProductBundlesApi({
+            warehouse_code:
+              warehouseCode.value,
+            page: page.value,
+            page_size: pageSize.value,
+          })
+
+        bundles.value =
+          Array.isArray(result?.items)
+            ? result.items
+            : []
+
+        const pagination =
+          result?.pagination || {}
+
+        page.value =
+          Number(pagination.page) ||
+          page.value
+
+        pageSize.value =
+          Number(pagination.page_size) ||
+          pageSize.value
+
+        total.value =
+          Number(pagination.total) || 0
+
+        return true
+      } catch (error) {
+        bundles.value = []
+        total.value = 0
+
+        if (
+          error.status === 502 ||
+          error.status === 503
+        ) {
+          bundleError.value =
+            '第三方 ERP 数据暂时不可用，请稍后重试'
+        } else if (error.status === 403) {
+          bundleError.value =
+            '当前用户没有 PRODUCT_BUNDLE_LIST 权限'
+        } else {
+          bundleError.value =
+            error.userMessage ||
+            '商品组合列表加载失败'
+        }
+
+        return false
+      } finally {
+        bundleLoading.value = false
+      }
+    }
 
     /* ==================== 加载仓库 ==================== */
 
@@ -119,8 +261,13 @@ export default {
         if (warehouses.value.length === 1) {
           warehouseCode.value =
             warehouses.value[0].code
+
+          page.value = 1
+          await loadBundles()
         } else {
           warehouseCode.value = undefined
+          bundles.value = []
+          total.value = 0
         }
       } catch (error) {
         warehouses.value = []
@@ -149,11 +296,41 @@ export default {
 
     const handleWarehouseChange = () => {
       page.value = 1
+      bundles.value = []
+      total.value = 0
 
-      /*
-       * 下一步在这里调用组合列表接口。
-       * 当前步骤只维护仓库和分页状态。
-       */
+      loadBundles()
+    }
+
+    /* ==================== 分页操作 ==================== */
+
+    const changePageSize = () => {
+      page.value = 1
+      loadBundles()
+    }
+
+    const goToPreviousPage = () => {
+      if (
+        bundleLoading.value ||
+        !canGoPrevious.value
+      ) {
+        return
+      }
+
+      page.value -= 1
+      loadBundles()
+    }
+
+    const goToNextPage = () => {
+      if (
+        bundleLoading.value ||
+        !canGoNext.value
+      ) {
+        return
+      }
+
+      page.value += 1
+      loadBundles()
     }
 
     onMounted(loadWarehouses)
@@ -168,8 +345,27 @@ export default {
       warehouseLoading,
       warehouseError,
 
+      bundles,
+      bundleLoading,
+      bundleError,
+
+      page,
+      pageSize,
+      total,
+      pageSizeOptions,
+      totalPages,
+      canGoPrevious,
+      canGoNext,
+
       loadWarehouses,
       handleWarehouseChange,
+      loadBundles,
+      changePageSize,
+      goToPreviousPage,
+      goToNextPage,
+
+      formatQuantity,
+      formatDateTime,
     }
   },
 }
