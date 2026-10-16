@@ -39,6 +39,7 @@ class BundleServiceTests(TestCase):
         *,
         external_id: str,
         bundle_sku: str,
+        name: str | None = None,
         is_active: bool = True,
     ) -> ProductBundle:
         """创建组合商品测试数据。"""
@@ -47,7 +48,7 @@ class BundleServiceTests(TestCase):
             provider_code="yuancang",
             external_id=external_id,
             bundle_sku=bundle_sku,
-            name=f"测试组合-{bundle_sku}",
+            name=(name or f"测试组合-{bundle_sku}"),
             collected_at=timezone.now(),
             is_active=is_active,
         )
@@ -222,3 +223,143 @@ class BundleServiceTests(TestCase):
                 provider_code="yuancang",
                 warehouse_code=" ",
             )
+
+    # ==================== 组合列表测试 ====================
+
+    def test_bundle_list_paginates_before_stock_request(
+        self,
+    ):
+        """组合列表只查询当前页涉及的子SKU库存。"""
+
+        first_bundle = self.create_bundle(
+            external_id="10",
+            bundle_sku="BUNDLE-001",
+        )
+        second_bundle = self.create_bundle(
+            external_id="11",
+            bundle_sku="BUNDLE-002",
+        )
+
+        self.create_item(
+            bundle=first_bundle,
+            customer_sku="SKU-A",
+            required_quantity=1,
+        )
+        self.create_item(
+            bundle=second_bundle,
+            customer_sku="SKU-B",
+            required_quantity=2,
+        )
+
+        self.stock_provider.get_stock_list.return_value = {
+            "SKU-B": {
+                "available": 9,
+            },
+        }
+
+        result = self.service.get_bundle_list(
+            provider_code="yuancang",
+            query={
+                "warehouse_code": "HK01",
+                "page": 2,
+                "page_size": 1,
+            },
+        )
+
+        self.assertEqual(
+            result["pagination"],
+            {
+                "page": 2,
+                "page_size": 1,
+                "total": 2,
+            },
+        )
+        self.assertEqual(
+            len(result["items"]),
+            1,
+        )
+        self.assertEqual(
+            result["items"][0][
+                "bundle_sku"
+            ],
+            "BUNDLE-002",
+        )
+        self.assertEqual(
+            result["items"][0][
+                "available_quantity"
+            ],
+            4,
+        )
+        self.assertEqual(
+            result["items"][0][
+                "item_count"
+            ],
+            1,
+        )
+
+        self.stock_provider.get_stock_list.assert_called_once_with(
+            "HK01",
+            ["SKU-B"],
+        )
+
+    def test_bundle_list_filters_by_sku_and_name(
+        self,
+    ):
+        """组合列表支持按组合SKU和名称筛选。"""
+
+        matched_bundle = self.create_bundle(
+            external_id="20",
+            bundle_sku="SET-001-A",
+            name="咖啡杯组合",
+        )
+        self.create_bundle(
+            external_id="21",
+            bundle_sku="SET-002-A",
+            name="铃兰杯组合",
+        )
+
+        self.create_item(
+            bundle=matched_bundle,
+            customer_sku="SKU-A",
+            required_quantity=1,
+        )
+
+        self.stock_provider.get_stock_list.return_value = {
+            "SKU-A": {
+                "available": 12,
+            },
+        }
+
+        result = self.service.get_bundle_list(
+            provider_code="yuancang",
+            query={
+                "warehouse_code": "HK01",
+                "page": 1,
+                "page_size": 20,
+                "bundle_sku": "SET-001",
+                "name": "咖啡",
+            },
+        )
+
+        self.assertEqual(
+            result["pagination"]["total"],
+            1,
+        )
+        self.assertEqual(
+            result["items"][0][
+                "bundle_sku"
+            ],
+            "SET-001-A",
+        )
+        self.assertEqual(
+            result["items"][0][
+                "warehouse_code"
+            ],
+            "HK01",
+        )
+        self.assertEqual(
+            result["items"][0][
+                "available_quantity"
+            ],
+            12,
+        )
