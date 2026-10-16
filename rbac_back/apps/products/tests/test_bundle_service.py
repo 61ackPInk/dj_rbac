@@ -1,0 +1,224 @@
+"""
+-*- coding: utf-8 -*-
+@File  : test_bundle_service.py
+@Author: 61ackPink
+@Time : 2026/10/16
+@Desc : 组合商品实时库存计算服务测试
+"""
+
+from unittest.mock import Mock
+
+from django.test import TestCase
+from django.utils import timezone
+
+from apps.products.adapters import BaseStockProvider
+from apps.products.models import (
+    ProductBundle,
+    ProductBundleItem,
+)
+from apps.products.services import BundleService
+
+
+class BundleServiceTests(TestCase):
+    """组合商品实时库存计算服务测试。"""
+
+    def setUp(self):
+        """初始化库存 Provider 和组合服务。"""
+
+        self.stock_provider = Mock(
+            spec=BaseStockProvider
+        )
+        self.service = BundleService(
+            stock_provider=self.stock_provider
+        )
+
+    # ==================== 测试数据构造 ====================
+
+    def create_bundle(
+        self,
+        *,
+        external_id: str,
+        bundle_sku: str,
+        is_active: bool = True,
+    ) -> ProductBundle:
+        """创建组合商品测试数据。"""
+
+        return ProductBundle.objects.create(
+            provider_code="yuancang",
+            external_id=external_id,
+            bundle_sku=bundle_sku,
+            name=f"测试组合-{bundle_sku}",
+            collected_at=timezone.now(),
+            is_active=is_active,
+        )
+
+    @staticmethod
+    def create_item(
+        *,
+        bundle: ProductBundle,
+        customer_sku: str,
+        required_quantity: int,
+    ) -> ProductBundleItem:
+        """创建组合子商品测试数据。"""
+
+        return ProductBundleItem.objects.create(
+            bundle=bundle,
+            customer_sku=customer_sku,
+            required_quantity=required_quantity,
+        )
+
+    # ==================== 组合库存计算 ====================
+
+    def test_calculates_inventory_from_child_skus(
+        self,
+    ):
+        """组合库存应取各子SKU可组成数量的最小值。"""
+
+        bundle = self.create_bundle(
+            external_id="1",
+            bundle_sku="BUNDLE-001",
+        )
+        self.create_item(
+            bundle=bundle,
+            customer_sku="SKU-A",
+            required_quantity=1,
+        )
+        self.create_item(
+            bundle=bundle,
+            customer_sku="SKU-B",
+            required_quantity=2,
+        )
+
+        self.stock_provider.get_stock_list.return_value = {
+            "SKU-A": {
+                "available": 7,
+            },
+            "SKU-B": {
+                "available": 5,
+            },
+        }
+
+        result = self.service.get_available_quantity_map(
+            provider_code="yuancang",
+            warehouse_code="HK01",
+        )
+
+        self.assertEqual(
+            result,
+            {
+                bundle.id: 2,
+            },
+        )
+        self.stock_provider.get_stock_list.assert_called_once_with(
+            "HK01",
+            [
+                "SKU-A",
+                "SKU-B",
+            ],
+        )
+
+    def test_missing_child_stock_returns_zero(
+        self,
+    ):
+        """任一子SKU库存缺失时组合库存应为0。"""
+
+        bundle = self.create_bundle(
+            external_id="2",
+            bundle_sku="BUNDLE-002",
+        )
+        self.create_item(
+            bundle=bundle,
+            customer_sku="SKU-A",
+            required_quantity=1,
+        )
+        self.create_item(
+            bundle=bundle,
+            customer_sku="SKU-MISSING",
+            required_quantity=1,
+        )
+
+        self.stock_provider.get_stock_list.return_value = {
+            "SKU-A": {
+                "available": 10,
+            },
+        }
+
+        result = self.service.get_available_quantity_map(
+            provider_code="yuancang",
+            warehouse_code="HK01",
+        )
+
+        self.assertEqual(result[bundle.id], 0)
+
+    def test_ignores_inactive_bundles(self):
+        """库存计算不应包含已经失效的组合。"""
+
+        active_bundle = self.create_bundle(
+            external_id="3",
+            bundle_sku="BUNDLE-003",
+        )
+        inactive_bundle = self.create_bundle(
+            external_id="4",
+            bundle_sku="BUNDLE-004",
+            is_active=False,
+        )
+        self.create_item(
+            bundle=active_bundle,
+            customer_sku="SKU-A",
+            required_quantity=1,
+        )
+        self.create_item(
+            bundle=inactive_bundle,
+            customer_sku="SKU-B",
+            required_quantity=1,
+        )
+
+        self.stock_provider.get_stock_list.return_value = {
+            "SKU-A": {
+                "available": 6,
+            },
+            "SKU-B": {
+                "available": 9,
+            },
+        }
+
+        result = self.service.get_available_quantity_map(
+            provider_code="yuancang",
+            warehouse_code="HK01",
+        )
+
+        self.assertEqual(
+            result,
+            {
+                active_bundle.id: 6,
+            },
+        )
+        self.stock_provider.get_stock_list.assert_called_once_with(
+            "HK01",
+            ["SKU-A"],
+        )
+
+    def test_empty_active_bundle_list_skips_stock_request(
+        self,
+    ):
+        """没有有效组合时不应请求第三方库存。"""
+
+        result = self.service.get_available_quantity_map(
+            provider_code="yuancang",
+            warehouse_code="HK01",
+        )
+
+        self.assertEqual(result, {})
+        self.stock_provider.get_stock_list.assert_not_called()
+
+    def test_requires_warehouse_code(self):
+        """计算组合库存必须提供仓库编码。"""
+
+        with self.assertRaisesMessage(
+            ValueError,
+            "仓库编码不能为空",
+        ):
+            self.service.get_available_quantity_map(
+                provider_code="yuancang",
+                warehouse_code=" ",
+            )
