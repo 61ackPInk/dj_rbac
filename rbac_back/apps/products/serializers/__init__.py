@@ -20,6 +20,13 @@ from .products import (
     ProductWarehouseInfoSerializer,
 )
 
+from .bundles import (
+    BundleListItemSerializer,
+    BundleListQuerySerializer,
+    BundleListResponseSerializer,
+    BundlePaginationSerializer,
+)
+
 __all__ = [
     "ProductInventorySerializer",
     "ProductListItemSerializer",
@@ -32,4 +39,10 @@ __all__ = [
     "ProductDetailPathSerializer",
     "ProductDetailSerializer",
     "ProductWarehouseInfoSerializer",
+
+    # 商品组合
+    "BundleListItemSerializer",
+    "BundleListQuerySerializer",
+    "BundleListResponseSerializer",
+    "BundlePaginationSerializer",
 ]
