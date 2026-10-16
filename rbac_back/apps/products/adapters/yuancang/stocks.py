@@ -14,8 +14,9 @@ from apps.products.adapters.base import (
 from apps.products.adapters.exceptions import (
     ProductProviderResponseError,
 )
-
-from .client import YuanCangClient
+from .common.client import (
+    YuanCangClient,
+)
 from .mappers import map_stock_item
 
 

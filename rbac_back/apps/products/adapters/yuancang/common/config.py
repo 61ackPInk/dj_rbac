@@ -20,7 +20,7 @@ from apps.products.adapters.exceptions import (
 
 PRODUCTS_APP_DIR = Path(
     __file__
-).resolve().parents[2]
+).resolve().parents[3]
 
 PRODUCTS_ENV_FILE = (
     PRODUCTS_APP_DIR / ".env"

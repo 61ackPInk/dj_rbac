@@ -15,7 +15,7 @@ from apps.products.adapters.exceptions import (
     ProductProviderResponseError,
 )
 
-from .config import YuanCangConfig
+from apps.products.adapters.yuancang.common.config import YuanCangConfig
 
 
 # ==================== 元仓接口常量 ====================

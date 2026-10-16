@@ -22,7 +22,7 @@ from apps.products.adapters.yuancang import (
 )
 
 # 导入元仓配置模块时会加载商品应用目录下的 .env
-from apps.products.adapters.yuancang.config import (
+from apps.products.adapters.yuancang.common.config import (
     PRODUCTS_ENV_FILE,
 )
 

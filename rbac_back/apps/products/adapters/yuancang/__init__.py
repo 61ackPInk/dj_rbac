@@ -7,8 +7,10 @@
 """
 # ==================== 元仓适配器导出 ====================
 
-from .client import YuanCangClient
-from .config import YuanCangConfig
+from .common import (
+    YuanCangClient,
+    YuanCangConfig,
+)
 from .products import (
     YuanCangProductProvider,
 )
