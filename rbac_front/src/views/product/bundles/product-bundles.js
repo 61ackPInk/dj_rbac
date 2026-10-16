@@ -74,11 +74,77 @@ export default {
       return '请选择仓库'
     })
 
+    /* ==================== 显示模式 ==================== */
+
+    /*
+     * 切换显示模式只改变当前页的前端展示，
+     * 不会重新请求组合列表。
+     */
+    const viewMode = ref('list')
+
+    const setViewMode = (mode) => {
+      if (!['list', 'card'].includes(mode)) {
+        return
+      }
+
+      viewMode.value = mode
+    }
+
     /* ==================== 组合列表状态 ==================== */
 
     const bundles = ref([])
     const bundleLoading = ref(false)
     const bundleError = ref('')
+
+    /* ==================== 当前页即时搜索 ==================== */
+
+    /*
+     * 搜索只过滤当前接口已经返回的数据，
+     * 输入内容时不会重新请求后端。
+     */
+    const keyword = ref('')
+
+    const displayedBundles = computed(() => {
+      const search =
+        keyword.value.trim().toLowerCase()
+
+      if (!search) {
+        return bundles.value
+      }
+
+      return bundles.value.filter((bundle) => {
+        const components =
+          Array.isArray(bundle?.components)
+            ? bundle.components
+            : []
+
+        const componentContent = components
+          .map((component) => {
+            return [
+              component?.customer_sku,
+              component?.name,
+            ]
+              .filter(Boolean)
+              .join(' ')
+          })
+          .join(' ')
+
+        const searchableContent = [
+          bundle?.name,
+          bundle?.bundle_sku,
+          componentContent,
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase()
+
+        return searchableContent.includes(search)
+      })
+    })
+
+    const clearSearch = () => {
+      keyword.value = ''
+    }
 
     /* ==================== 组合分页状态 ==================== */
 
@@ -345,7 +411,12 @@ export default {
       warehouseLoading,
       warehouseError,
 
+      viewMode,
+      setViewMode,
+
       bundles,
+      keyword,
+      displayedBundles,
       bundleLoading,
       bundleError,
 
@@ -366,6 +437,7 @@ export default {
 
       formatQuantity,
       formatDateTime,
+      clearSearch,
     }
   },
 }

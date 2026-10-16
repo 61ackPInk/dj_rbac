@@ -13,6 +13,47 @@
           查看不同仓库中的商品组合及组成商品明细。
         </p>
       </div>
+
+      <!-- 显示模式切换 -->
+
+      <div
+        v-if="canViewBundleList"
+        class="view-switch"
+        role="group"
+        aria-label="商品组合显示方式"
+      >
+        <button
+          class="view-button"
+          :class="{
+            'is-active': viewMode === 'list',
+          }"
+          type="button"
+          aria-label="列表显示"
+          :aria-pressed="viewMode === 'list'"
+          @click="setViewMode('list')"
+        >
+          <i
+            class="bi bi-list-ul"
+            aria-hidden="true"
+          ></i>
+        </button>
+
+        <button
+          class="view-button"
+          :class="{
+            'is-active': viewMode === 'card',
+          }"
+          type="button"
+          aria-label="卡片显示"
+          :aria-pressed="viewMode === 'card'"
+          @click="setViewMode('card')"
+        >
+          <i
+            class="bi bi-grid"
+            aria-hidden="true"
+          ></i>
+        </button>
+      </div>
     </header>
 
     <!-- ==================== 仓库选择面板 ==================== -->
@@ -176,43 +217,230 @@
       </div>
 
       <template v-else>
+        <!-- ==================== 当前页即时搜索 ==================== -->
+
+        <div class="bundle-toolbar">
+          <label class="search-box">
+            <i
+              class="bi bi-search"
+              aria-hidden="true"
+            ></i>
+
+            <input
+              v-model="keyword"
+              type="search"
+              placeholder="搜索组合名称、组合 SKU、子商品名称或子 SKU"
+              aria-label="搜索当前页商品组合"
+            />
+          </label>
+        </div>
+
         <!-- 列表统计 -->
 
         <header class="bundle-summary">
           <span>
-            共 {{ total }} 个商品组合
+            ERP 共
+            <strong>{{ total }}</strong>
+            个组合，当前页
+            <strong>{{ bundles.length }}</strong>
+            个
           </span>
 
           <span>
-            当前仓库：{{ warehouseCode }}
+            当前搜索结果
+            <strong>{{ displayedBundles.length }}</strong>
+            个
           </span>
         </header>
 
-        <!-- 组合列表 -->
+        <!-- 当前页无匹配结果 -->
 
-        <div class="bundle-list">
-          <article
-            v-for="bundle in bundles"
-            :key="bundle.id"
-            class="bundle-item"
+        <div
+          v-if="displayedBundles.length === 0"
+          class="page-state filtered-empty"
+        >
+          <i
+            class="bi bi-search"
+            aria-hidden="true"
+          ></i>
+
+          <strong>当前页没有匹配的商品组合</strong>
+          <span>
+            请修改组合名称、组合 SKU 或子商品搜索内容。
+          </span>
+
+          <button
+            class="secondary-button"
+            type="button"
+            @click="clearSearch"
           >
-            <div class="bundle-image">
-              <img
-                v-if="bundle.image_url"
-                :src="bundle.image_url"
-                :alt="bundle.name || bundle.bundle_sku"
-                loading="lazy"
-              />
+            清除搜索
+          </button>
+        </div>
 
-              <i
+        <!-- ==================== 列表显示 ==================== -->
+
+        <div
+          v-else-if="viewMode === 'list'"
+          class="table-scroll"
+        >
+          <table class="bundle-table">
+            <thead>
+              <tr>
+                <th>商品组合</th>
+                <th>组合 SKU</th>
+                <th>状态</th>
+                <th>可用数量</th>
+                <th>组成商品</th>
+                <th>采集时间</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr
+                v-for="bundle in displayedBundles"
+                :key="bundle.id"
+              >
+                <td>
+                  <div class="bundle-name-cell">
+                    <div
+                      class="bundle-thumbnail"
+                      @click.stop
+                      @keydown.stop
+                    >
+                      <el-image
+                        v-if="bundle.image_url"
+                        class="bundle-preview-image"
+                        :src="bundle.image_url"
+                        :preview-src-list="[
+                          bundle.image_url,
+                        ]"
+                        :alt="bundle.name || bundle.bundle_sku"
+                        fit="contain"
+                        loading="lazy"
+                        preview-teleported
+                        hide-on-click-modal
+                        :infinite="false"
+                        :z-index="10000"
+                      >
+                        <template #error>
+                          <i
+                            class="bi bi-image"
+                            aria-hidden="true"
+                          ></i>
+                        </template>
+                      </el-image>
+
+                      <i
+                        v-else
+                        class="bi bi-image"
+                        aria-hidden="true"
+                      ></i>
+                    </div>
+
+                    <strong>
+                      {{ bundle.name || '未命名组合' }}
+                    </strong>
+                  </div>
+                </td>
+
+                <td class="sku-cell">
+                  {{ bundle.bundle_sku || '-' }}
+                </td>
+
+                <td>
+                  <span class="status-badge">
+                    {{
+                      bundle.source_status_name ||
+                      '状态未知'
+                    }}
+                  </span>
+                </td>
+
+                <td class="quantity-column">
+                  {{
+                    formatQuantity(
+                      bundle.available_quantity,
+                    )
+                  }}
+                </td>
+
+                <td class="quantity-column">
+                  {{
+                    formatQuantity(
+                      bundle.item_count,
+                    )
+                  }}
+                </td>
+
+                <td>
+                  {{
+                    formatDateTime(
+                      bundle.collected_at,
+                    )
+                  }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ==================== 卡片显示 ==================== -->
+
+        <div
+          v-else
+          class="bundle-card-view"
+        >
+          <article
+            v-for="bundle in displayedBundles"
+            :key="bundle.id"
+            class="bundle-card"
+          >
+            <div
+              class="bundle-card-image"
+              @click.stop
+              @keydown.stop
+            >
+              <el-image
+                v-if="bundle.image_url"
+                class="bundle-preview-image"
+                :src="bundle.image_url"
+                :preview-src-list="[
+                  bundle.image_url,
+                ]"
+                :alt="bundle.name || bundle.bundle_sku"
+                fit="contain"
+                loading="lazy"
+                preview-teleported
+                hide-on-click-modal
+                :infinite="false"
+                :z-index="10000"
+              >
+                <template #error>
+                  <div class="image-placeholder">
+                    <i
+                      class="bi bi-image"
+                      aria-hidden="true"
+                    ></i>
+                    <span>暂无组合图片</span>
+                  </div>
+                </template>
+              </el-image>
+
+              <div
                 v-else
-                class="bi bi-image"
-                aria-hidden="true"
-              ></i>
+                class="image-placeholder"
+              >
+                <i
+                  class="bi bi-image"
+                  aria-hidden="true"
+                ></i>
+                <span>暂无组合图片</span>
+              </div>
             </div>
 
-            <div class="bundle-main">
-              <div class="bundle-title">
+            <div class="bundle-card-content">
+              <div class="bundle-card-title">
                 <strong>
                   {{ bundle.name || '未命名组合' }}
                 </strong>
@@ -225,14 +453,11 @@
                 </span>
               </div>
 
-              <dl class="bundle-meta">
-                <div>
-                  <dt>组合 SKU</dt>
-                  <dd>
-                    {{ bundle.bundle_sku || '-' }}
-                  </dd>
-                </div>
+              <div class="bundle-card-sku">
+                {{ bundle.bundle_sku || '-' }}
+              </div>
 
+              <dl class="bundle-card-meta">
                 <div>
                   <dt>可用数量</dt>
                   <dd>
@@ -254,18 +479,19 @@
                     }}
                   </dd>
                 </div>
-
-                <div>
-                  <dt>采集时间</dt>
-                  <dd>
-                    {{
-                      formatDateTime(
-                        bundle.collected_at,
-                      )
-                    }}
-                  </dd>
-                </div>
               </dl>
+
+              <div class="bundle-card-time">
+                <i
+                  class="bi bi-clock"
+                  aria-hidden="true"
+                ></i>
+                {{
+                  formatDateTime(
+                    bundle.collected_at,
+                  )
+                }}
+              </div>
             </div>
           </article>
         </div>
