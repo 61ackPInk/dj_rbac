@@ -146,9 +146,45 @@ class BundleService:
                         stock_map=stock_map,
                     )
                 ),
-                "item_count": len(
+                                "item_count": len(
                     bundle_items
                 ),
+
+                # ====================
+                # 组合组成商品
+                # ====================
+
+                "components": [
+                    {
+                        "provider_sku": (
+                            bundle_item.provider_sku
+                        ),
+                        "customer_sku": (
+                            bundle_item.customer_sku
+                        ),
+                        "name": (
+                            bundle_item.name
+                        ),
+                        "image_url": (
+                            bundle_item.image_url
+                        ),
+                        "required_quantity": (
+                            bundle_item
+                            .required_quantity
+                        ),
+                        "source_status": (
+                            bundle_item
+                            .source_status
+                        ),
+                        "source_status_name": (
+                            bundle_item
+                            .source_status_name
+                        ),
+                    }
+                    for bundle_item
+                    in bundle_items
+                ],
+
                 "collected_at": (
                     bundle.collected_at
                 ),

@@ -112,6 +112,38 @@ class BundleOperationPermissionTests(TestCase):
                     "warehouse_code": "HK01",
                     "available_quantity": 10,
                     "item_count": 2,
+                    "components": [
+                        {
+                            "provider_sku": (
+                                "ERP-SKU-A"
+                            ),
+                            "customer_sku": (
+                                "SKU-A"
+                            ),
+                            "name": "测试子商品A",
+                            "image_url": "",
+                            "required_quantity": 1,
+                            "source_status": "1",
+                            "source_status_name": (
+                                "正常"
+                            ),
+                        },
+                        {
+                            "provider_sku": (
+                                "ERP-SKU-B"
+                            ),
+                            "customer_sku": (
+                                "SKU-B"
+                            ),
+                            "name": "测试子商品B",
+                            "image_url": "",
+                            "required_quantity": 1,
+                            "source_status": "1",
+                            "source_status_name": (
+                                "正常"
+                            ),
+                        },
+                    ],
                     "collected_at": (
                         "2026-10-16T18:00:00"
                         "+08:00"

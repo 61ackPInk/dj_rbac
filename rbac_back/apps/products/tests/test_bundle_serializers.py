@@ -90,7 +90,39 @@ class BundleListSerializerTests(
                         "source_status_name": "启用",
                         "warehouse_code": "HK01",
                         "available_quantity": 75,
-                        "item_count": 3,
+                        "item_count": 2,
+                        "components": [
+                            {
+                                "provider_sku": (
+                                    "YC7832-SET-001"
+                                ),
+                                "customer_sku": (
+                                    "SET-001"
+                                ),
+                                "name": "咖啡杯",
+                                "image_url": "",
+                                "required_quantity": 1,
+                                "source_status": "1",
+                                "source_status_name": (
+                                    "正常"
+                                ),
+                            },
+                            {
+                                "provider_sku": (
+                                    "YC7832-ARO-001"
+                                ),
+                                "customer_sku": (
+                                    "ARO-001"
+                                ),
+                                "name": "香薰",
+                                "image_url": "",
+                                "required_quantity": 2,
+                                "source_status": "1",
+                                "source_status_name": (
+                                    "正常"
+                                ),
+                            },
+                        ],
                         "collected_at": (
                             "2026-10-16T18:00:00"
                             "+08:00"

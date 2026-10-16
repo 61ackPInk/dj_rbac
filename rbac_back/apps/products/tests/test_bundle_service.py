@@ -55,16 +55,20 @@ class BundleServiceTests(TestCase):
 
     @staticmethod
     def create_item(
-        *,
-        bundle: ProductBundle,
-        customer_sku: str,
-        required_quantity: int,
+            *,
+            bundle: ProductBundle,
+            customer_sku: str,
+            required_quantity: int,
+            provider_sku: str = "",
+            name: str = "",
     ) -> ProductBundleItem:
         """创建组合子商品测试数据。"""
 
         return ProductBundleItem.objects.create(
             bundle=bundle,
+            provider_sku=provider_sku,
             customer_sku=customer_sku,
+            name=name,
             required_quantity=required_quantity,
         )
 
@@ -247,7 +251,9 @@ class BundleServiceTests(TestCase):
         )
         self.create_item(
             bundle=second_bundle,
+            provider_sku="ERP-SKU-B",
             customer_sku="SKU-B",
+            name="测试子商品B",
             required_quantity=2,
         )
 
@@ -295,6 +301,37 @@ class BundleServiceTests(TestCase):
                 "item_count"
             ],
             1,
+        )
+
+        components = result["items"][0][
+            "components"
+        ]
+
+        self.assertEqual(
+            len(components),
+            1,
+        )
+
+        self.assertEqual(
+            components[0]["provider_sku"],
+            "ERP-SKU-B",
+        )
+
+        self.assertEqual(
+            components[0]["customer_sku"],
+            "SKU-B",
+        )
+
+        self.assertEqual(
+            components[0]["name"],
+            "测试子商品B",
+        )
+
+        self.assertEqual(
+            components[0][
+                "required_quantity"
+            ],
+            2,
         )
 
         self.stock_provider.get_stock_list.assert_called_once_with(

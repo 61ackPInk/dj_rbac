@@ -74,6 +74,42 @@ class BundleListQuerySerializer(
         return dict(self.validated_data)
 
 
+# ==================== 组合组成明细 ====================
+
+class BundleComponentSerializer(
+    serializers.Serializer
+):
+    """组合商品中的一个组成商品。"""
+
+    provider_sku = serializers.CharField(
+        allow_blank=True,
+    )
+
+    customer_sku = serializers.CharField(
+        allow_blank=False,
+    )
+
+    name = serializers.CharField(
+        allow_blank=True,
+    )
+
+    image_url = serializers.URLField(
+        allow_blank=True,
+    )
+
+    required_quantity = serializers.IntegerField(
+        min_value=1,
+    )
+
+    source_status = serializers.CharField(
+        allow_blank=True,
+    )
+
+    source_status_name = serializers.CharField(
+        allow_blank=True,
+    )
+
+
 # ==================== 组合列表项 ====================
 
 
@@ -114,6 +150,10 @@ class BundleListItemSerializer(
 
     item_count = serializers.IntegerField(
         min_value=0,
+    )
+
+    components = BundleComponentSerializer(
+        many=True,
     )
 
     collected_at = serializers.DateTimeField()
