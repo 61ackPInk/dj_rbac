@@ -75,6 +75,13 @@
     background: var(--bg-card);
   }
 
+  .bundle-filters {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
   .warehouse-field {
     display: flex;
     align-items: center;
@@ -175,12 +182,6 @@
 
   /* ==================== 当前页即时搜索 ==================== */
 
-  .bundle-toolbar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
   .search-box {
     display: flex;
     align-items: center;
@@ -235,6 +236,11 @@
 
       &::placeholder {
         color: var(--text-muted);
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
       }
     }
   }
@@ -291,6 +297,8 @@
 
       color: var(--text-title);
 
+      font-size: var(--font-small);
+      font-weight: var(--font-weight-medium);
       text-overflow: ellipsis;
       white-space: nowrap;
     }
@@ -328,14 +336,15 @@
 
   .status-badge {
     flex: 0 0 auto;
-    padding: 4px 9px;
+    padding: 5px 9px;
 
-    border-radius: 999px;
+    border-radius: 20px;
 
-    color: var(--primary);
-    background: var(--primary-soft);
+    color: var(--success);
+    background: var(--success-light);
 
-    font-size: var(--font-small);
+    font-size: var(--font-caption);
+    white-space: nowrap;
   }
 
   /* ==================== 卡片模式 ==================== */
@@ -423,19 +432,24 @@
 
   .bundle-card-title {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 8px;
+    min-width: 0;
 
     strong {
-      display: -webkit-box;
+      display: block;
+      flex: 1;
+      min-width: 0;
       overflow: hidden;
 
       color: var(--text-title);
 
-      line-height: 1.5;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
+      /* 与商品列表卡片中的商品名称保持一致 */
+      font-size: var(--font-main);
+      font-weight: var(--font-weight-heading);
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   }
 
@@ -554,8 +568,19 @@
       flex-direction: column;
     }
 
+    .bundle-filters {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
     .warehouse-field :deep(.app-select) {
       width: 100% !important;
+    }
+
+    .search-box {
+      flex-basis: auto;
+      width: 100%;
+      max-width: none;
     }
 
     .bundle-summary,

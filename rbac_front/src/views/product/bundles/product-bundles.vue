@@ -78,25 +78,47 @@
       </div>
 
       <template v-else>
-        <div class="warehouse-field">
-          <label for="bundle-warehouse">
-            仓库
-          </label>
+        <!-- 仓库与当前页搜索 -->
 
-          <AppSelect
-            id="bundle-warehouse"
-            v-model="warehouseCode"
-            :options="warehouseOptions"
-            :placeholder="warehousePlaceholder"
-            :loading="warehouseLoading"
-            :disabled="
-              warehouseLoading ||
-              warehouses.length === 0
-            "
-            empty-text="暂无可用仓库"
-            width="280px"
-            @change="handleWarehouseChange"
-          />
+        <div class="bundle-filters">
+          <div class="warehouse-field">
+            <label for="bundle-warehouse">
+              仓库
+            </label>
+
+            <AppSelect
+              id="bundle-warehouse"
+              v-model="warehouseCode"
+              :options="warehouseOptions"
+              :placeholder="warehousePlaceholder"
+              :loading="warehouseLoading"
+              :disabled="
+                warehouseLoading ||
+                warehouses.length === 0
+              "
+              empty-text="暂无可用仓库"
+              width="280px"
+              @change="handleWarehouseChange"
+            />
+          </div>
+
+          <label class="search-box">
+            <i
+              class="bi bi-search"
+              aria-hidden="true"
+            ></i>
+
+            <input
+              v-model="keyword"
+              type="search"
+              placeholder="搜索组合名称、组合 SKU、子商品名称或子 SKU"
+              aria-label="搜索当前页商品组合"
+              :disabled="
+                !warehouseCode ||
+                bundleLoading
+              "
+            />
+          </label>
         </div>
 
         <!-- 仓库加载错误 -->
@@ -217,24 +239,6 @@
       </div>
 
       <template v-else>
-        <!-- ==================== 当前页即时搜索 ==================== -->
-
-        <div class="bundle-toolbar">
-          <label class="search-box">
-            <i
-              class="bi bi-search"
-              aria-hidden="true"
-            ></i>
-
-            <input
-              v-model="keyword"
-              type="search"
-              placeholder="搜索组合名称、组合 SKU、子商品名称或子 SKU"
-              aria-label="搜索当前页商品组合"
-            />
-          </label>
-        </div>
-
         <!-- 列表统计 -->
 
         <header class="bundle-summary">
@@ -345,7 +349,11 @@
                 </td>
 
                 <td class="sku-cell">
-                  {{ bundle.bundle_sku || '-' }}
+                  <AppCopyText
+                    :value="bundle.bundle_sku"
+                    label="组合 SKU"
+                    @click.stop
+                  />
                 </td>
 
                 <td>
@@ -454,7 +462,11 @@
               </div>
 
               <div class="bundle-card-sku">
-                {{ bundle.bundle_sku || '-' }}
+                <AppCopyText
+                  :value="bundle.bundle_sku"
+                  label="组合 SKU"
+                  @click.stop
+                />
               </div>
 
               <dl class="bundle-card-meta">
