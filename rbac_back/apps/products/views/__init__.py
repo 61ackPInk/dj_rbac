@@ -10,8 +10,11 @@ from .products import (
     ProductDetailAPIView,
     ProductListAPIView,
 )
+from .bundles import BundleListAPIView
 
 __all__ = [
     "ProductDetailAPIView",
     "ProductListAPIView",
+
+    "BundleListAPIView",
 ]
