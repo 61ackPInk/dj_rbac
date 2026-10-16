@@ -46,6 +46,7 @@ class CollectBundleCommandTests(
             "total": 12,
             "created": 10,
             "updated": 2,
+            "deactivated": 3,
             "failed": 0,
             "errors": [],
         }
@@ -70,6 +71,10 @@ class CollectBundleCommandTests(
         )
         self.assertIn(
             "更新 2",
+            output_value,
+        )
+        self.assertIn(
+            "失效 3",
             output_value,
         )
         self.assertIn(
@@ -112,6 +117,7 @@ class CollectBundleCommandTests(
             "total": 2,
             "created": 1,
             "updated": 0,
+            "deactivated": 0,
             "failed": 1,
             "errors": [
                 {

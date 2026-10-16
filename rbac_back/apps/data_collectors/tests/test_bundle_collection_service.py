@@ -50,12 +50,17 @@ class FakeBundleSyncService:
         fail_skus=None,
         existing_skus=None,
     ):
+        """初始化模拟同步状态。"""
+
         self.fail_skus = set(
             fail_skus or []
         )
         self.existing_skus = set(
             existing_skus or []
         )
+        self.deactivate_calls = []
+
+    # ==================== 单条组合同步 ====================
 
     def save_bundle(
         self,
@@ -77,6 +82,25 @@ class FakeBundleSyncService:
         )
 
         return object(), created
+
+    # ==================== 缺失组合失效 ====================
+
+    def deactivate_missing_bundles(
+        self,
+        *,
+        provider_code,
+        active_external_ids,
+    ):
+        """记录缺失组合失效调用参数。"""
+
+        self.deactivate_calls.append({
+            "provider_code": provider_code,
+            "active_external_ids": (
+                active_external_ids
+            ),
+        })
+
+        return 3
 
 
 class BundleCollectionServiceTests(
@@ -144,6 +168,22 @@ class BundleCollectionServiceTests(
             result["errors"],
             [],
         )
+        self.assertEqual(
+            result["deactivated"],
+            3,
+        )
+        self.assertEqual(
+            sync_service.deactivate_calls,
+            [
+                {
+                    "provider_code": "fake",
+                    "active_external_ids": [
+                        "1",
+                        "2",
+                    ],
+                }
+            ],
+        )
 
     def test_database_error_is_recorded(self):
         """单条保存失败会记录并继续处理。"""
@@ -189,6 +229,14 @@ class BundleCollectionServiceTests(
                 "bundle_sku"
             ],
             "BUNDLE-001",
+        )
+        self.assertEqual(
+            result["deactivated"],
+            0,
+        )
+        self.assertEqual(
+            sync_service.deactivate_calls,
+            [],
         )
 
     def test_invalid_collection_result_raises_error(

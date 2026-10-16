@@ -40,28 +40,37 @@ class BundleCollectionService:
     def run(self) -> dict:
         """采集组合商品并逐条同步到数据库。"""
 
+        # ==================== 完整数据采集 ====================
+
         collected_bundles = (
             self.collector.collect()
         )
 
         if not isinstance(
-            collected_bundles,
-            list,
+                collected_bundles,
+                list,
         ):
             raise CollectorResponseError(
                 "组合商品采集结果必须是列表"
             )
 
+        # ==================== 同步结果初始化 ====================
+
         result = {
             "total": len(collected_bundles),
             "created": 0,
             "updated": 0,
+            "deactivated": 0,
             "failed": 0,
             "errors": [],
         }
 
+        active_external_ids = []
+
+        # ==================== 逐条保存组合商品 ====================
+
         for collected_bundle in (
-            collected_bundles
+                collected_bundles
         ):
             try:
                 unused_bundle, created = (
@@ -82,9 +91,30 @@ class BundleCollectionService:
 
                 continue
 
+            active_external_ids.append(
+                collected_bundle.external_id
+            )
+
             if created:
                 result["created"] += 1
             else:
                 result["updated"] += 1
+
+        # ==================== 缺失组合失效处理 ====================
+
+        # 只有全部组合都保存成功时，才允许处理本次
+        # 完整采集中没有出现的历史组合。
+        if result["failed"] == 0:
+            result["deactivated"] = (
+                self.sync_service
+                .deactivate_missing_bundles(
+                    provider_code=(
+                        self.collector.source_name
+                    ),
+                    active_external_ids=(
+                        active_external_ids
+                    ),
+                )
+            )
 
         return result

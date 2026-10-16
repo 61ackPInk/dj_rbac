@@ -95,6 +95,7 @@ class Command(BaseCommand):
                 f"总数 {result['total']}，"
                 f"新增 {result['created']}，"
                 f"更新 {result['updated']}，"
+                f"失效 {result['deactivated']}，"
                 f"失败 {result['failed']}"
             )
         )
