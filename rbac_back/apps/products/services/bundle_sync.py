@@ -105,3 +105,55 @@ class BundleSyncService:
         ])
 
         return bundle, created
+
+    # ==================== 缺失组合失效处理 ====================
+
+    @transaction.atomic
+    def deactivate_missing_bundles(
+        self,
+        *,
+        provider_code: str,
+        active_external_ids: list[str],
+    ) -> int:
+        """
+        将完整采集中未出现的来源组合标记为无效。
+
+        只处理指定数据来源下当前仍然有效的组合，不删除数据库记录。
+        如果后续重新采集到该组合，save_bundle 会重新将其恢复为有效状态。
+        """
+
+        # ==================== 参数校验 ====================
+
+        normalized_provider_code = provider_code.strip()
+
+        if not normalized_provider_code:
+            raise ValueError("数据来源编码不能为空")
+
+        normalized_external_ids = {
+            str(external_id).strip()
+            for external_id in active_external_ids
+            if external_id is not None
+            and str(external_id).strip()
+        }
+
+        # 防止第三方接口异常返回空列表时误伤全部组合数据
+        if not normalized_external_ids:
+            raise ValueError(
+                "完整采集结果为空，拒绝批量失效组合商品"
+            )
+
+        # ==================== 查询缺失组合 ====================
+
+        missing_queryset = ProductBundle.objects.filter(
+            provider_code=normalized_provider_code,
+            is_active=True,
+        ).exclude(
+            external_id__in=normalized_external_ids,
+        )
+
+        # ==================== 批量标记无效 ====================
+
+        return missing_queryset.update(
+            is_active=False,
+            update_time=timezone.now(),
+        )
