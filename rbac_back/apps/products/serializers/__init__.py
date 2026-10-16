@@ -27,6 +27,11 @@ from .bundles import (
     BundlePaginationSerializer,
 )
 
+from .warehouses import (
+    WarehouseListItemSerializer,
+    WarehouseListResponseSerializer,
+)
+
 __all__ = [
     "ProductInventorySerializer",
     "ProductListItemSerializer",
@@ -45,4 +50,8 @@ __all__ = [
     "BundleListQuerySerializer",
     "BundleListResponseSerializer",
     "BundlePaginationSerializer",
+
+    # 仓库
+    "WarehouseListItemSerializer",
+    "WarehouseListResponseSerializer",
 ]
