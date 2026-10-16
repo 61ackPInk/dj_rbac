@@ -3,7 +3,7 @@
 @File  : config.py
 @Author: 61ackPink
 @Time : 2026/10/10 16:41
-@Desc : 
+@Desc : 元仓开放平台公共连接配置
 """
 import os
 from dataclasses import dataclass
