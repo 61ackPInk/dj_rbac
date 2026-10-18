@@ -199,6 +199,133 @@ class BundleService:
             },
         }
 
+    # ==================== 组合商品详情 ====================
+
+    def get_bundle_detail(
+        self,
+        *,
+        provider_code: str,
+        bundle_id: int,
+        query: dict[str, Any],
+    ) -> dict[str, Any]:
+        """获取组合资料、组成商品及实时库存。"""
+
+        # ==================== 参数标准化 ====================
+
+        normalized_provider_code = (
+            provider_code.strip()
+        )
+        warehouse_code = str(
+            query.get(
+                "warehouse_code",
+                "",
+            )
+        ).strip()
+
+        if not normalized_provider_code:
+            raise ValueError(
+                "数据来源编码不能为空"
+            )
+
+        if not warehouse_code:
+            raise ValueError(
+                "仓库编码不能为空"
+            )
+
+        # ==================== 查询本地组合 ====================
+
+        bundle = (
+            ProductBundle.objects
+            .prefetch_related("items")
+            .get(
+                id=bundle_id,
+                provider_code=(
+                    normalized_provider_code
+                ),
+                is_active=True,
+            )
+        )
+
+        bundle_items = list(
+            bundle.items.all()
+        )
+
+        # ==================== 查询实时库存 ====================
+
+        stock_map = self._load_stock_map(
+            bundles=[bundle],
+            warehouse_code=warehouse_code,
+        )
+
+        components = []
+
+        for bundle_item in bundle_items:
+            stock = stock_map.get(
+                bundle_item.customer_sku
+            )
+            available_quantity = (
+                self._read_available(stock)
+            )
+            producible_quantity = (
+                available_quantity
+                // bundle_item.required_quantity
+            )
+
+            components.append({
+                "provider_sku": (
+                    bundle_item.provider_sku
+                ),
+                "customer_sku": (
+                    bundle_item.customer_sku
+                ),
+                "name": bundle_item.name,
+                "image_url": (
+                    bundle_item.image_url
+                ),
+                "required_quantity": (
+                    bundle_item
+                    .required_quantity
+                ),
+                "available_quantity": (
+                    available_quantity
+                ),
+                "producible_quantity": (
+                    producible_quantity
+                ),
+                "source_status": (
+                    bundle_item.source_status
+                ),
+                "source_status_name": (
+                    bundle_item
+                    .source_status_name
+                ),
+            })
+
+        # ==================== 统一详情结构 ====================
+
+        return {
+            "id": bundle.id,
+            "bundle_sku": bundle.bundle_sku,
+            "name": bundle.name,
+            "image_url": bundle.image_url,
+            "source_status": (
+                bundle.source_status
+            ),
+            "source_status_name": (
+                bundle.source_status_name
+            ),
+            "warehouse_code": warehouse_code,
+            "available_quantity": (
+                self._calculate_available_quantity(
+                    bundle=bundle,
+                    stock_map=stock_map,
+                )
+            ),
+            "item_count": len(bundle_items),
+            "components": components,
+            "collected_at": bundle.collected_at,
+        }
+
     # ==================== 批量组合库存 ====================
 
     def get_available_quantity_map(

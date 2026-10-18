@@ -400,3 +400,212 @@ class BundleServiceTests(TestCase):
             ],
             12,
         )
+
+    # ==================== 组合详情测试 ====================
+
+    def test_bundle_detail_returns_component_stock(
+        self,
+    ):
+        """组合详情应返回组成商品及实时库存。"""
+
+        bundle = self.create_bundle(
+            external_id="30",
+            bundle_sku="SET-003-A",
+            name="测试组合详情",
+        )
+
+        first_item = self.create_item(
+            bundle=bundle,
+            provider_sku="ERP-SKU-A",
+            customer_sku="SKU-A",
+            name="测试子商品A",
+            required_quantity=1,
+        )
+        first_item.image_url = (
+            "https://example.com/a.png"
+        )
+        first_item.save(
+            update_fields=["image_url"]
+        )
+
+        second_item = self.create_item(
+            bundle=bundle,
+            provider_sku="ERP-SKU-B",
+            customer_sku="SKU-B",
+            name="测试子商品B",
+            required_quantity=2,
+        )
+        second_item.image_url = (
+            "https://example.com/b.png"
+        )
+        second_item.save(
+            update_fields=["image_url"]
+        )
+
+        self.stock_provider.get_stock_list.return_value = {
+            "SKU-A": {
+                "available": 20,
+            },
+            "SKU-B": {
+                "available": 25,
+            },
+        }
+
+        result = self.service.get_bundle_detail(
+            provider_code="yuancang",
+            bundle_id=bundle.id,
+            query={
+                "warehouse_code": "055",
+            },
+        )
+
+        self.assertEqual(
+            result["bundle_sku"],
+            "SET-003-A",
+        )
+        self.assertEqual(
+            result["warehouse_code"],
+            "055",
+        )
+        self.assertEqual(
+            result["available_quantity"],
+            12,
+        )
+        self.assertEqual(
+            result["item_count"],
+            2,
+        )
+
+        components = result["components"]
+
+        self.assertEqual(
+            components[0]["customer_sku"],
+            "SKU-A",
+        )
+        self.assertEqual(
+            components[0][
+                "available_quantity"
+            ],
+            20,
+        )
+        self.assertEqual(
+            components[0][
+                "producible_quantity"
+            ],
+            20,
+        )
+        self.assertEqual(
+            components[0]["image_url"],
+            "https://example.com/a.png",
+        )
+
+        self.assertEqual(
+            components[1][
+                "available_quantity"
+            ],
+            25,
+        )
+        self.assertEqual(
+            components[1][
+                "producible_quantity"
+            ],
+            12,
+        )
+
+        self.stock_provider.get_stock_list.assert_called_once_with(
+            "055",
+            [
+                "SKU-A",
+                "SKU-B",
+            ],
+        )
+
+    def test_bundle_detail_missing_stock_uses_zero(
+        self,
+    ):
+        """子SKU库存缺失时详情和组合库存均按0处理。"""
+
+        bundle = self.create_bundle(
+            external_id="31",
+            bundle_sku="SET-004-A",
+        )
+        self.create_item(
+            bundle=bundle,
+            customer_sku="SKU-MISSING",
+            required_quantity=2,
+        )
+
+        self.stock_provider.get_stock_list.return_value = {}
+
+        result = self.service.get_bundle_detail(
+            provider_code="yuancang",
+            bundle_id=bundle.id,
+            query={
+                "warehouse_code": "055",
+            },
+        )
+
+        self.assertEqual(
+            result["available_quantity"],
+            0,
+        )
+        self.assertEqual(
+            result["components"][0][
+                "available_quantity"
+            ],
+            0,
+        )
+        self.assertEqual(
+            result["components"][0][
+                "producible_quantity"
+            ],
+            0,
+        )
+
+    def test_bundle_detail_rejects_blank_warehouse(
+        self,
+    ):
+        """组合详情必须提供仓库编码。"""
+
+        bundle = self.create_bundle(
+            external_id="32",
+            bundle_sku="SET-005-A",
+        )
+
+        with self.assertRaisesMessage(
+            ValueError,
+            "仓库编码不能为空",
+        ):
+            self.service.get_bundle_detail(
+                provider_code="yuancang",
+                bundle_id=bundle.id,
+                query={
+                    "warehouse_code": " ",
+                },
+            )
+
+        self.stock_provider.get_stock_list.assert_not_called()
+
+    def test_bundle_detail_excludes_inactive_bundle(
+        self,
+    ):
+        """已经失效的组合不能通过详情服务查询。"""
+
+        bundle = self.create_bundle(
+            external_id="33",
+            bundle_sku="SET-006-A",
+            is_active=False,
+        )
+
+        with self.assertRaises(
+            ProductBundle.DoesNotExist,
+        ):
+            self.service.get_bundle_detail(
+                provider_code="yuancang",
+                bundle_id=bundle.id,
+                query={
+                    "warehouse_code": "055",
+                },
+            )
+
+        self.stock_provider.get_stock_list.assert_not_called()
