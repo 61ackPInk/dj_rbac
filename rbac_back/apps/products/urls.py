@@ -9,9 +9,10 @@
 from django.urls import path
 
 from apps.products.views import (
+    BundleDetailAPIView,
+    BundleListAPIView,
     ProductDetailAPIView,
     ProductListAPIView,
-    BundleListAPIView,
     WarehouseListAPIView,
 )
 
@@ -36,6 +37,12 @@ urlpatterns = [
         "bundles/",
         BundleListAPIView.as_view(),
         name="bundle-list",
+    ),
+    # 组合商品详情
+    path(
+        "bundles/<int:bundle_id>/",
+        BundleDetailAPIView.as_view(),
+        name="bundle-detail",
     ),
     # 客户已开启仓库列表
     path(

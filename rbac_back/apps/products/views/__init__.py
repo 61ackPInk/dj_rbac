@@ -10,7 +10,10 @@ from .products import (
     ProductDetailAPIView,
     ProductListAPIView,
 )
-from .bundles import BundleListAPIView
+from .bundles import (
+    BundleDetailAPIView,
+    BundleListAPIView,
+)
 
 from .warehouses import (
     WarehouseListAPIView,
@@ -20,6 +23,7 @@ __all__ = [
     "ProductDetailAPIView",
     "ProductListAPIView",
 
+    "BundleDetailAPIView",
     "BundleListAPIView",
 
     "WarehouseListAPIView",
