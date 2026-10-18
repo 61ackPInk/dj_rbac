@@ -503,11 +503,34 @@
     div {
       padding: 10px;
 
+      border: 1px solid var(--border);
       border-radius: 8px;
 
-      background: var(--bg-sidebar);
+      background: var(--bg-hover);
 
       text-align: center;
+
+      &.available {
+        border-color:
+          color-mix(
+            in srgb,
+            var(--success) 22%,
+            var(--border)
+          );
+
+        background: var(--success-light);
+      }
+
+      &.components {
+        border-color:
+          color-mix(
+            in srgb,
+            var(--primary) 18%,
+            var(--border)
+          );
+
+        background: var(--primary-light);
+      }
     }
 
     dt {

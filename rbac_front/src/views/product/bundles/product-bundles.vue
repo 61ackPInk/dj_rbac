@@ -483,7 +483,7 @@
               </div>
 
               <dl class="bundle-card-meta">
-                <div>
+                <div class="available">
                   <dt>可用数量</dt>
                   <dd>
                     {{
@@ -494,7 +494,7 @@
                   </dd>
                 </div>
 
-                <div>
+                <div class="components">
                   <dt>组成商品</dt>
                   <dd>
                     {{
@@ -840,16 +840,6 @@
                   </dd>
                 </div>
 
-                <div>
-                  <dt>可组合</dt>
-                  <dd>
-                    {{
-                      formatQuantity(
-                        component.producible_quantity,
-                      )
-                    }}
-                  </dd>
-                </div>
               </dl>
             </div>
           </article>
