@@ -510,26 +510,12 @@
 
       text-align: center;
 
-      &.available {
-        border-color:
-          color-mix(
-            in srgb,
-            var(--success) 22%,
-            var(--border)
-          );
-
-        background: var(--success-light);
+      &.available dd {
+        color: var(--success);
       }
 
-      &.components {
-        border-color:
-          color-mix(
-            in srgb,
-            var(--primary) 18%,
-            var(--border)
-          );
-
-        background: var(--primary-light);
+      &.components dd {
+        color: var(--text-title);
       }
     }
 
