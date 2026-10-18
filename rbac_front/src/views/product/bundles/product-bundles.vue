@@ -304,13 +304,15 @@
               <tr
                 v-for="bundle in displayedBundles"
                 :key="bundle.id"
+                class="is-clickable"
+                tabindex="0"
+                @click="openBundleDetail(bundle)"
+                @keydown.enter="openBundleDetail(bundle)"
               >
                 <td>
                   <div class="bundle-name-cell">
                     <div
                       class="bundle-thumbnail"
-                      @click.stop
-                      @keydown.stop
                     >
                       <el-image
                         v-if="bundle.image_url"
@@ -326,6 +328,8 @@
                         hide-on-click-modal
                         :infinite="false"
                         :z-index="10000"
+                        @click.stop
+                        @keydown.stop
                       >
                         <template #error>
                           <i
@@ -342,7 +346,10 @@
                       ></i>
                     </div>
 
-                    <strong>
+                    <strong
+                      class="bundle-detail-trigger"
+                      @click.stop="openBundleDetail(bundle)"
+                    >
                       {{ bundle.name || '未命名组合' }}
                     </strong>
                   </div>
@@ -403,11 +410,12 @@
             v-for="bundle in displayedBundles"
             :key="bundle.id"
             class="bundle-card"
+            tabindex="0"
+            @click="openBundleDetail(bundle)"
+            @keydown.enter="openBundleDetail(bundle)"
           >
             <div
               class="bundle-card-image"
-              @click.stop
-              @keydown.stop
             >
               <el-image
                 v-if="bundle.image_url"
@@ -423,6 +431,8 @@
                 hide-on-click-modal
                 :infinite="false"
                 :z-index="10000"
+                @click.stop
+                @keydown.stop
               >
                 <template #error>
                   <div class="image-placeholder">
@@ -449,7 +459,10 @@
 
             <div class="bundle-card-content">
               <div class="bundle-card-title">
-                <strong>
+                <strong
+                  class="bundle-detail-trigger"
+                  @click.stop="openBundleDetail(bundle)"
+                >
                   {{ bundle.name || '未命名组合' }}
                 </strong>
 
@@ -558,10 +571,259 @@
       </template>
     </section>
   </div>
+
+  <!-- ==================== 商品组合详情弹窗 ==================== -->
+
+  <AppModal
+    v-model="detailModalVisible"
+    scope-class="product-bundle-detail-modal-scope"
+    title="商品组合详情"
+    :width="920"
+    @close="closeBundleDetail"
+  >
+    <div
+      v-if="selectedBundle"
+      class="bundle-detail"
+    >
+      <!-- 组合基础信息 -->
+
+      <section class="bundle-detail-heading">
+        <div class="bundle-detail-image">
+          <el-image
+            v-if="selectedBundle.image_url"
+            :src="selectedBundle.image_url"
+            :preview-src-list="[
+              selectedBundle.image_url,
+            ]"
+            :alt="
+              selectedBundle.name ||
+              selectedBundle.bundle_sku
+            "
+            fit="contain"
+            preview-teleported
+            hide-on-click-modal
+            :infinite="false"
+            :z-index="10001"
+          >
+            <template #error>
+              <i
+                class="bi bi-image"
+                aria-hidden="true"
+              ></i>
+            </template>
+          </el-image>
+
+          <i
+            v-else
+            class="bi bi-image"
+            aria-hidden="true"
+          ></i>
+        </div>
+
+        <div class="bundle-detail-summary">
+          <div class="bundle-detail-title">
+            <h2>
+              {{
+                selectedBundle.name ||
+                '未命名组合'
+              }}
+            </h2>
+
+            <span class="bundle-detail-status">
+              {{
+                selectedBundle.source_status_name ||
+                '状态未知'
+              }}
+            </span>
+          </div>
+
+          <dl class="bundle-detail-meta">
+            <div>
+              <dt>组合 SKU</dt>
+              <dd>
+                <AppCopyText
+                  :value="selectedBundle.bundle_sku"
+                  label="组合 SKU"
+                />
+              </dd>
+            </div>
+
+            <div>
+              <dt>仓库编码</dt>
+              <dd>
+                {{ selectedBundle.warehouse_code || '-' }}
+              </dd>
+            </div>
+
+            <div>
+              <dt>可用数量</dt>
+              <dd>
+                {{
+                  formatQuantity(
+                    selectedBundle.available_quantity,
+                  )
+                }}
+              </dd>
+            </div>
+
+            <div>
+              <dt>组成商品</dt>
+              <dd>
+                {{
+                  formatQuantity(
+                    selectedBundle.item_count,
+                  )
+                }}
+              </dd>
+            </div>
+
+            <div class="full-row">
+              <dt>采集时间</dt>
+              <dd>
+                {{
+                  formatDateTime(
+                    selectedBundle.collected_at,
+                  )
+                }}
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <!-- 组成商品明细 -->
+
+      <section class="component-section">
+        <header>
+          <h3>组成商品</h3>
+          <span>
+            共
+            {{
+              Array.isArray(selectedBundle.components)
+                ? selectedBundle.components.length
+                : 0
+            }}
+            项
+          </span>
+        </header>
+
+        <div
+          v-if="
+            Array.isArray(selectedBundle.components) &&
+            selectedBundle.components.length > 0
+          "
+          class="component-list"
+        >
+          <article
+            v-for="component in selectedBundle.components"
+            :key="
+              component.provider_sku ||
+              component.customer_sku
+            "
+            class="component-item"
+          >
+            <div class="component-image">
+              <el-image
+                v-if="component.image_url"
+                :src="component.image_url"
+                :preview-src-list="[
+                  component.image_url,
+                ]"
+                :alt="component.name || component.customer_sku"
+                fit="contain"
+                loading="lazy"
+                preview-teleported
+                hide-on-click-modal
+                :infinite="false"
+                :z-index="10001"
+              >
+                <template #error>
+                  <i
+                    class="bi bi-image"
+                    aria-hidden="true"
+                  ></i>
+                </template>
+              </el-image>
+
+              <i
+                v-else
+                class="bi bi-image"
+                aria-hidden="true"
+              ></i>
+            </div>
+
+            <div class="component-content">
+              <strong>
+                {{ component.name || '未命名商品' }}
+              </strong>
+
+              <div class="component-skus">
+                <span>客户 SKU</span>
+                <AppCopyText
+                  :value="component.customer_sku"
+                  label="客户 SKU"
+                />
+
+                <span>服务商 SKU</span>
+                <AppCopyText
+                  :value="component.provider_sku"
+                  label="服务商 SKU"
+                />
+              </div>
+            </div>
+
+            <div class="component-side">
+              <span class="component-status">
+                {{
+                  component.source_status_name ||
+                  '状态未知'
+                }}
+              </span>
+
+              <span class="component-quantity">
+                × {{
+                  formatQuantity(
+                    component.required_quantity,
+                  )
+                }}
+              </span>
+            </div>
+          </article>
+        </div>
+
+        <div
+          v-else
+          class="component-empty"
+        >
+          <i
+            class="bi bi-boxes"
+            aria-hidden="true"
+          ></i>
+          <span>暂无组成商品明细</span>
+        </div>
+      </section>
+    </div>
+
+    <template #footer>
+      <button
+        class="bundle-detail-close"
+        type="button"
+        @click="closeBundleDetail"
+      >
+        关闭
+      </button>
+    </template>
+  </AppModal>
 </template>
 
 <style
   src="./product-bundles.scss"
   lang="scss"
   scoped
+></style>
+
+<!-- AppModal 使用 Teleport，弹窗业务样式不能使用 scoped。 -->
+<style
+  src="./product-bundles-modal.scss"
+  lang="scss"
 ></style>

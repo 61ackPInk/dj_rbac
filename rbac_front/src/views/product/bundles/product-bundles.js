@@ -10,6 +10,7 @@ import {
 
 import AppSelect from '@/components/form/select/app-select.vue'
 import AppCopyText from '@/components/common/copy-text/copy-text.vue'
+import AppModal from '@/components/feedback/modal/app-modal.vue'
 
 /* ==================== 商品组合接口与权限 ==================== */
 
@@ -27,6 +28,7 @@ export default {
   components: {
     AppSelect,
     AppCopyText,
+    AppModal,
   },
 
   setup() {
@@ -146,6 +148,25 @@ export default {
 
     const clearSearch = () => {
       keyword.value = ''
+    }
+
+    /* ==================== 组合详情弹窗 ==================== */
+
+    const detailModalVisible = ref(false)
+    const selectedBundle = ref(null)
+
+    const openBundleDetail = (bundle) => {
+      if (!bundle) {
+        return
+      }
+
+      selectedBundle.value = bundle
+      detailModalVisible.value = true
+    }
+
+    const closeBundleDetail = () => {
+      detailModalVisible.value = false
+      selectedBundle.value = null
     }
 
     /* ==================== 组合分页状态 ==================== */
@@ -421,6 +442,11 @@ export default {
       displayedBundles,
       bundleLoading,
       bundleError,
+
+      detailModalVisible,
+      selectedBundle,
+      openBundleDetail,
+      closeBundleDetail,
 
       page,
       pageSize,
