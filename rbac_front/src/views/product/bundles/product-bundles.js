@@ -15,6 +15,7 @@ import AppModal from '@/components/feedback/modal/app-modal.vue'
 /* ==================== 商品组合接口与权限 ==================== */
 
 import {
+  getProductBundleDetailApi,
   getProductBundlesApi,
   getProductWarehousesApi,
 } from '@/api/product-bundles'
@@ -154,6 +155,72 @@ export default {
 
     const detailModalVisible = ref(false)
     const selectedBundle = ref(null)
+    const detailLoading = ref(false)
+    const detailError = ref('')
+    let detailRequestSequence = 0
+
+    const loadBundleDetail = async (bundle) => {
+      if (
+        !bundle ||
+        bundle.id === null ||
+        bundle.id === undefined ||
+        !warehouseCode.value
+      ) {
+        return
+      }
+
+      const requestSequence =
+        ++detailRequestSequence
+
+      detailLoading.value = true
+      detailError.value = ''
+
+      try {
+        const result =
+          await getProductBundleDetailApi(
+            bundle.id,
+            warehouseCode.value,
+          )
+
+        if (
+          requestSequence !==
+          detailRequestSequence
+        ) {
+          return
+        }
+
+        selectedBundle.value = result
+      } catch (error) {
+        if (
+          requestSequence !==
+          detailRequestSequence
+        ) {
+          return
+        }
+
+        if (
+          error.status === 502 ||
+          error.status === 503
+        ) {
+          detailError.value =
+            '第三方 ERP 数据暂时不可用，请稍后重试'
+        } else if (error.status === 403) {
+          detailError.value =
+            '当前用户没有 PRODUCT_BUNDLE_LIST 权限'
+        } else {
+          detailError.value =
+            error.userMessage ||
+            '商品组合详情加载失败'
+        }
+      } finally {
+        if (
+          requestSequence ===
+          detailRequestSequence
+        ) {
+          detailLoading.value = false
+        }
+      }
+    }
 
     const openBundleDetail = (bundle) => {
       if (!bundle) {
@@ -162,11 +229,19 @@ export default {
 
       selectedBundle.value = bundle
       detailModalVisible.value = true
+      loadBundleDetail(bundle)
+    }
+
+    const retryBundleDetail = () => {
+      loadBundleDetail(selectedBundle.value)
     }
 
     const closeBundleDetail = () => {
+      detailRequestSequence += 1
       detailModalVisible.value = false
       selectedBundle.value = null
+      detailLoading.value = false
+      detailError.value = ''
     }
 
     /* ==================== 组合分页状态 ==================== */
@@ -445,7 +520,10 @@ export default {
 
       detailModalVisible,
       selectedBundle,
+      detailLoading,
+      detailError,
       openBundleDetail,
+      retryBundleDetail,
       closeBundleDetail,
 
       page,

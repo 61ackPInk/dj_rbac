@@ -32,3 +32,23 @@ export function getProductBundlesApi(params) {
     params,
   })
 }
+
+/**
+ * 获取商品组合详情
+ *
+ * @param {string|number} bundleId 商品组合 ID
+ * @param {string} warehouseCode 仓库编码
+ */
+export function getProductBundleDetailApi(
+  bundleId,
+  warehouseCode,
+) {
+  return request({
+    url:
+      `/products/bundles/${encodeURIComponent(bundleId)}/`,
+    method: 'get',
+    params: {
+      warehouse_code: warehouseCode,
+    },
+  })
+}

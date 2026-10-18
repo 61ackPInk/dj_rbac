@@ -581,8 +581,45 @@
     :width="920"
     @close="closeBundleDetail"
   >
+    <!-- 详情加载状态 -->
+
     <div
-      v-if="selectedBundle"
+      v-if="detailLoading"
+      class="bundle-detail-state"
+    >
+      <i
+        class="bi bi-arrow-clockwise is-rotating"
+        aria-hidden="true"
+      ></i>
+      <strong>正在读取组合详情</strong>
+      <span>正在获取组成商品及实时可用数量。</span>
+    </div>
+
+    <!-- 详情加载错误 -->
+
+    <div
+      v-else-if="detailError"
+      class="bundle-detail-state error"
+      role="alert"
+    >
+      <i
+        class="bi bi-exclamation-circle"
+        aria-hidden="true"
+      ></i>
+      <strong>组合详情加载失败</strong>
+      <span>{{ detailError }}</span>
+
+      <button
+        class="bundle-detail-retry"
+        type="button"
+        @click="retryBundleDetail"
+      >
+        重新加载
+      </button>
+    </div>
+
+    <div
+      v-else-if="selectedBundle"
       class="bundle-detail"
     >
       <!-- 组合基础信息 -->
@@ -780,13 +817,40 @@
                 }}
               </span>
 
-              <span class="component-quantity">
-                × {{
-                  formatQuantity(
-                    component.required_quantity,
-                  )
-                }}
-              </span>
+              <dl class="component-quantities">
+                <div>
+                  <dt>所需</dt>
+                  <dd>
+                    × {{
+                      formatQuantity(
+                        component.required_quantity,
+                      )
+                    }}
+                  </dd>
+                </div>
+
+                <div>
+                  <dt>可用</dt>
+                  <dd>
+                    {{
+                      formatQuantity(
+                        component.available_quantity,
+                      )
+                    }}
+                  </dd>
+                </div>
+
+                <div>
+                  <dt>可组合</dt>
+                  <dd>
+                    {{
+                      formatQuantity(
+                        component.producible_quantity,
+                      )
+                    }}
+                  </dd>
+                </div>
+              </dl>
             </div>
           </article>
         </div>
