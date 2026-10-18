@@ -37,5 +37,13 @@ PERMISSION_CONFIG = {
             ),
             "sort_order": 10,
         },
+        {
+            "name": "查看组合商品详情",
+            "code": "PRODUCT_BUNDLE_DETAIL",
+            "description": (
+                "允许查看组合商品组成明细及子商品实时库存"
+            ),
+            "sort_order": 20,
+        },
     ],
 }

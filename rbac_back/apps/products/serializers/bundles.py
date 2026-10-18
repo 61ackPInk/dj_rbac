@@ -9,6 +9,46 @@
 from rest_framework import serializers
 
 
+# ==================== 组合详情路径参数 ====================
+
+
+class BundleDetailPathSerializer(
+    serializers.Serializer
+):
+    """校验组合详情路径中的本地组合ID。"""
+
+    bundle_id = serializers.IntegerField(
+        min_value=1,
+        error_messages={
+            "invalid": "组合商品ID必须是整数",
+            "min_value": "组合商品ID必须大于0",
+        },
+    )
+
+
+# ==================== 组合详情查询参数 ====================
+
+
+class BundleDetailQuerySerializer(
+    serializers.Serializer
+):
+    """校验组合详情的仓库查询参数。"""
+
+    warehouse_code = serializers.CharField(
+        allow_blank=False,
+        trim_whitespace=True,
+        error_messages={
+            "required": "仓库编码不能为空",
+            "blank": "仓库编码不能为空",
+        },
+    )
+
+    def to_service_query(self) -> dict:
+        """返回组合详情服务使用的查询参数。"""
+
+        return dict(self.validated_data)
+
+
 # ==================== 组合列表查询参数 ====================
 
 
@@ -110,6 +150,27 @@ class BundleComponentSerializer(
     )
 
 
+# ==================== 详情组成商品 ====================
+
+
+class BundleDetailComponentSerializer(
+    BundleComponentSerializer
+):
+    """组合详情中的组成商品及实时库存。"""
+
+    available_quantity = (
+        serializers.IntegerField(
+            min_value=0,
+        )
+    )
+
+    producible_quantity = (
+        serializers.IntegerField(
+            min_value=0,
+        )
+    )
+
+
 # ==================== 组合列表项 ====================
 
 
@@ -157,6 +218,21 @@ class BundleListItemSerializer(
     )
 
     collected_at = serializers.DateTimeField()
+
+
+# ==================== 组合详情响应 ====================
+
+
+class BundleDetailResponseSerializer(
+    BundleListItemSerializer
+):
+    """组合商品详情统一响应结构。"""
+
+    components = (
+        BundleDetailComponentSerializer(
+            many=True,
+        )
+    )
 
 
 # ==================== 组合分页信息 ====================

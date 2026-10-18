@@ -21,11 +21,15 @@ from .products import (
 )
 
 from .bundles import (
+    BundleComponentSerializer,
+    BundleDetailComponentSerializer,
+    BundleDetailPathSerializer,
+    BundleDetailQuerySerializer,
+    BundleDetailResponseSerializer,
     BundleListItemSerializer,
     BundleListQuerySerializer,
     BundleListResponseSerializer,
     BundlePaginationSerializer,
-    BundleComponentSerializer,
 )
 
 from .warehouses import (
@@ -47,11 +51,15 @@ __all__ = [
     "ProductWarehouseInfoSerializer",
 
     # 商品组合
+    "BundleComponentSerializer",
+    "BundleDetailComponentSerializer",
+    "BundleDetailPathSerializer",
+    "BundleDetailQuerySerializer",
+    "BundleDetailResponseSerializer",
     "BundleListItemSerializer",
     "BundleListQuerySerializer",
     "BundleListResponseSerializer",
     "BundlePaginationSerializer",
-    "BundleComponentSerializer",
 
     # 仓库
     "WarehouseListItemSerializer",
