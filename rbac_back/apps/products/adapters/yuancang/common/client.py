@@ -3,7 +3,7 @@
 @File  : client.py
 @Author: 61ackPink
 @Time : 2026/10/10 16:50
-@Desc : 
+@Desc : 元仓开放平台公共请求客户端
 """
 from typing import Any
 
@@ -16,6 +16,7 @@ from apps.products.adapters.exceptions import (
 )
 
 from .config import YuanCangConfig
+from .endpoints import YUANCANG_AUTH_PATH
 
 
 # ==================== 元仓接口常量 ====================
@@ -26,11 +27,6 @@ YUANCANG_UNAUTHORIZED_STATE = "000401"
 YUANCANG_TOKEN_CACHE_KEY = (
     "products:yuancang:access-token"
 )
-
-YUANCANG_AUTH_PATH = (
-    "/api/openPlatform/authorization/login"
-)
-
 
 # ==================== 元仓通用客户端 ====================
 

@@ -22,6 +22,16 @@ class HasOperationPermission(BasePermission):
         "GET": "USER_LIST",
         "POST": "USER_CREATE",
     }
+
+    同一个接口也可以声明多个候选权限，
+    用户拥有其中任意一个即可访问：
+
+    required_permissions = {
+        "GET": [
+            "PRODUCT_LIST",
+            "PRODUCT_BUNDLE_LIST",
+        ],
+    }
     """
 
     message = "你没有执行此操作的权限"
@@ -60,17 +70,49 @@ class HasOperationPermission(BasePermission):
             {},
         )
 
-        permission_code = (
+        permission_value = (
             required_permissions.get(
                 request.method,
             )
         )
 
-        # 视图没有声明权限编码时直接拒绝。
+        # --------------------
+        # 统一权限编码列表
+        # --------------------
+
+        # 兼容原有的单个字符串写法
+        if isinstance(
+                permission_value,
+                str,
+        ):
+            permission_codes = [
+                permission_value,
+            ]
+
+        # 同一个接口可以配置多个候选权限，
+        # 用户拥有其中任意一个即可访问
+        elif isinstance(
+                permission_value,
+                (list, tuple, set),
+        ):
+            permission_codes = [
+                permission_code
+                for permission_code
+                in permission_value
+                if isinstance(
+                    permission_code,
+                    str,
+                )
+                   and permission_code
+            ]
+        else:
+            permission_codes = []
+
+        # 视图没有声明有效权限编码时直接拒绝。
         #
         # 这样可以避免开发新接口时，
         # 忘记配置权限而造成越权。
-        if not permission_code:
+        if not permission_codes:
             return False
 
         # --------------------
@@ -110,7 +152,7 @@ class HasOperationPermission(BasePermission):
 
         return role.permissions.filter(
             # 角色必须拥有当前接口需要的权限
-            code=permission_code,
+            code__in=permission_codes,
 
             # 操作权限必须处于启用状态
             is_active=True,

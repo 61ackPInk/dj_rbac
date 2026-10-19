@@ -12,6 +12,7 @@ from functools import lru_cache
 from apps.products.adapters.base import (
     BaseProductProvider,
     BaseStockProvider,
+    BaseWarehouseProvider,
 )
 from apps.products.adapters.exceptions import (
     ProductProviderConfigurationError,
@@ -19,13 +20,35 @@ from apps.products.adapters.exceptions import (
 from apps.products.adapters.yuancang import (
     YuanCangProductProvider,
     YuanCangStockProvider,
+    YuanCangWarehouseProvider,
 )
 
 # 导入元仓配置模块时会加载商品应用目录下的 .env
-from apps.products.adapters.yuancang.config import (
+from apps.products.adapters.yuancang.common.config import (
     PRODUCTS_ENV_FILE,
 )
 
+
+# ==================== 当前 ERP 编码 ====================
+
+
+def get_product_erp_provider_code() -> str:
+    """返回当前启用的商品 ERP 编码。"""
+
+    # PRODUCTS_ENV_FILE 已在配置模块中加载。
+    _ = PRODUCTS_ENV_FILE
+
+    provider_code = os.getenv(
+        "PRODUCT_ERP_PROVIDER",
+        "",
+    ).strip().lower()
+
+    if not provider_code:
+        raise ProductProviderConfigurationError(
+            "未配置商品 ERP 提供方"
+        )
+
+    return provider_code
 
 # ==================== 普通商品 Provider 工厂 ====================
 
@@ -41,20 +64,12 @@ def get_product_provider() -> BaseProductProvider:
 
     # PRODUCTS_ENV_FILE 已在配置模块中加载。
     # 这里引用一次，明确当前配置来源于商品应用。
-    _ = PRODUCTS_ENV_FILE
-
-    provider_code = os.getenv(
-        "PRODUCT_ERP_PROVIDER",
-        "",
-    ).strip().lower()
+    provider_code = (
+        get_product_erp_provider_code()
+    )
 
     if provider_code == "yuancang":
         return YuanCangProductProvider()
-
-    if not provider_code:
-        raise ProductProviderConfigurationError(
-            "未配置商品 ERP 提供方"
-        )
 
     raise ProductProviderConfigurationError(
         f"不支持的商品 ERP 提供方：{provider_code}"
@@ -68,20 +83,32 @@ def get_product_provider() -> BaseProductProvider:
 def get_stock_provider() -> BaseStockProvider:
     """获取当前启用的商品库存 Provider。"""
 
-    _ = PRODUCTS_ENV_FILE
-
-    provider_code = os.getenv(
-        "PRODUCT_ERP_PROVIDER",
-        "",
-    ).strip().lower()
+    provider_code = (
+        get_product_erp_provider_code()
+    )
 
     if provider_code == "yuancang":
         return YuanCangStockProvider()
 
-    if not provider_code:
-        raise ProductProviderConfigurationError(
-            "未配置商品 ERP 提供方"
-        )
+    raise ProductProviderConfigurationError(
+        f"不支持的商品 ERP 提供方：{provider_code}"
+    )
+
+# ==================== 仓库 Provider 工厂 ====================
+
+
+@lru_cache(maxsize=1)
+def get_warehouse_provider() -> (
+    BaseWarehouseProvider
+):
+    """获取当前启用的仓库 Provider。"""
+
+    provider_code = (
+        get_product_erp_provider_code()
+    )
+
+    if provider_code == "yuancang":
+        return YuanCangWarehouseProvider()
 
     raise ProductProviderConfigurationError(
         f"不支持的商品 ERP 提供方：{provider_code}"

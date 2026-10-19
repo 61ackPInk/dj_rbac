@@ -3,7 +3,7 @@
 @File  : config.py
 @Author: 61ackPink
 @Time : 2026/10/10 16:41
-@Desc : 
+@Desc : 元仓开放平台公共连接配置
 """
 import os
 from dataclasses import dataclass
@@ -20,7 +20,7 @@ from apps.products.adapters.exceptions import (
 
 PRODUCTS_APP_DIR = Path(
     __file__
-).resolve().parents[2]
+).resolve().parents[3]
 
 PRODUCTS_ENV_FILE = (
     PRODUCTS_APP_DIR / ".env"

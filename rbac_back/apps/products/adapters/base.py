@@ -89,3 +89,17 @@ class BaseBundleProvider(ABC):
         """获取组合商品详情。"""
 
         raise NotImplementedError
+
+# ==================== 仓库适配器协议 ====================
+
+
+class BaseWarehouseProvider(ABC):
+    """ERP 客户已开启仓库数据提供方协议。"""
+
+    @abstractmethod
+    def get_warehouse_list(
+        self,
+    ) -> list[dict[str, Any]]:
+        """获取客户当前已开启的仓库列表。"""
+
+        raise NotImplementedError

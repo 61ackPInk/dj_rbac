@@ -7,16 +7,23 @@
 """
 # ==================== 元仓适配器导出 ====================
 
-from .client import YuanCangClient
-from .config import YuanCangConfig
+from .common import (
+    YuanCangClient,
+    YuanCangConfig,
+)
 from .products import (
     YuanCangProductProvider,
 )
 from .stocks import YuanCangStockProvider
+
+from .warehouses import (
+    YuanCangWarehouseProvider,
+)
 
 __all__ = [
     "YuanCangClient",
     "YuanCangConfig",
     "YuanCangProductProvider",
     "YuanCangStockProvider",
+    "YuanCangWarehouseProvider",
 ]

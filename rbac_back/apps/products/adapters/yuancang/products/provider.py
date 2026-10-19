@@ -1,6 +1,6 @@
 """
 -*- coding: utf-8 -*-
-@File  : products.py
+@File  : provider.py
 @Author: 61ackPink
 @Time : 2026/10/10 17:06
 @Desc : 元仓普通商品数据适配器
@@ -14,22 +14,15 @@ from apps.products.adapters.exceptions import (
     ProductProviderResponseError,
 )
 
-from .client import YuanCangClient
+from ..common.client import YuanCangClient
+from .endpoints import (
+    YUANCANG_PRODUCT_DETAIL_PATH,
+    YUANCANG_PRODUCT_LIST_PATH,
+)
 from .mappers import (
     map_product_detail,
     map_product_list_item,
     map_product_list_query,
-)
-
-
-# ==================== 元仓商品接口地址 ====================
-
-YUANCANG_PRODUCT_LIST_PATH = (
-    "/api/openPlatform/product/list"
-)
-
-YUANCANG_PRODUCT_DETAIL_PATH = (
-    "/api/openPlatform/product/detail"
 )
 
 

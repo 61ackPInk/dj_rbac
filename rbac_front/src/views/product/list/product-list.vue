@@ -1403,7 +1403,7 @@
                   index
                 "
               >
-                <td>
+                <td data-label="仓库编码">
                   {{
                     formatDetailValue(
                       warehouse.code,
@@ -1411,7 +1411,7 @@
                   }}
                 </td>
 
-                <td>
+                <td data-label="仓库名称">
                   {{
                     formatDetailValue(
                       warehouse.name,
@@ -1419,7 +1419,7 @@
                   }}
                 </td>
 
-                <td>
+                <td data-label="采购价">
                   {{
                     formatDetailValue(
                       warehouse.purchase_price,
@@ -1427,7 +1427,7 @@
                   }}
                 </td>
 
-                <td>
+                <td data-label="库存价">
                   {{
                     formatDetailValue(
                       warehouse.stock_price,
@@ -1435,7 +1435,7 @@
                   }}
                 </td>
 
-                <td>
+                <td data-label="更新时间">
                   {{
                     formatDateTime(
                       warehouse.updated_at,

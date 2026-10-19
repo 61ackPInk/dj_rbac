@@ -1,8 +1,8 @@
 """
 -*- coding: utf-8 -*-
-@File  : stocks.py
+@File  : provider.py
 @Author: 61ackPink
-@Time : 2026/10/10 17:35
+@Time : 2026/10/16
 @Desc : 元仓商品库存数据适配器
 """
 
@@ -15,15 +15,11 @@ from apps.products.adapters.exceptions import (
     ProductProviderResponseError,
 )
 
-from .client import YuanCangClient
-from .mappers import map_stock_item
-
-
-# ==================== 元仓库存接口地址 ====================
-
-YUANCANG_STOCK_LIST_PATH = (
-    "/api/openPlatform/stock/list"
+from ..common.client import YuanCangClient
+from .endpoints import (
+    YUANCANG_STOCK_LIST_PATH,
 )
+from .mappers import map_stock_item
 
 
 # ==================== 元仓库存适配器 ====================

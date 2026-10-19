@@ -9,9 +9,11 @@
 
 from .bundles import BundleService
 from .products import ProductService
+from .warehouses import WarehouseService
 
 
 __all__ = [
     "BundleService",
     "ProductService",
+    "WarehouseService",
 ]
